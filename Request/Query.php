@@ -45,8 +45,7 @@ class Query extends Data
         if (empty($this->array)) {
             $this->array = ['main' => 'default'];
         }
-
-        $this->array = array_reverse($this->array);
+        
         [$this->array['_name_'], $this->array['_action_']] = [
             array_keys($this->array)[0],
             array_values($this->array)[0]
