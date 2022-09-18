@@ -116,7 +116,17 @@ class Template extends Data
      */
     public function hasRoute(string $path): bool
     {
-        return ((bool)preg_match('/^' . preg_quote($path, '/') . '/', $this->request->getQuery()->getRoute()));
+        return ($this->request->getQuery()->hasRoute($path));
+    }
+
+    /**
+     * Get active URI
+     *
+     * @return string
+     */
+    public function getUri(): string
+    {
+        return ($this->request->getQuery()->getUri());
     }
 
     /**
