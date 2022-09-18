@@ -11,7 +11,7 @@ class Query extends Data
      */
     public function __construct()
     {
-        $this->array = filter_input_array(INPUT_GET);
+        $this->array = (array)filter_input_array(INPUT_GET);
 
         $uri = $this->getUri();
         if (!preg_match('/\/$/', $uri)) {
