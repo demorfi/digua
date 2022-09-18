@@ -83,6 +83,17 @@ class Query extends Data
     }
 
     /**
+     * Has route.
+     *
+     * @param string $path Route path
+     * @return bool
+     */
+    public function hasRoute(string $path): bool
+    {
+        return ((bool)preg_match('/^' . preg_quote($path, '/') . '/', $this->getRoute()));
+    }
+
+    /**
      * Get URI path.
      *
      * @return string
