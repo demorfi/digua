@@ -17,12 +17,15 @@ class Response
     /**
      * Print JSON.
      *
-     * @param array $data Print data
+     * @param mixed $data Print data
+     * @return string
      */
-    public function json(array $data): void
+    public function json(mixed $data): string
     {
         header('Content-Type: application/json; charset=UTF-8');
-        print (json_encode($data));
+        $json = json_encode($data);
+        print ($json);
+        return ($json);
     }
 
     /**
