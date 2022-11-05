@@ -71,10 +71,10 @@ class Storage
         $journal = $this->journal->getAll();
 
         if ($sort == self::SORT_DESC) {
-            $journal = array_reverse($journal);
+            $journal = array_reverse($journal, true);
         }
 
-        return ($limit ? array_slice($journal, 0, $limit) : $journal);
+        return ($limit ? array_slice($journal, 0, $limit, true) : $journal);
     }
 
     /**
@@ -87,9 +87,9 @@ class Storage
     public function getJournal(int $limit = 0, int $sort = self::SORT_DESC): \Generator
     {
         $journal = $this->getAll($limit, $sort);
-        foreach ($journal as $item) {
+        foreach ($journal as $key => $item) {
             $item['date'] = date('Y-m-d H:m:s', $item['time']);
-            yield $item;
+            yield $key => $item;
         }
     }
 }
