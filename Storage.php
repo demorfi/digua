@@ -73,7 +73,7 @@ class Storage extends Abstracts\Data implements \JsonSerializable
         if (sizeof($this->array) != sizeof($this->original)
             || sizeof(@array_diff_assoc($this->array, $this->original))
         ) {
-            file_put_contents(static::$path . $this->name, json_encode($this->array));
+            file_put_contents(static::$path . $this->name, json_encode($this->array), LOCK_EX);
         }
     }
 
@@ -82,7 +82,7 @@ class Storage extends Abstracts\Data implements \JsonSerializable
      */
     public function save(): void
     {
-        file_put_contents(static::$path . $this->name, json_encode($this->array));
+        file_put_contents(static::$path . $this->name, json_encode($this->array), LOCK_EX);
     }
 
     /**
