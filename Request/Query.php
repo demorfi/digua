@@ -12,44 +12,56 @@ class Query extends Data
     public function __construct()
     {
         $this->array = (array)filter_input_array(INPUT_GET);
+        $parseUrl    = parse_url($this->getUri());
 
-        $uri = $this->getUri();
-        if (!preg_match('/\/$/', $uri)) {
-            $uri .= '/';
-        }
+        if (!empty($parseUrl)) {
 
-        // Key and values in query
-        $uriData = array_values(array_filter(explode('/', parse_url($uri)['path'])));
+            // Add query values
+            if (isset($parseUrl['query']) && !empty($parseUrl['query'])) {
+                parse_str($parseUrl['query'], $result);
+                $this->array += $result;
+            }
 
-        $name = null;
-        for ($i = 0; $i < sizeof($uriData); $i++) {
-
-            // Action
-            if ($i % 2) {
-                if (!empty($name)) {
-                    $this->array[$name] = $uriData[$i] == 'default' ? null : $uriData[$i];
+            // Check path transfer
+            if (isset($parseUrl['path']) && !empty($parseUrl['path'])) {
+                if (!preg_match('/\/$/', $parseUrl['path'])) {
+                    $parseUrl['path'] .= '/';
                 }
-            } else {
 
-                // Controller
-                $name = $uriData[$i];
+                // Key and values in query
+                $uriData = array_values(array_filter(explode('/', $parseUrl['path'])));
+                $name    = null;
 
-                // First action for one controller
-                if (!isset($uriData[$i + 1])) {
-                    $this->array[$name] = 'default';
+                for ($i = 0; $i < sizeof($uriData); $i++) {
+
+                    // Controller name
+                    if (!isset($this->array['_name_'])) {
+                        $this->array['_name_'] = $uriData[$i];
+                        continue;
+                    }
+
+                    // Action name
+                    if (!isset($this->array['_action_'])) {
+                        $this->array['_action_'] = $uriData[$i];
+                        continue;
+                    }
+
+                    // Var value
+                    if ($i % 2) {
+                        if (!empty($name)) {
+                            $this->array[$name] = $uriData[$i] == 'default' ? null : $uriData[$i];
+                        }
+                    } else {
+
+                        // Var name
+                        $name = $uriData[$i];
+                    }
                 }
             }
         }
 
-        // Default controller and action
-        if (empty($this->array)) {
-            $this->array = ['main' => 'default'];
-        }
-        
-        [$this->array['_name_'], $this->array['_action_']] = [
-            array_keys($this->array)[0],
-            array_values($this->array)[0]
-        ];
+        $this->array['_name_']   ??= 'main';
+        $this->array['_action_'] ??= 'default';
     }
 
     /**
