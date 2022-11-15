@@ -35,7 +35,7 @@ class Storage
      *
      * @throws \Exception
      */
-    protected function __init()
+    protected function __init(): void
     {
         $this->journal = _Storage::load('journal');
     }
@@ -43,20 +43,23 @@ class Storage
     /**
      * Add message to journal.
      *
-     * @param string $message
+     * @param string ...$message
      */
-    public function push(string $message): void
+    public function push(string ...$message): void
     {
-        $time = time();
+        $time    = time();
+        $message = sizeof($message) < 2 ? array_shift($message) : $message;
         $this->journal->__set($this->journal->size() + 1, compact('message', 'time'));
     }
 
     /**
      * Flush journal.
      */
-    public function flush(): void
+    public function flush(int $offset = 0): void
     {
-        $this->journal->flush();
+        $offset > 0
+            ? $this->journal->overwrite(array_reverse($this->getAll($offset, self::SORT_DESC)))
+            : $this->journal->flush();
     }
 
     /**
