@@ -2,6 +2,8 @@
 
 namespace Digua\Traits;
 
+use Exception;
+
 trait Singleton
 {
     /**
@@ -11,30 +13,36 @@ trait Singleton
      */
     protected static array $instance = [];
 
+    /**
+     * Disabled constructor.
+     */
     private function __construct()
     {
-        return;
-    }
-
-    private function __clone()
-    {
-        return;
     }
 
     /**
-     * @throws \Exception
+     * Disabled cloning.
+     *
+     * @return void
+     */
+    private function __clone(): void
+    {
+    }
+
+    /**
+     * @throws Exception
      */
     public function __wakeup()
     {
-        throw new \Exception('object unserialize forbidden');
+        throw new Exception('object unserialize forbidden');
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     public function __sleep()
     {
-        throw new \Exception('object serialize forbidden');
+        throw new Exception('object serialize forbidden');
     }
 
     /**
@@ -42,7 +50,6 @@ trait Singleton
      */
     protected function __init(): void
     {
-        return;
     }
 
     /**

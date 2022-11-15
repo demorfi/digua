@@ -3,6 +3,7 @@
 namespace Digua\Traits;
 
 use Digua\Memory;
+use Exception;
 
 trait Stack
 {
@@ -24,7 +25,7 @@ trait Stack
      * Stack constructor.
      *
      * @param string|null $hash
-     * @throws \Exception
+     * @throws Exception
      */
     public function __construct(string $hash = null)
     {
@@ -50,7 +51,7 @@ trait Stack
     /**
      * Set finished flag.
      *
-     * @throws \Exception
+     * @throws Exception
      */
     public function setEndFlag(): void
     {
@@ -71,7 +72,7 @@ trait Stack
     /**
      * Free stack.
      *
-     * @throws \Exception
+     * @throws Exception
      */
     public function free(): void
     {

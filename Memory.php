@@ -2,10 +2,9 @@
 
 namespace Digua;
 
-use SysvSemaphore;
-use SysvSharedMemory;
+use {SysvSemaphore, SysvSharedMemory, JsonSerializable, Generator, Exception};
 
-class Memory implements \JsonSerializable
+class Memory implements JsonSerializable
 {
     /**
      * Memory size.
@@ -31,16 +30,16 @@ class Memory implements \JsonSerializable
     /**
      * Semaphore id.
      *
-     * @var SysvSemaphore|resource
+     * @var SysvSemaphore|false
      */
-    private $semId;
+    private SysvSemaphore|bool $semId;
 
     /**
      * Shared memory id.
      *
-     * @var SysvSemaphore|SysvSharedMemory|resource
+     * @var SysvSharedMemory|false
      */
-    private $shmId;
+    private SysvSharedMemory|bool $shmId;
 
     /**
      * Offset key.
@@ -55,13 +54,13 @@ class Memory implements \JsonSerializable
      * @param int $semKey
      * @param int $shmKey
      * @param int $size
-     * @throws \Exception
+     * @throws Exception
      */
     public function __construct(int $semKey, int $shmKey, int $size = 1024)
     {
-        $this->semKey = (int)$semKey;
-        $this->shmKey = (int)$shmKey;
-        $this->size   = abs((int)$size);
+        $this->semKey = $semKey;
+        $this->shmKey = $shmKey;
+        $this->size   = abs($size);
 
         $this->attach();
     }
@@ -71,7 +70,7 @@ class Memory implements \JsonSerializable
      *
      * @param int $size
      * @return self
-     * @throws \Exception
+     * @throws Exception
      */
     public static function create(int $size = 1024): self
     {
@@ -86,12 +85,12 @@ class Memory implements \JsonSerializable
      *
      * @param string $hash
      * @return self
-     * @throws \Exception
+     * @throws Exception
      */
     public static function restore(string $hash): self
     {
         if (!str_contains($hash, ':')) {
-            throw new \Exception('error restore hash!');
+            throw new Exception('error restore hash!');
         }
 
         [$semKey, $shmKey, $size] = explode(':', $hash);
@@ -101,50 +100,50 @@ class Memory implements \JsonSerializable
     /**
      * Attach.
      *
-     * @throws \Exception
+     * @throws Exception
      */
     protected function attach(): void
     {
-        $this->semId = sem_get($this->semKey, 1);
+        $this->semId = sem_get($this->semKey);
         if ($this->semId === false) {
-            throw new \Exception('error creating semaphore!');
+            throw new Exception('error creating semaphore!');
         }
 
         if (!sem_acquire($this->semId)) {
             sem_remove($this->semId);
-            throw new \Exception('error when trying to take a semaphore ' . $this->semId . '!');
+            throw new Exception('error when trying to take a semaphore ' . $this->semId . '!');
         }
 
         $this->shmId = shm_attach($this->shmKey, $this->size);
         if ($this->shmId === false) {
-            throw new \Exception('error when connecting to shared memory!');
+            throw new Exception('error when connecting to shared memory!');
         }
     }
 
     /**
      * Detach memory.
      *
-     * @throws \Exception
+     * @throws Exception
      */
     public function detach(): void
     {
         if (!sem_release($this->semId)) {
-            throw new \Exception('error while trying to release the semaphore ' . $this->semId . '!');
+            throw new Exception('error while trying to release the semaphore ' . $this->semId . '!');
         }
 
         if (!shm_remove($this->shmId)) {
-            throw new \Exception('error when trying to delete the shared memory segment ' . $this->shmId . '!');
+            throw new Exception('error when trying to delete the shared memory segment ' . $this->shmId . '!');
         }
 
         if (!sem_remove($this->semId)) {
-            throw new \Exception('error when attempting to delete the semaphore ' . $this->semId . '!');
+            throw new Exception('error when attempting to delete the semaphore ' . $this->semId . '!');
         }
     }
 
     /**
      * Detach memory.
      *
-     * @throws \Exception
+     * @throws Exception
      */
     public function free(): void
     {
@@ -154,9 +153,9 @@ class Memory implements \JsonSerializable
     /**
      * Get semaphore key.
      *
-     * @return resource
+     * @return SysvSemaphore|false
      */
-    public function getSemKey()
+    public function getSemKey(): SysvSemaphore|bool
     {
         return ($this->semId);
     }
@@ -202,26 +201,26 @@ class Memory implements \JsonSerializable
      * Push.
      *
      * @param mixed $data
-     * @throws \Exception
+     * @throws Exception
      */
     public function push(mixed $data): void
     {
         try {
             if (!shm_has_var($this->shmId, $this->offset)) {
                 if (!shm_put_var($this->shmId, $this->offset, [])) {
-                    throw new \Exception();
+                    throw new Exception();
                 }
             }
 
             $stack   = shm_get_var($this->shmId, $this->offset);
             $stack[] = $data;
             if (!shm_put_var($this->shmId, $this->offset, $stack)) {
-                throw new \Exception();
+                throw new Exception();
             }
-        } catch (\Exception $e) {
+        } catch (Exception) {
             sem_remove($this->semId);
             shm_remove($this->shmId);
-            throw new \Exception('error when trying to write to shared memory ' . $this->shmId . '!');
+            throw new Exception('error when trying to write to shared memory ' . $this->shmId . '!');
         }
     }
 
@@ -229,7 +228,7 @@ class Memory implements \JsonSerializable
      * Pull.
      *
      * @return mixed
-     * @throws \Exception
+     * @throws Exception
      */
     public function pull(): mixed
     {
@@ -240,7 +239,7 @@ class Memory implements \JsonSerializable
 
             $stack = shm_get_var($this->shmId, $this->offset);
             if ($stack === false) {
-                throw new \Exception();
+                throw new Exception();
             }
 
             if (sizeof($stack) < 1) {
@@ -249,12 +248,12 @@ class Memory implements \JsonSerializable
 
             $data = array_pop($stack);
             if (!shm_put_var($this->shmId, $this->offset, $stack)) {
-                throw new \Exception();
+                throw new Exception();
             }
 
             return ($data);
-        } catch (\Exception $e) {
-            throw new \Exception('error attempting to read from shared memory ' . $this->shmId . '!');
+        } catch (Exception) {
+            throw new Exception('error attempting to read from shared memory ' . $this->shmId . '!');
         }
     }
 
@@ -262,7 +261,7 @@ class Memory implements \JsonSerializable
      * Shift.
      *
      * @return mixed
-     * @throws \Exception
+     * @throws Exception
      */
     public function shift(): mixed
     {
@@ -273,7 +272,7 @@ class Memory implements \JsonSerializable
 
             $stack = shm_get_var($this->shmId, $this->offset);
             if ($stack === false) {
-                throw new \Exception();
+                throw new Exception();
             }
 
             if (sizeof($stack) < 1) {
@@ -282,22 +281,22 @@ class Memory implements \JsonSerializable
 
             $data = array_shift($stack);
             if (!shm_put_var($this->shmId, $this->offset, $stack)) {
-                throw new \Exception();
+                throw new Exception();
             }
 
             return ($data);
-        } catch (\Exception $e) {
-            throw new \Exception('error attempting to read from shared memory ' . $this->shmId . '!');
+        } catch (Exception) {
+            throw new Exception('error attempting to read from shared memory ' . $this->shmId . '!');
         }
     }
 
     /**
      * Read.
      *
-     * @return bool|\Generator
-     * @throws \Exception
+     * @return bool|Generator
+     * @throws Exception
      */
-    public function read(): bool|\Generator
+    public function read(): bool|Generator
     {
         while (true) {
             $data = $this->shift();
@@ -313,7 +312,7 @@ class Memory implements \JsonSerializable
      * Read.
      *
      * @return bool|array
-     * @throws \Exception
+     * @throws Exception
      */
     public function readToArray(): bool|array
     {
@@ -324,7 +323,7 @@ class Memory implements \JsonSerializable
 
             $stack = shm_get_var($this->shmId, $this->offset);
             if ($stack === false) {
-                throw new \Exception();
+                throw new Exception();
             }
 
             if (sizeof($stack) < 1) {
@@ -332,8 +331,8 @@ class Memory implements \JsonSerializable
             }
 
             return ($stack);
-        } catch (\Exception $e) {
-            throw new \Exception('error attempting to read from shared memory ' . $this->shmId . '!');
+        } catch (Exception) {
+            throw new Exception('error attempting to read from shared memory ' . $this->shmId . '!');
         }
     }
 
@@ -350,7 +349,7 @@ class Memory implements \JsonSerializable
             }
 
             $stack = shm_get_var($this->shmId, $this->offset);
-        } catch (\Exception $e) {
+        } catch (Exception) {
             return (0);
         }
 

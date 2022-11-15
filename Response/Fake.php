@@ -38,7 +38,7 @@ class Fake extends Response
     /**
      * @inheritdoc
      */
-    public function json(array $data): void
+    public function json(mixed $data): void
     {
         $this->json = $data;
     }

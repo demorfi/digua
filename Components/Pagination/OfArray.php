@@ -3,8 +3,9 @@
 namespace Digua\Components\Pagination;
 
 use Digua\Request;
+use {JsonSerializable, Generator};
 
-class OfArray implements \JsonSerializable
+class OfArray implements JsonSerializable
 {
     /**
      * Data.
@@ -164,9 +165,9 @@ class OfArray implements \JsonSerializable
      * Get navigation list.
      *
      * @param string|null $url
-     * @return \Generator
+     * @return Generator
      */
-    public function getNavigation(string $url = null): \Generator
+    public function getNavigation(string $url = null): Generator
     {
         for ($i = 1; $i <= $this->total; $i++) {
             yield [

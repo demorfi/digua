@@ -2,8 +2,7 @@
 
 namespace Digua\Abstracts;
 
-use Digua\Request;
-use Digua\Response;
+use Digua\{Request, Response};
 
 abstract class Controller
 {

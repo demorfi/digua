@@ -3,6 +3,7 @@
 namespace Digua\Components\Client;
 
 use Digua\Interfaces\Client;
+use {stdClass, Exception};
 
 class Curl implements Client
 {
@@ -30,22 +31,22 @@ class Curl implements Client
     /**
      * Object instance.
      *
-     * @var \stdClass
+     * @var stdClass
      */
-    protected \stdClass $instance;
+    protected stdClass $instance;
 
     /**
      * Curl constructor.
      *
-     * @throws \Exception
+     * @throws Exception
      */
     public function __construct()
     {
         if (empty(static::$path)) {
-            throw new \Exception('the path to the cookie is not configured');
+            throw new Exception('the path to the cookie is not configured');
         }
 
-        $this->instance = new \stdClass;
+        $this->instance = new stdClass;
 
         $this->instance->curl     = curl_init();
         $this->instance->response = null;
@@ -185,7 +186,7 @@ class Curl implements Client
 
     /**
      * @inheritdoc
-     * @throws \Exception
+     * @throws Exception
      */
     public function clean(): void
     {

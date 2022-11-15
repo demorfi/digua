@@ -2,6 +2,8 @@
 
 namespace Digua;
 
+use Exception;
+
 class Config extends Abstracts\Data
 {
     /**
@@ -15,12 +17,12 @@ class Config extends Abstracts\Data
      * Config constructor.
      *
      * @param string $name Config name
-     * @throws \Exception
+     * @throws Exception
      */
     public function __construct(string $name)
     {
         if (empty(static::$path)) {
-            throw new \Exception('the path to the config is not configured');
+            throw new Exception('the path to the config is not configured');
         }
 
         $this->array = require(static::$path . $name . '.php');

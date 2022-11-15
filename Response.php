@@ -18,14 +18,13 @@ class Response
      * Print JSON.
      *
      * @param mixed $data Print data
-     * @return string
+     * @return void
      */
-    public function json(mixed $data): string
+    public function json(mixed $data): void
     {
         header('Content-Type: application/json; charset=UTF-8');
         $json = json_encode($data);
         print ($json);
-        return ($json);
     }
 
     /**

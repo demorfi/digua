@@ -4,6 +4,7 @@ namespace Digua\Components\Journal;
 
 use Digua\Storage as _Storage;
 use Digua\Traits\Singleton;
+use {Exception, Generator};
 
 class Storage
 {
@@ -33,7 +34,7 @@ class Storage
     /**
      * Initialize.
      *
-     * @throws \Exception
+     * @throws Exception
      */
     protected function __init(): void
     {
@@ -85,9 +86,9 @@ class Storage
      *
      * @param int $limit
      * @param int $sort
-     * @return \Generator
+     * @return Generator
      */
-    public function getJournal(int $limit = 0, int $sort = self::SORT_DESC): \Generator
+    public function getJournal(int $limit = 0, int $sort = self::SORT_DESC): Generator
     {
         $journal = $this->getAll($limit, $sort);
         foreach ($journal as $key => $item) {

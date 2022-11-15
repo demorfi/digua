@@ -112,7 +112,7 @@ class Query extends Data
      */
     public function getUri(): string
     {
-        [$uri] = array_values(filter_input_array(INPUT_SERVER, ['REQUEST_URI' => FILTER_SANITIZE_URL], true));
+        [$uri] = array_values(filter_input_array(INPUT_SERVER, ['REQUEST_URI' => FILTER_SANITIZE_URL]));
         return ($uri);
     }
 

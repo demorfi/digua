@@ -4,6 +4,7 @@ namespace Digua;
 
 use Digua\Abstracts\Data;
 use Digua\Traits\Output;
+use Exception;
 
 class Template extends Data
 {
@@ -54,12 +55,12 @@ class Template extends Data
     /**
      * Template constructor.
      *
-     * @throws \Exception
+     * @throws Exception
      */
     public function __construct()
     {
         if (empty(static::$path)) {
-            throw new \Exception('the path to the template is not configured');
+            throw new Exception('the path to the template is not configured');
         }
 
         $this->startBuffer();
@@ -191,7 +192,7 @@ class Template extends Data
      */
     public function endSection(string $name): void
     {
-        if (isset($this->sections[$name]) && ($this->sections[$name] == true)) {
+        if (isset($this->sections[$name]) && $this->sections[$name] === true) {
             $this->sections[$name] = $this->flushBuffer();
             $this->cleanBuffer();
         }
