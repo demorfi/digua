@@ -3,7 +3,8 @@
 namespace Digua\Components\Pagination;
 
 use Digua\Request;
-use {JsonSerializable, Generator};
+use JsonSerializable;
+use Generator;
 
 class OfArray implements JsonSerializable
 {

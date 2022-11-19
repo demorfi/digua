@@ -2,7 +2,11 @@
 
 namespace Digua;
 
-use {SysvSemaphore, SysvSharedMemory, JsonSerializable, Generator, Exception};
+use SysvSemaphore;
+use SysvSharedMemory;
+use JsonSerializable;
+use Generator;
+use Exception;
 
 class Memory implements JsonSerializable
 {

@@ -2,9 +2,7 @@
 
 namespace Digua;
 
-use Digua\Request\Cookies;
-use Digua\Request\Data;
-use Digua\Request\Query;
+use Digua\Request\{Cookies, Data, Query};
 
 class Request
 {

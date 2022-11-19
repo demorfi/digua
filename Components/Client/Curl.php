@@ -3,7 +3,8 @@
 namespace Digua\Components\Client;
 
 use Digua\Interfaces\Client;
-use {stdClass, Exception};
+use stdClass;
+use Exception;
 
 class Curl implements Client
 {

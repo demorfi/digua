@@ -4,7 +4,8 @@ namespace Digua\Components\Journal;
 
 use Digua\Storage as _Storage;
 use Digua\Traits\Singleton;
-use {Exception, Generator};
+use Exception;
+use Generator;
 
 class Storage
 {

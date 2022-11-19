@@ -2,7 +2,8 @@
 
 namespace Digua;
 
-use {JsonSerializable, Exception};
+use JsonSerializable;
+use Exception;
 
 class Storage extends Abstracts\Data implements JsonSerializable
 {
