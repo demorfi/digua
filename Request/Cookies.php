@@ -11,6 +11,6 @@ class Cookies extends _Data
      */
     public function __construct()
     {
-        $this->array = (array)filter_input_array(INPUT_COOKIE);
+        $this->array = (array)filter_input_array(INPUT_COOKIE, FILTER_SANITIZE_SPECIAL_CHARS);
     }
 }

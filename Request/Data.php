@@ -11,6 +11,6 @@ class Data extends _Data
      */
     public function __construct()
     {
-        $this->array = (array)filter_input_array(INPUT_POST);
+        $this->array = (array)filter_input_array(INPUT_POST, FILTER_SANITIZE_SPECIAL_CHARS);
     }
 }

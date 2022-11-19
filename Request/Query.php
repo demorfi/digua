@@ -11,7 +11,7 @@ class Query extends Data
      */
     public function __construct()
     {
-        $this->array = (array)filter_input_array(INPUT_GET);
+        $this->array = (array)filter_input_array(INPUT_GET, FILTER_SANITIZE_SPECIAL_CHARS);
         $parseUrl    = parse_url($this->getUri());
 
         if (!empty($parseUrl)) {
@@ -19,7 +19,7 @@ class Query extends Data
             // Add query values
             if (isset($parseUrl['query']) && !empty($parseUrl['query'])) {
                 parse_str($parseUrl['query'], $result);
-                $this->array += $result;
+                $this->array += filter_var_array($result, FILTER_SANITIZE_SPECIAL_CHARS);
             }
 
             // Check path transfer
@@ -29,9 +29,12 @@ class Query extends Data
                 }
 
                 // Key and values in query
-                $uriData = array_values(array_filter(explode('/', $parseUrl['path'])));
-                $name    = null;
+                $uriData = filter_var_array(
+                    array_values(array_filter(explode('/', $parseUrl['path']))),
+                    FILTER_SANITIZE_SPECIAL_CHARS
+                );
 
+                $name = null;
                 for ($i = 0; $i < sizeof($uriData); $i++) {
 
                     // Controller name
@@ -112,8 +115,7 @@ class Query extends Data
      */
     public function getUri(): string
     {
-        [$uri] = array_values(filter_input_array(INPUT_SERVER, ['REQUEST_URI' => FILTER_SANITIZE_URL]));
-        return ($uri);
+        return filter_var($_SERVER['REQUEST_URI'] ?? '/', FILTER_SANITIZE_URL);
     }
 
     /**
@@ -123,8 +125,7 @@ class Query extends Data
      */
     public static function getHost(): string
     {
-        $data = (array)filter_input_array(INPUT_SERVER);
-        return (htmlspecialchars($data['REQUEST_SCHEME']) . '://' . htmlspecialchars($data['HTTP_HOST']));
+        return strtolower(($_SERVER['REQUEST_SCHEME'] ?? 'http') . '://' . $_SERVER['HTTP_HOST']);
     }
 
     /**
@@ -144,6 +145,6 @@ class Query extends Data
      */
     public function isAjax(): bool
     {
-        return (filter_input(INPUT_SERVER, 'HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest');
+        return isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] === 'XMLHttpRequest';
     }
 }
