@@ -4,7 +4,10 @@ namespace Digua;
 
 use Digua\Abstracts\Data;
 use Digua\Traits\Output;
-use Digua\Exceptions\Path as PathException;
+use Digua\Exceptions\{
+    Path as PathException,
+    Template as TemplateException
+};
 use Stringable;
 
 class Template extends Data implements Stringable
@@ -70,6 +73,8 @@ class Template extends Data implements Stringable
 
     /**
      * Render template.
+     *
+     * @throws TemplateException
      */
     public function __toString(): string
     {
@@ -100,6 +105,7 @@ class Template extends Data implements Stringable
      *
      * @param string $name Template name
      * @return string
+     * @throws TemplateException
      */
     public function inject(string $name): string
     {
@@ -154,10 +160,16 @@ class Template extends Data implements Stringable
      * Include template.
      *
      * @param string $name Template name
+     * @throws TemplateException
      */
     public function view(string $name): void
     {
-        require(static::$path . $name . '.php');
+        $filePath = static::$path . $name . '.tpl.php';
+        if (!is_readable($filePath)) {
+            throw new TemplateException($filePath . ' - template not found');
+        }
+
+        require($filePath);
     }
 
     /**
@@ -209,6 +221,7 @@ class Template extends Data implements Stringable
      *
      * @param string $name Section name
      * @param string $tpl  Template name
+     * @throws TemplateException
      */
     public function shortSection(string $name, string $tpl): void
     {
