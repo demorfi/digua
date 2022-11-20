@@ -2,8 +2,9 @@
 
 namespace Digua\Components\Journal;
 
-use Digua\Storage as _Storage;
+use Digua\Storage as StorageBase;
 use Digua\Traits\Singleton;
+use Digua\Enums\SortType;
 use Exception;
 use Generator;
 
@@ -12,25 +13,11 @@ class Storage
     use Singleton;
 
     /**
-     * Sort ASC.
-     *
-     * @var int
-     */
-    const SORT_ASC = 1;
-
-    /**
-     * Sort DESC.
-     *
-     * @var int
-     */
-    const SORT_DESC = 2;
-
-    /**
      * Storage instance.
      *
-     * @var _Storage
+     * @var StorageBase
      */
-    protected _Storage $journal;
+    protected StorageBase $journal;
 
     /**
      * Initialize.
@@ -39,7 +26,7 @@ class Storage
      */
     protected function __init(): void
     {
-        $this->journal = _Storage::load('journal');
+        $this->journal = StorageBase::load('journal');
     }
 
     /**
@@ -60,22 +47,22 @@ class Storage
     public function flush(int $offset = 0): void
     {
         $offset > 0
-            ? $this->journal->overwrite(array_reverse($this->getAll($offset, self::SORT_DESC)))
+            ? $this->journal->overwrite(array_reverse($this->getAll($offset, SortType::DESC)))
             : $this->journal->flush();
     }
 
     /**
      * Get journal.
      *
-     * @param int $limit
-     * @param int $sort
+     * @param int      $limit
+     * @param SortType $sort
      * @return array
      */
-    protected function getAll(int $limit = 0, int $sort = self::SORT_DESC): array
+    protected function getAll(int $limit = 0, SortType $sort = SortType::DESC): array
     {
         $journal = $this->journal->getAll();
 
-        if ($sort == self::SORT_DESC) {
+        if ($sort == SortType::DESC) {
             $journal = array_reverse($journal, true);
         }
 
@@ -87,11 +74,11 @@ class Storage
     /**
      * Get journal.
      *
-     * @param int $limit
-     * @param int $sort
+     * @param int      $limit
+     * @param SortType $sort
      * @return Generator
      */
-    public function getJournal(int $limit = 0, int $sort = self::SORT_DESC): Generator
+    public function getJournal(int $limit = 0, SortType $sort = SortType::DESC): Generator
     {
         $journal = $this->getAll($limit, $sort);
         foreach ($journal as $key => $item) {
