@@ -2,33 +2,16 @@
 
 namespace Digua\Abstracts;
 
-use Digua\{Request, Response};
+use Digua\Request;
 
 abstract class Controller
 {
     /**
-     * Request.
-     *
-     * @var Request
-     */
-    protected Request $request;
-
-    /**
-     * Response.
-     *
-     * @var Response
-     */
-    protected Response $response;
-
-    /**
      * Controller constructor.
      *
-     * @param Response $response
-     * @param Request  $request
+     * @param Request $request
      */
-    public function __construct(Request $request, Response $response)
+    public function __construct(protected Request $request)
     {
-        $this->request  = $request;
-        $this->response = $response;
     }
 }

@@ -5,8 +5,9 @@ namespace Digua;
 use Digua\Abstracts\Data;
 use Digua\Traits\Output;
 use Exception;
+use Stringable;
 
-class Template extends Data
+class Template extends Data implements Stringable
 {
     use Output;
 
@@ -70,13 +71,18 @@ class Template extends Data
     /**
      * Render template.
      */
-    public function __destruct()
+    public function __toString(): string
     {
+        $this->startBuffer();
         $this->view($this->tpl);
 
         for ($i = 0; $i < sizeof($this->extends); $i++) {
             $this->view($this->extends[$i]);
         }
+
+        $content = $this->flushBuffer();
+        $this->cleanBuffer();
+        return $content;
     }
 
     /**
@@ -214,12 +220,12 @@ class Template extends Data
     /**
      * Proxy.
      *
-     * @param string $name Method name
-     * @param array  $args Method arguments
+     * @param string $name      Method name
+     * @param array  $arguments Method arguments
      * @return mixed
      */
-    public function __call(string $name, array $args): mixed
+    public function __call(string $name, array $arguments): mixed
     {
-        return (empty($args) ? ($this->data[$name] ?? []) : $this->data[$name] = $args[0]);
+        return (empty($arguments) ? ($this->data[$name] ?? []) : $this->data[$name] = $arguments[0]);
     }
 }

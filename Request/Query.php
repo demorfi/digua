@@ -111,6 +111,7 @@ class Query extends Data
     /**
      * Get URI path.
      *
+     * @internal Not use INPUT_SERVER as not always available with cli.
      * @return string
      */
     public function getUri(): string
@@ -121,6 +122,7 @@ class Query extends Data
     /**
      * Get host path.
      *
+     * @internal Not use INPUT_SERVER as not always available with cli.
      * @return string
      */
     public static function getHost(): string
@@ -141,6 +143,7 @@ class Query extends Data
     /**
      * Is request ajax.
      *
+     * @internal Not use INPUT_SERVER as not always available with cli.
      * @return bool
      */
     public function isAjax(): bool

@@ -31,12 +31,12 @@ class Route
                 throw new Exception($name . ' - controller not found');
             }
 
-            $controller = new $name($this->request, new Response);
+            $controller = new $name($this->request);
             if (!method_exists($controller, $action)) {
                 throw new Exception($name . '->' . $action . ' - action not found');
             }
 
-            call_user_func([$controller, $action]);
+            print Response::create(call_user_func([$controller, $action]))->build();
         } catch (Exception $e) {
             header('HTTP/1.1 404 Not Found');
             print ($e->getMessage());
