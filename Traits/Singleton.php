@@ -2,7 +2,7 @@
 
 namespace Digua\Traits;
 
-use Exception;
+use Digua\Exceptions\Singleton as SingletonException;
 
 trait Singleton
 {
@@ -30,19 +30,19 @@ trait Singleton
     }
 
     /**
-     * @throws Exception
+     * @throws SingletonException
      */
     public function __wakeup()
     {
-        throw new Exception('object unserialize forbidden');
+        throw new SingletonException('object unserialize forbidden');
     }
 
     /**
-     * @throws Exception
+     * @throws SingletonException
      */
     public function __sleep()
     {
-        throw new Exception('object serialize forbidden');
+        throw new SingletonException('object serialize forbidden');
     }
 
     /**
