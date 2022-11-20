@@ -5,6 +5,7 @@ namespace Digua;
 use Digua\Abstracts\Data;
 use JsonSerializable;
 use Digua\Exceptions\Path as PathException;
+use Digua\Enums\FileExtension;
 
 class Storage extends Data implements JsonSerializable
 {
@@ -41,7 +42,7 @@ class Storage extends Data implements JsonSerializable
             throw new PathException('the path to the storage is not configured');
         }
 
-        $this->name = $name . '.json';
+        $this->name = $name . FileExtension::JSON->value;
         if (file_exists(static::$path . $this->name)) {
             $this->array = $this->original = json_decode(file_get_contents(static::$path . $this->name), true);
         }

@@ -4,6 +4,7 @@ namespace Digua\Components\Client;
 
 use Digua\Interfaces\Client;
 use Digua\Exceptions\Path as PathException;
+use Digua\Enums\FileExtension;
 use stdClass;
 
 class Curl implements Client
@@ -14,13 +15,6 @@ class Curl implements Client
      * @var string
      */
     const DEFAULT_USER_AGENT = 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/535 (KHTML, like Gecko) Chrome/14 Safari/535';
-
-    /**
-     * Cookie extension.
-     *
-     * @var string
-     */
-    const COOKIE_EXTENSION = '.cookie';
 
     /**
      * Path to cookie files.
@@ -130,7 +124,7 @@ class Curl implements Client
      */
     public function useCookie(string $name): void
     {
-        $filePath = static::$path . $this->cleanFileName($name) . self::COOKIE_EXTENSION;
+        $filePath = static::$path . $this->cleanFileName($name) . FileExtension::COOKIE->value;
         curl_setopt($this->instance->curl, CURLOPT_COOKIEJAR, $filePath);
         curl_setopt($this->instance->curl, CURLOPT_COOKIEFILE, $filePath);
     }
