@@ -79,7 +79,9 @@ class Storage
             $journal = array_reverse($journal, true);
         }
 
-        return ($limit ? array_slice($journal, 0, $limit, true) : $journal);
+        return $limit
+            ? array_slice($journal, 0, $limit, true)
+            : $journal;
     }
 
     /**

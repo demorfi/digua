@@ -32,7 +32,7 @@ class InArray
     {
         $elements = $this->array;
         if (empty($value)) {
-            return ($elements);
+            return $elements;
         }
 
         foreach ($elements as $index => $element) {
@@ -41,6 +41,6 @@ class InArray
             }
         }
 
-        return ($elements);
+        return $elements;
     }
 }

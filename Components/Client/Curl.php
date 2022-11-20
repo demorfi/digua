@@ -120,7 +120,7 @@ class Curl implements Client
      */
     public function getOption($name): mixed
     {
-        return (curl_getinfo($this->instance->curl, $name));
+        return curl_getinfo($this->instance->curl, $name);
     }
 
     /**
@@ -143,11 +143,11 @@ class Curl implements Client
      */
     protected function cleanFileName(string $fileName): string
     {
-        return (strtr(
+        return strtr(
             mb_convert_encoding($fileName, 'ASCII'),
             ' ,;:?*#!§$%&/(){}<>=`´|\\\'"',
             '____________________________'
-        ));
+        );
     }
 
     /**
@@ -159,7 +159,8 @@ class Curl implements Client
         if (!empty($this->instance->query)) {
             $url .= ((!str_contains($url, '?') ? '?' : '&') . http_build_query($this->instance->query));
         }
-        return ($url);
+
+        return $url;
     }
 
     /**
@@ -167,7 +168,7 @@ class Curl implements Client
      */
     public function getResponse(): string
     {
-        return ($this->instance->response);
+        return $this->instance->response;
     }
 
     /**

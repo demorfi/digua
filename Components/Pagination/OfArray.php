@@ -77,7 +77,7 @@ class OfArray implements JsonSerializable
         $this->current = (!$page ? 1 : $page);
         $this->offset  = ($this->current > 1 ? ($this->current - 1) * $this->limit : 0);
 
-        return ($this);
+        return $this;
     }
 
     /**
@@ -87,7 +87,7 @@ class OfArray implements JsonSerializable
      */
     public function getElementsOnPage(): array
     {
-        return (array_slice($this->array, $this->offset, $this->limit));
+        return array_slice($this->array, $this->offset, $this->limit);
     }
 
     /**
@@ -97,7 +97,7 @@ class OfArray implements JsonSerializable
      */
     public function hasNext(): bool
     {
-        return ($this->current < $this->total);
+        return $this->current < $this->total;
     }
 
     /**
@@ -107,7 +107,7 @@ class OfArray implements JsonSerializable
      */
     public function hasPrev(): bool
     {
-        return ($this->current > 1 && $this->current <= $this->total);
+        return $this->current > 1 && $this->current <= $this->total;
     }
 
     /**
@@ -117,7 +117,7 @@ class OfArray implements JsonSerializable
      */
     public function hasPages(): bool
     {
-        return ($this->total > 1);
+        return $this->total > 1;
     }
 
     /**
@@ -127,7 +127,7 @@ class OfArray implements JsonSerializable
      */
     public function getCurrent(): int
     {
-        return ($this->current);
+        return $this->current;
     }
 
     /**
@@ -137,7 +137,7 @@ class OfArray implements JsonSerializable
      */
     public function getTotal(): int
     {
-        return ($this->total);
+        return $this->total;
     }
 
     /**
@@ -148,7 +148,7 @@ class OfArray implements JsonSerializable
      */
     public function getNextPage(string $url = null): string
     {
-        return ((!is_null($url) ? $url . '/page/' : '') . ($this->hasNext() ? $this->current + 1 : $this->current));
+        return (!is_null($url) ? $url . '/page/' : '') . ($this->hasNext() ? $this->current + 1 : $this->current);
     }
 
     /**
@@ -159,7 +159,7 @@ class OfArray implements JsonSerializable
      */
     public function getPrevPage(string $url = null): string
     {
-        return ((!is_null($url) ? $url . '/page/' : '') . ($this->hasPrev() ? $this->current - 1 : $this->current));
+        return (!is_null($url) ? $url . '/page/' : '') . ($this->hasPrev() ? $this->current - 1 : $this->current);
     }
 
     /**
@@ -185,7 +185,7 @@ class OfArray implements JsonSerializable
      */
     public function jsonSerialize(): array
     {
-        return ([
+        return [
             'hasPages' => $this->hasPages(),
             'hasNext'  => $this->hasNext(),
             'hasPrev'  => $this->hasPrev(),
@@ -193,6 +193,6 @@ class OfArray implements JsonSerializable
             'current'  => $this->getCurrent(),
             'nextPage' => $this->getNextPage(''),
             'prevPage' => $this->getPrevPage('')
-        ]);
+        ];
     }
 }
