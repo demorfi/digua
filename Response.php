@@ -3,13 +3,14 @@
 namespace Digua;
 
 use Digua\Enums\ContentType;
+use Digua\Interfaces\Response as ResponseInterface;
 use Stringable;
 
 /**
  * @method json(mixed $data) Print JSON
  * @method html(mixed $data) Print HTML
  */
-class Response implements Stringable
+class Response implements ResponseInterface
 {
     /**
      * Redirect location.
@@ -80,9 +81,9 @@ class Response implements Stringable
     /**
      * Has redirect to.
      *
-     * @return string|bool
+     * @return string|false
      */
-    public function hasRedirect(): string|bool
+    public function hasRedirect(): string|false
     {
         return $this->redirectTo ?: false;
     }
@@ -93,7 +94,7 @@ class Response implements Stringable
      * @param mixed $data
      * @return void
      */
-    protected function setData(mixed $data): void
+    public function setData(mixed $data): void
     {
         $this->data        = $data;
         $this->contentType = match (true) {
@@ -101,7 +102,9 @@ class Response implements Stringable
             default => ContentType::JSON
         };
 
-        $this->addHeader('Content-Type', $this->contentType->value . '; charset=UTF-8');
+        if (!($this->data instanceof ResponseInterface)) {
+            $this->addHeader('Content-Type', $this->contentType->value . '; charset=UTF-8');
+        }
     }
 
     /**
@@ -134,9 +137,18 @@ class Response implements Stringable
      */
     public function build(): self
     {
+        if ($this->data instanceof ResponseInterface) {
+            $this->data->build();
+        }
+
         foreach ($this->headers as $header) {
             [$type, $value, $code] = $header;
-            header(sprintf('%s: %s', ucfirst($type), $value), true, $code);
+            $header = match ($type) {
+                'http' => $value,
+                default => sprintf('%s: %s', ucfirst($type), $value)
+            };
+
+            header($header, true, $code);
         }
 
         return $this;
@@ -160,9 +172,9 @@ class Response implements Stringable
      * @param array  $arguments Method arguments
      * @return self
      */
-    public function __call(string $name, array $arguments)
+    public function __call(string $name, array $arguments): self
     {
-        $this->setData(...$arguments);
+        $this->setData($arguments[0]);
         return $this;
     }
 }
