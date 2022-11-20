@@ -42,7 +42,7 @@ class Request
      */
     public function getData(): Data
     {
-        return ($this->data);
+        return $this->data;
     }
 
     /**
@@ -52,7 +52,7 @@ class Request
      */
     public function getQuery(): Query
     {
-        return ($this->query);
+        return $this->query;
     }
 
     /**
@@ -62,6 +62,6 @@ class Request
      */
     public function getCookies(): Cookies
     {
-        return ($this->cookies);
+        return $this->cookies;
     }
 }

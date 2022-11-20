@@ -2,9 +2,10 @@
 
 namespace Digua;
 
+use Digua\Abstracts\Data;
 use Exception;
 
-class Config extends Abstracts\Data
+class Config extends Data
 {
     /**
      * Path to config files.

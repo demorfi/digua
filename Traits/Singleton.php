@@ -59,7 +59,7 @@ trait Singleton
      */
     public static function __callStatic(string $method, array $args): mixed
     {
-        return (call_user_func_array([self::$instance[get_called_class()], $method], $args));
+        return call_user_func_array([self::$instance[get_called_class()], $method], $args);
     }
 
     /**
@@ -71,7 +71,7 @@ trait Singleton
     public static function getInstance(string $name = null): static
     {
         if (isset(self::$instance[$name])) {
-            return (self::$instance[$name]);
+            return self::$instance[$name];
         }
 
         $called = get_called_class();
@@ -79,7 +79,8 @@ trait Singleton
             self::$instance[$called] = new static();
             self::$instance[$called]->__init();
         }
-        return (self::$instance[$called]);
+
+        return self::$instance[$called];
     }
 
     /**
@@ -94,6 +95,7 @@ trait Singleton
             self::$instance[$called] = new static();
             self::$instance[$called]->__init();
         }
-        return (self::$instance[$called]);
+
+        return self::$instance[$called];
     }
 }

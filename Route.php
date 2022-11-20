@@ -39,7 +39,7 @@ class Route
             print Response::create(call_user_func([$controller, $action]))->build();
         } catch (Exception $e) {
             header('HTTP/1.1 404 Not Found');
-            print ($e->getMessage());
+            print $e->getMessage();
         }
     }
 }

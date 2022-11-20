@@ -19,7 +19,7 @@ abstract class Data
      */
     public function __get(string $name): mixed
     {
-        return ($this->array[$name] ?? null);
+        return $this->array[$name] ?? null;
     }
 
     /**
@@ -41,7 +41,7 @@ abstract class Data
      */
     public function __isset(string $name): bool
     {
-        return (isset($this->array[$name]));
+        return isset($this->array[$name]);
     }
 
     /**
@@ -53,7 +53,7 @@ abstract class Data
      */
     public function get(string $name, mixed $default = null): mixed
     {
-        return ((isset($this->array[$name]) && !empty($this->array[$name])) ? $this->array[$name] : $default);
+        return $this->array[$name] ?? $default;
     }
 
     /**
@@ -75,7 +75,7 @@ abstract class Data
      */
     public function has(string $name): bool
     {
-        return (isset($this->array[$name]));
+        return $this->__isset($name);
     }
 
     /**
@@ -94,7 +94,7 @@ abstract class Data
             }
         }
 
-        return ($array);
+        return $array;
     }
 
     /**
@@ -104,7 +104,7 @@ abstract class Data
      */
     public function getAll(): array
     {
-        return ($this->array);
+        return $this->array;
     }
 
     /**
@@ -114,7 +114,7 @@ abstract class Data
      */
     public function getKeys(): array
     {
-        return (array_keys($this->array));
+        return array_keys($this->array);
     }
 
     /**
@@ -124,7 +124,7 @@ abstract class Data
      */
     public function size(): int
     {
-        return (sizeof($this->array));
+        return sizeof($this->array);
     }
 
     /**

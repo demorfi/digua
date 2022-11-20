@@ -81,7 +81,7 @@ class Memory implements JsonSerializable
         $semKey = random_int(time(), PHP_INT_MAX);
         $shmKey = random_int(time() + 1, PHP_INT_MAX);
 
-        return (new self($semKey, $shmKey, $size));
+        return new self($semKey, $shmKey, $size);
     }
 
     /**
@@ -98,7 +98,7 @@ class Memory implements JsonSerializable
         }
 
         [$semKey, $shmKey, $size] = explode(':', $hash);
-        return (new self($semKey, $shmKey, $size));
+        return new self($semKey, $shmKey, $size);
     }
 
     /**
@@ -161,7 +161,7 @@ class Memory implements JsonSerializable
      */
     public function getSemKey(): SysvSemaphore|bool
     {
-        return ($this->semId);
+        return $this->semId;
     }
 
     /**
@@ -171,7 +171,7 @@ class Memory implements JsonSerializable
      */
     public function getShmKey(): int
     {
-        return ($this->shmKey);
+        return $this->shmKey;
     }
 
     /**
@@ -180,7 +180,7 @@ class Memory implements JsonSerializable
      */
     public function jsonSerialize(): string
     {
-        return ($this->__toString());
+        return $this->__toString();
     }
 
     /**
@@ -190,7 +190,7 @@ class Memory implements JsonSerializable
      */
     public function getHash(): string
     {
-        return ($this->__toString());
+        return $this->__toString();
     }
 
     /**
@@ -198,7 +198,7 @@ class Memory implements JsonSerializable
      */
     public function __toString(): string
     {
-        return ($this->semKey . ':' . $this->shmKey . ':' . $this->size);
+        return $this->semKey . ':' . $this->shmKey . ':' . $this->size;
     }
 
     /**
@@ -212,20 +212,40 @@ class Memory implements JsonSerializable
         try {
             if (!shm_has_var($this->shmId, $this->offset)) {
                 if (!shm_put_var($this->shmId, $this->offset, [])) {
-                    throw new Exception();
+                    throw new Exception;
                 }
             }
 
             $stack   = shm_get_var($this->shmId, $this->offset);
             $stack[] = $data;
             if (!shm_put_var($this->shmId, $this->offset, $stack)) {
-                throw new Exception();
+                throw new Exception;
             }
         } catch (Exception) {
             sem_remove($this->semId);
             shm_remove($this->shmId);
             throw new Exception('error when trying to write to shared memory ' . $this->shmId . '!');
         }
+    }
+
+    /**
+     * Get.
+     *
+     * @return mixed
+     * @throws Exception
+     */
+    protected function get(): mixed
+    {
+        if (!shm_has_var($this->shmId, $this->offset)) {
+            return false;
+        }
+
+        $stack = shm_get_var($this->shmId, $this->offset);
+        if ($stack === false) {
+            throw new Exception;
+        }
+
+        return $stack;
     }
 
     /**
@@ -237,25 +257,17 @@ class Memory implements JsonSerializable
     public function pull(): mixed
     {
         try {
-            if (!shm_has_var($this->shmId, $this->offset)) {
-                return (false);
-            }
-
-            $stack = shm_get_var($this->shmId, $this->offset);
-            if ($stack === false) {
-                throw new Exception();
-            }
-
-            if (sizeof($stack) < 1) {
-                return (false);
+            $stack = $this->get();
+            if (is_bool($stack) || sizeof($stack) < 1) {
+                return false;
             }
 
             $data = array_pop($stack);
             if (!shm_put_var($this->shmId, $this->offset, $stack)) {
-                throw new Exception();
+                throw new Exception;
             }
 
-            return ($data);
+            return $data;
         } catch (Exception) {
             throw new Exception('error attempting to read from shared memory ' . $this->shmId . '!');
         }
@@ -270,25 +282,17 @@ class Memory implements JsonSerializable
     public function shift(): mixed
     {
         try {
-            if (!shm_has_var($this->shmId, $this->offset)) {
-                return (false);
-            }
-
-            $stack = shm_get_var($this->shmId, $this->offset);
-            if ($stack === false) {
-                throw new Exception();
-            }
-
-            if (sizeof($stack) < 1) {
-                return (false);
+            $stack = $this->get();
+            if (is_bool($stack) || sizeof($stack) < 1) {
+                return false;
             }
 
             $data = array_shift($stack);
             if (!shm_put_var($this->shmId, $this->offset, $stack)) {
-                throw new Exception();
+                throw new Exception;
             }
 
-            return ($data);
+            return $data;
         } catch (Exception) {
             throw new Exception('error attempting to read from shared memory ' . $this->shmId . '!');
         }
@@ -321,20 +325,12 @@ class Memory implements JsonSerializable
     public function readToArray(): bool|array
     {
         try {
-            if (!shm_has_var($this->shmId, $this->offset)) {
-                return (false);
+            $stack = $this->get();
+            if (is_bool($stack) || sizeof($stack) < 1) {
+                return false;
             }
 
-            $stack = shm_get_var($this->shmId, $this->offset);
-            if ($stack === false) {
-                throw new Exception();
-            }
-
-            if (sizeof($stack) < 1) {
-                return (false);
-            }
-
-            return ($stack);
+            return $stack;
         } catch (Exception) {
             throw new Exception('error attempting to read from shared memory ' . $this->shmId . '!');
         }
@@ -349,14 +345,14 @@ class Memory implements JsonSerializable
     {
         try {
             if (!shm_has_var($this->shmId, $this->offset)) {
-                return (false);
+                return false;
             }
 
             $stack = shm_get_var($this->shmId, $this->offset);
         } catch (Exception) {
-            return (0);
+            return 0;
         }
 
-        return ($stack !== false ? sizeof($stack) : 0);
+        return $stack !== false ? sizeof($stack) : 0;
     }
 }

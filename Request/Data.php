@@ -2,9 +2,9 @@
 
 namespace Digua\Request;
 
-use Digua\Abstracts\Data as _Data;
+use Digua\Abstracts\Data as DataAbstract;
 
-class Data extends _Data
+class Data extends DataAbstract
 {
     /**
      * Data constructor.

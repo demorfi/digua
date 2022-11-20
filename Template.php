@@ -112,7 +112,7 @@ class Template extends Data implements Stringable
         $this->endSection($name);
 
         $this->extends = [];
-        return ($this->block($name));
+        return $this->block($name);
     }
 
     /**
@@ -123,7 +123,7 @@ class Template extends Data implements Stringable
      */
     public function hasRoute(string $path): bool
     {
-        return ($this->request->getQuery()->hasRoute($path));
+        return $this->request->getQuery()->hasRoute($path);
     }
 
     /**
@@ -133,7 +133,7 @@ class Template extends Data implements Stringable
      */
     public function getUri(): string
     {
-        return ($this->request->getQuery()->getUri());
+        return $this->request->getQuery()->getUri();
     }
 
     /**
@@ -147,7 +147,7 @@ class Template extends Data implements Stringable
     {
         $this->tpl   = $name;
         $this->array = $variables;
-        return ($this);
+        return $this;
     }
 
     /**
@@ -178,7 +178,7 @@ class Template extends Data implements Stringable
      */
     public function block(string $name): string|null
     {
-        return ($this->sections[$name] ?? null);
+        return $this->sections[$name] ?? null;
     }
 
     /**
@@ -226,6 +226,8 @@ class Template extends Data implements Stringable
      */
     public function __call(string $name, array $arguments): mixed
     {
-        return (empty($arguments) ? ($this->data[$name] ?? []) : $this->data[$name] = $arguments[0]);
+        return empty($arguments)
+            ? ($this->data[$name] ?? [])
+            : $this->data[$name] = $arguments[0];
     }
 }

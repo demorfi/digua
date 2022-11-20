@@ -29,12 +29,10 @@ trait Stack
      */
     public function __construct(string $hash = null)
     {
-        $size = ($this->size ?? $this->defaultSize);
-        if (!is_null($hash)) {
-            $this->memory = Memory::restore($hash . ':' . $size);
-        } else {
-            $this->memory = Memory::create($size);
-        }
+        $size         = ($this->size ?? $this->defaultSize);
+        $this->memory = !is_null($hash)
+            ? Memory::restore($hash . ':' . $size)
+            : Memory::create($size);
     }
 
     /**
@@ -45,7 +43,7 @@ trait Stack
     public function getHash(): string
     {
         $size = ($this->size ?? $this->defaultSize);
-        return (preg_replace('/:' . $size . '$/', '', $this->memory->getHash()));
+        return preg_replace('/:' . $size . '$/', '', $this->memory->getHash());
     }
 
     /**
@@ -66,7 +64,7 @@ trait Stack
      */
     public function isEndFlag(mixed $data): bool
     {
-        return ($data === -1);
+        return $data === -1;
     }
 
     /**
@@ -88,6 +86,6 @@ trait Stack
      */
     public function __call(string $name, array $arguments): mixed
     {
-        return (call_user_func_array([$this->memory, $name], $arguments));
+        return call_user_func_array([$this->memory, $name], $arguments);
     }
 }

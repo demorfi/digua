@@ -11,7 +11,7 @@ trait Output
      */
     public function startBuffer(): bool
     {
-        return (ob_start());
+        return ob_start();
     }
 
     /**
@@ -21,7 +21,7 @@ trait Output
      */
     public function flushBuffer(): string
     {
-        return (ob_get_clean());
+        return ob_get_clean();
     }
 
     /**

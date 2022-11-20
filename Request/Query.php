@@ -74,7 +74,7 @@ class Query extends Data
      */
     public function getName(): string
     {
-        return ($this->array['_name_']);
+        return $this->array['_name_'];
     }
 
     /**
@@ -84,7 +84,7 @@ class Query extends Data
      */
     public function getAction(): string
     {
-        return ($this->array['_action_']);
+        return $this->array['_action_'];
     }
 
     /**
@@ -94,7 +94,7 @@ class Query extends Data
      */
     public function getRoute(): string
     {
-        return (strtolower($this->array['_name_'] . '.' . $this->array['_action_']));
+        return strtolower($this->array['_name_'] . '.' . $this->array['_action_']);
     }
 
     /**
@@ -105,7 +105,7 @@ class Query extends Data
      */
     public function hasRoute(string $path): bool
     {
-        return ((bool)preg_match('/^' . preg_quote($path, '/') . '/', $this->getRoute()));
+        return (bool)preg_match('/^' . preg_quote($path, '/') . '/', $this->getRoute());
     }
 
     /**
@@ -137,7 +137,7 @@ class Query extends Data
      */
     public function getLocation(): string
     {
-        return ($this->getHost() . $this->getUri());
+        return $this->getHost() . $this->getUri();
     }
 
     /**

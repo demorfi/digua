@@ -2,10 +2,11 @@
 
 namespace Digua;
 
+use Digua\Abstracts\Data;
 use JsonSerializable;
 use Exception;
 
-class Storage extends Abstracts\Data implements JsonSerializable
+class Storage extends Data implements JsonSerializable
 {
     /**
      * Path to storage files.
@@ -65,7 +66,7 @@ class Storage extends Abstracts\Data implements JsonSerializable
      */
     public static function load(string $name): self
     {
-        return (new self($name));
+        return new self($name);
     }
 
     /**
@@ -93,6 +94,6 @@ class Storage extends Abstracts\Data implements JsonSerializable
      */
     public function jsonSerialize(): array
     {
-        return ($this->array);
+        return $this->array;
     }
 }

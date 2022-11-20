@@ -2,19 +2,19 @@
 
 namespace Digua\Traits;
 
-use Digua\Interfaces\Client as _Client;
+use Digua\Interfaces\Client as ClientInterface;
 
 trait Client
 {
     /**
      * Send POST request.
      *
-     * @param _Client $client
-     * @param string  $url
-     * @param array   $fields
+     * @param ClientInterface $client
+     * @param string          $url
+     * @param array           $fields
      * @return string
      */
-    protected function sendPost(_Client $client, string $url, array $fields = []): string
+    protected function sendPost(ClientInterface $client, string $url, array $fields = []): string
     {
         $client->setUrl($url);
 
@@ -23,18 +23,18 @@ trait Client
         }
 
         $client->send();
-        return ($client->getResponse());
+        return $client->getResponse();
     }
 
     /**
      * Send GET request.
      *
-     * @param _Client $client
-     * @param string  $url
-     * @param array   $fields
+     * @param ClientInterface $client
+     * @param string          $url
+     * @param array           $fields
      * @return string
      */
-    protected function sendGet(_Client $client, string $url, array $fields = []): string
+    protected function sendGet(ClientInterface $client, string $url, array $fields = []): string
     {
         $client->setUrl($url);
 
@@ -43,6 +43,6 @@ trait Client
         }
 
         $client->send();
-        return ($client->getResponse());
+        return $client->getResponse();
     }
 }
