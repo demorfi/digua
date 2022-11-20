@@ -3,7 +3,7 @@
 namespace Digua;
 
 use Digua\Abstracts\Data;
-use Exception;
+use Digua\Exceptions\Path as PathException;
 
 class Config extends Data
 {
@@ -18,12 +18,12 @@ class Config extends Data
      * Config constructor.
      *
      * @param string $name Config name
-     * @throws Exception
+     * @throws PathException
      */
     public function __construct(string $name)
     {
         if (empty(static::$path)) {
-            throw new Exception('the path to the config is not configured');
+            throw new PathException('the path to the config is not configured');
         }
 
         $this->array = require(static::$path . $name . '.php');

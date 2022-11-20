@@ -3,8 +3,8 @@
 namespace Digua\Components\Client;
 
 use Digua\Interfaces\Client;
+use Digua\Exceptions\Path as PathException;
 use stdClass;
-use Exception;
 
 class Curl implements Client
 {
@@ -39,12 +39,12 @@ class Curl implements Client
     /**
      * Curl constructor.
      *
-     * @throws Exception
+     * @throws PathException
      */
     public function __construct()
     {
         if (empty(static::$path)) {
-            throw new Exception('the path to the cookie is not configured');
+            throw new PathException('the path to the cookie is not configured');
         }
 
         $this->instance = new stdClass;
@@ -86,7 +86,7 @@ class Curl implements Client
     /**
      * @inheritdoc
      */
-    public function setUrl($url): void
+    public function setUrl(string $url): void
     {
         $this->instance->url = $url;
     }
@@ -94,7 +94,7 @@ class Curl implements Client
     /**
      * @inheritdoc
      */
-    public function addQuery($name, $value): void
+    public function addQuery(string $name, string $value): void
     {
         $this->instance->query[$name] = $value;
     }
@@ -102,7 +102,7 @@ class Curl implements Client
     /**
      * @inheritdoc
      */
-    public function addField($name, $value): void
+    public function addField(string $name, string $value): void
     {
         $this->instance->fields[$name] = $value;
     }
@@ -110,7 +110,7 @@ class Curl implements Client
     /**
      * @inheritdoc
      */
-    public function setOption($name, $value): void
+    public function setOption(string $name, mixed $value): void
     {
         curl_setopt($this->instance->curl, $name, $value);
     }
@@ -118,7 +118,7 @@ class Curl implements Client
     /**
      * @inheritdoc
      */
-    public function getOption($name): mixed
+    public function getOption(string $name): mixed
     {
         return curl_getinfo($this->instance->curl, $name);
     }
@@ -188,7 +188,7 @@ class Curl implements Client
 
     /**
      * @inheritdoc
-     * @throws Exception
+     * @throws PathException
      */
     public function clean(): void
     {

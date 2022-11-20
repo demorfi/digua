@@ -4,7 +4,7 @@ namespace Digua;
 
 use Digua\Abstracts\Data;
 use Digua\Traits\Output;
-use Exception;
+use Digua\Exceptions\Path as PathException;
 use Stringable;
 
 class Template extends Data implements Stringable
@@ -56,12 +56,12 @@ class Template extends Data implements Stringable
     /**
      * Template constructor.
      *
-     * @throws Exception
+     * @throws PathException
      */
     public function __construct()
     {
         if (empty(static::$path)) {
-            throw new Exception('the path to the template is not configured');
+            throw new PathException('the path to the template is not configured');
         }
 
         $this->startBuffer();

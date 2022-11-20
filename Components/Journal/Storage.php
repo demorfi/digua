@@ -5,7 +5,7 @@ namespace Digua\Components\Journal;
 use Digua\Storage as StorageBase;
 use Digua\Traits\Singleton;
 use Digua\Enums\SortType;
-use Exception;
+use Digua\Exceptions\Path as PathException;
 use Generator;
 
 class Storage
@@ -22,7 +22,7 @@ class Storage
     /**
      * Initialize.
      *
-     * @throws Exception
+     * @throws PathException
      */
     protected function __init(): void
     {

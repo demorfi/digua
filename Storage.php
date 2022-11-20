@@ -4,7 +4,7 @@ namespace Digua;
 
 use Digua\Abstracts\Data;
 use JsonSerializable;
-use Exception;
+use Digua\Exceptions\Path as PathException;
 
 class Storage extends Data implements JsonSerializable
 {
@@ -33,12 +33,12 @@ class Storage extends Data implements JsonSerializable
      * Storage constructor.
      *
      * @param string $name Storage name
-     * @throws Exception
+     * @throws PathException
      */
     public function __construct(string $name)
     {
         if (empty(static::$path)) {
-            throw new Exception('the path to the storage is not configured');
+            throw new PathException('the path to the storage is not configured');
         }
 
         $this->name = $name . '.json';
@@ -62,7 +62,7 @@ class Storage extends Data implements JsonSerializable
      *
      * @param string $name Storage name
      * @return Storage
-     * @throws Exception
+     * @throws PathException
      */
     public static function load(string $name): self
     {
