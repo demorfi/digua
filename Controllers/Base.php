@@ -1,11 +1,18 @@
 <?php
 
-namespace Digua\Abstracts;
+namespace Digua\Controllers;
 
 use Digua\Request;
 
-abstract class Controller
+class Base
 {
+    /**
+     * Accessible controller.
+     *
+     * @var bool
+     */
+    public bool $accessible = true;
+
     /**
      * Controller constructor.
      *
