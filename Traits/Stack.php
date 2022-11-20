@@ -2,8 +2,11 @@
 
 namespace Digua\Traits;
 
+use Digua\Exceptions\{
+    Memory as MemoryException,
+    MemoryShared as MemorySharedException
+};
 use Digua\Memory;
-use Exception;
 
 trait Stack
 {
@@ -25,9 +28,9 @@ trait Stack
      * Stack constructor.
      *
      * @param string|null $hash
-     * @throws Exception
+     * @throws MemoryException
      */
-    public function __construct(string $hash = null)
+    public function __construct(?string $hash = null)
     {
         $size         = ($this->size ?? $this->defaultSize);
         $this->memory = !is_null($hash)
@@ -49,7 +52,7 @@ trait Stack
     /**
      * Set finished flag.
      *
-     * @throws Exception
+     * @throws MemorySharedException
      */
     public function setEndFlag(): void
     {
@@ -70,7 +73,7 @@ trait Stack
     /**
      * Free stack.
      *
-     * @throws Exception
+     * @throws MemoryException
      */
     public function free(): void
     {
