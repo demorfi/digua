@@ -2,13 +2,15 @@
 
 namespace Digua;
 
-use Digua\Abstracts\Data;
+use Digua\Traits\Data;
 use JsonSerializable;
 use Digua\Exceptions\Path as PathException;
 use Digua\Enums\FileExtension;
 
-class Storage extends Data implements JsonSerializable
+class Storage implements JsonSerializable
 {
+    use Data;
+
     /**
      * Path to storage files.
      *

@@ -2,10 +2,12 @@
 
 namespace Digua\Request;
 
-use Digua\Abstracts\Data;
+use Digua\Traits\Data;
 
-class Query extends Data
+class Query
 {
+    use Data;
+
     /**
      * Query constructor.
      */

@@ -2,10 +2,12 @@
 
 namespace Digua\Request;
 
-use Digua\Abstracts\Data;
+use Digua\Traits\Data;
 
-class Cookies extends Data
+class Cookies
 {
+    use Data;
+
     /**
      * Cookies constructor.
      */

@@ -2,10 +2,12 @@
 
 namespace Digua\Request;
 
-use Digua\Abstracts\Data as DataAbstract;
+use Digua\Traits\Data as DataTrait;
 
-class Data extends DataAbstract
+class Data
 {
+    use DataTrait;
+
     /**
      * Data constructor.
      */

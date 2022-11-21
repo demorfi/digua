@@ -2,11 +2,13 @@
 
 namespace Digua;
 
-use Digua\Abstracts\Data;
+use Digua\Traits\Data;
 use Digua\Exceptions\Path as PathException;
 
-class Config extends Data
+class Config
 {
+    use Data;
+
     /**
      * Path to config files.
      *

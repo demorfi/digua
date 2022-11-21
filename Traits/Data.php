@@ -1,8 +1,8 @@
 <?php
 
-namespace Digua\Abstracts;
+namespace Digua\Traits;
 
-abstract class Data
+trait Data
 {
     /**
      * Data.

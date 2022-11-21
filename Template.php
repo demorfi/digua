@@ -2,7 +2,7 @@
 
 namespace Digua;
 
-use Digua\Abstracts\Data;
+use Digua\Traits\Data;
 use Digua\Traits\Output;
 use Digua\Exceptions\{
     Path as PathException,
@@ -10,9 +10,9 @@ use Digua\Exceptions\{
 };
 use Stringable;
 
-class Template extends Data implements Stringable
+class Template implements Stringable
 {
-    use Output;
+    use Output, Data;
 
     /**
      * Path to views files.
