@@ -2,13 +2,15 @@
 
 namespace Digua;
 
-use Digua\Exceptions\Route as RouteException;
+use Digua\Exceptions\{
+    Loader as LoaderException,
+    Route as RouteException
+};
 use Digua\Interfaces\Route as RouteInterface;
 use Digua\Controllers\{
     Base as BaseController,
     Error as ErrorController
 };
-use Exception;
 
 class Route implements RouteInterface
 {
@@ -66,11 +68,17 @@ class Route implements RouteInterface
 
         $controller = $this->name;
         $action     = ($this->action . 'Action');
+
         if (is_string($controller)) {
             $name = str_contains($this->name, '\\')
                 ? $this->name
                 : ('\App\Controllers\\' . ucfirst($this->name));
-            if (!class_exists($name)) {
+
+            try {
+                if (!class_exists($name)) {
+                    throw new RouteException($name . ' - controller not found');
+                }
+            } catch (LoaderException $e) {
                 throw new RouteException($name . ' - controller not found');
             }
 
@@ -103,7 +111,7 @@ class Route implements RouteInterface
     {
         try {
             return $this->delegate();
-        } catch (Exception $e) {
+        } catch (RouteException $e) {
             if (!empty($error)) {
                 return (new self($error, 'default'))->delegate();
             }
