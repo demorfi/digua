@@ -2,8 +2,7 @@
 
 namespace Digua;
 
-use Digua\Traits\Data;
-use Digua\Traits\Output;
+use Digua\Traits\{Data, Output, StaticPath};
 use Digua\Exceptions\{
     Path as PathException,
     Template as TemplateException
@@ -12,14 +11,7 @@ use Stringable;
 
 class Template implements Stringable
 {
-    use Output, Data;
-
-    /**
-     * Path to views files.
-     *
-     * @var string
-     */
-    public static string $path = '';
+    use Output, Data, StaticPath;
 
     /**
      * Sections.
@@ -63,10 +55,7 @@ class Template implements Stringable
      */
     public function __construct()
     {
-        if (empty(static::$path)) {
-            throw new PathException('the path to the template is not configured');
-        }
-
+        self::isEmptyPath();
         $this->startBuffer();
         $this->request = new Request();
     }
@@ -88,16 +77,6 @@ class Template implements Stringable
         $content = $this->flushBuffer();
         $this->cleanBuffer();
         return $content;
-    }
-
-    /**
-     * Set path to views files.
-     *
-     * @param string $path
-     */
-    public static function setPath(string $path): void
-    {
-        static::$path = $path;
     }
 
     /**

@@ -2,21 +2,14 @@
 
 namespace Digua;
 
-use Digua\Traits\Data;
+use Digua\Traits\{Data, StaticPath};
 use JsonSerializable;
 use Digua\Exceptions\Path as PathException;
 use Digua\Enums\FileExtension;
 
 class Storage implements JsonSerializable
 {
-    use Data;
-
-    /**
-     * Path to storage files.
-     *
-     * @var string
-     */
-    public static string $path = '';
+    use Data, StaticPath;
 
     /**
      * Original data for diff.
@@ -40,24 +33,12 @@ class Storage implements JsonSerializable
      */
     public function __construct(string $name)
     {
-        if (empty(static::$path)) {
-            throw new PathException('the path to the storage is not configured');
-        }
+        self::isEmptyPath();
 
         $this->name = $name . FileExtension::JSON->value;
         if (file_exists(static::$path . $this->name)) {
             $this->array = $this->original = json_decode(file_get_contents(static::$path . $this->name), true);
         }
-    }
-
-    /**
-     * Set path to storage files.
-     *
-     * @param string $path
-     */
-    public static function setPath(string $path): void
-    {
-        static::$path = $path;
     }
 
     /**

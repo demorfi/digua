@@ -2,19 +2,12 @@
 
 namespace Digua;
 
-use Digua\Traits\Data;
+use Digua\Traits\{Data, StaticPath};
 use Digua\Exceptions\Path as PathException;
 
 class Config
 {
-    use Data;
-
-    /**
-     * Path to config files.
-     *
-     * @var string
-     */
-    public static string $path = '';
+    use Data, StaticPath;
 
     /**
      * Config constructor.
@@ -24,20 +17,7 @@ class Config
      */
     public function __construct(string $name)
     {
-        if (empty(static::$path)) {
-            throw new PathException('the path to the config is not configured');
-        }
-
+        self::isEmptyPath();
         $this->array = require(static::$path . $name . '.php');
-    }
-
-    /**
-     * Set path to config files.
-     *
-     * @param string $path
-     */
-    public static function setPath(string $path): void
-    {
-        static::$path = $path;
     }
 }

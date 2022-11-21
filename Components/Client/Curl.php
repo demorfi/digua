@@ -2,6 +2,7 @@
 
 namespace Digua\Components\Client;
 
+use Digua\Traits\StaticPath;
 use Digua\Interfaces\Client;
 use Digua\Exceptions\Path as PathException;
 use Digua\Enums\FileExtension;
@@ -9,19 +10,14 @@ use stdClass;
 
 class Curl implements Client
 {
+    use StaticPath;
+
     /**
      * User agent.
      *
      * @var string
      */
     const DEFAULT_USER_AGENT = 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/535 (KHTML, like Gecko) Chrome/14 Safari/535';
-
-    /**
-     * Path to cookie files.
-     *
-     * @var string
-     */
-    public static string $path = '';
 
     /**
      * Object instance.
@@ -37,9 +33,7 @@ class Curl implements Client
      */
     public function __construct()
     {
-        if (empty(static::$path)) {
-            throw new PathException('the path to the cookie is not configured');
-        }
+        self::isEmptyPath();
 
         $this->instance = new stdClass;
 
@@ -65,16 +59,6 @@ class Curl implements Client
         if (is_resource($this->instance->curl)) {
             curl_close($this->instance->curl);
         }
-    }
-
-    /**
-     * Set path to cookie files.
-     *
-     * @param string $path
-     */
-    public static function setPath(string $path): void
-    {
-        static::$path = $path;
     }
 
     /**
