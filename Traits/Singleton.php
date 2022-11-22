@@ -6,12 +6,7 @@ use Digua\Exceptions\Singleton as SingletonException;
 
 trait Singleton
 {
-    /**
-     * Instances.
-     *
-     * @var static[]
-     */
-    protected static array $instance = [];
+    private static ?self $instance = null;
 
     private function __construct()
     {
@@ -29,7 +24,7 @@ trait Singleton
      */
     public function __wakeup()
     {
-        throw new SingletonException('object unserialize forbidden');
+        throw new SingletonException('Object unserialize forbidden!');
     }
 
     /**
@@ -37,42 +32,29 @@ trait Singleton
      */
     public function __sleep()
     {
-        throw new SingletonException('object serialize forbidden');
+        throw new SingletonException('Object serialize forbidden!');
     }
 
     /**
      * @param string $method
-     * @param array  $args
+     * @param array  $arguments
      * @return mixed
      */
-    public static function __callStatic(string $method, array $args): mixed
+    public static function __callStatic(string $method, array $arguments): mixed
     {
         return call_user_func_array([
-            self::getInstance(),
+            static::getInstance(),
             preg_replace('/^static/', '', $method)
-        ], $args);
+        ], $arguments);
     }
 
     /**
-     * Get instance.
-     *
-     * @param string|null $name
      * @return static
      */
-    public static function getInstance(string $name = null): static
+    public static function getInstance(): static
     {
-        return self::$instance[$name] ?? self::newInstance();
-    }
-
-    /**
-     * New instance.
-     *
-     * @return static
-     */
-    protected static function newInstance(): static
-    {
-        $called = get_called_class();
-        self::$instance[$called] ??= new static();
-        return self::$instance[$called];
+        return static::$instance === null
+            ? static::$instance = new static()
+            : static::$instance;
     }
 }
