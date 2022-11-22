@@ -14,8 +14,6 @@ trait StaticPath
     public static string $path = '';
 
     /**
-     * Set path.
-     *
      * @param string $path
      */
     public static function setPath(string $path): void
@@ -24,8 +22,6 @@ trait StaticPath
     }
 
     /**
-     * Get path.
-     *
      * @return string
      */
     public static function getPath(): string
@@ -34,15 +30,13 @@ trait StaticPath
     }
 
     /**
-     * Check is empty path.
-     *
      * @return bool
      * @throws PathException
      */
     public static function isEmptyPath(): bool
     {
         return empty(static::$path)
-            ? throw new PathException('the path to the config is not configured')
+            ? throw new PathException('The path for ' . self::class . ' is not configured!')
             : false;
     }
 }
