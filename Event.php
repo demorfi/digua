@@ -5,8 +5,6 @@ namespace Digua;
 class Event
 {
     /**
-     * Events.
-     *
      * @var array
      */
     private static array $events = [];

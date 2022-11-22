@@ -12,22 +12,19 @@ use Digua\Enums\ContentType;
 use Digua\Enums\FileExtension;
 
 /**
- * @method static void staticPush()
+ * @method static void staticPush(string $message);
+ * @method static void staticSave();
  */
 class Logger
 {
     use Singleton;
 
     /**
-     * Storage instance.
-     *
      * @var Storage
      */
     protected readonly Storage $storage;
 
     /**
-     * Initialize.
-     *
      * @throws PathException
      * @throws StorageException
      */

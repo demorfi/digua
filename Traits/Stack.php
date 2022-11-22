@@ -18,15 +18,11 @@ trait Stack
     protected int $defaultSize = 1024;
 
     /**
-     * Memory instance.
-     *
      * @var Memory
      */
     protected Memory $memory;
 
     /**
-     * Stack constructor.
-     *
      * @param string|null $hash
      * @throws MemoryException
      */

@@ -14,22 +14,16 @@ class Template implements Stringable
     use Output, Data, StaticPath;
 
     /**
-     * Sections.
-     *
      * @var array
      */
     private array $sections = [];
 
     /**
-     * Extends.
-     *
      * @var array
      */
     private array $extends = [];
 
     /**
-     * Data template.
-     *
      * @var array
      */
     private array $data = [];
@@ -42,15 +36,11 @@ class Template implements Stringable
     private string $tpl = '';
 
     /**
-     * Request instance.
-     *
      * @var Request
      */
     private Request $request;
 
     /**
-     * Template constructor.
-     *
      * @throws PathException
      */
     public function __construct()
@@ -145,7 +135,7 @@ class Template implements Stringable
     {
         $filePath = static::$path . $name . '.tpl.php';
         if (!is_readable($filePath)) {
-            throw new TemplateException($filePath . ' - template not found');
+            throw new TemplateException($filePath . ' - template not found!');
         }
 
         require($filePath);
@@ -173,7 +163,7 @@ class Template implements Stringable
     }
 
     /**
-     * Init section.
+     * Start section.
      *
      * @param string $name Section name
      */
@@ -183,8 +173,6 @@ class Template implements Stringable
     }
 
     /**
-     * Close init section.
-     *
      * @param string $name Section name
      */
     public function endSection(string $name): void
@@ -196,7 +184,7 @@ class Template implements Stringable
     }
 
     /**
-     * Init short section for include template.
+     * Start short section for include template.
      *
      * @param string $name Section name
      * @param string $tpl  Template name
@@ -210,10 +198,8 @@ class Template implements Stringable
     }
 
     /**
-     * Proxy.
-     *
-     * @param string $name      Method name
-     * @param array  $arguments Method arguments
+     * @param string $name
+     * @param array  $arguments
      * @return mixed
      */
     public function __call(string $name, array $arguments): mixed

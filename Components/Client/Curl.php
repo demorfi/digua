@@ -13,8 +13,6 @@ class Curl implements Client
     use StaticPath;
 
     /**
-     * User agent.
-     *
      * @var string
      */
     const DEFAULT_USER_AGENT = 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/535 (KHTML, like Gecko) Chrome/14 Safari/535';
@@ -27,8 +25,6 @@ class Curl implements Client
     protected stdClass $instance;
 
     /**
-     * Curl constructor.
-     *
      * @throws PathException
      */
     public function __construct()
@@ -102,13 +98,13 @@ class Curl implements Client
     }
 
     /**
-     * Use cookie.
+     * Use cookie file.
      *
-     * @param string $name
+     * @param string $fileName Cookie file name
      */
-    public function useCookie(string $name): void
+    public function useCookie(string $fileName): void
     {
-        $filePath = static::$path . $this->cleanFileName($name) . FileExtension::COOKIE->value;
+        $filePath = static::$path . $this->cleanFileName($fileName) . FileExtension::COOKIE->value;
         curl_setopt($this->instance->curl, CURLOPT_COOKIEJAR, $filePath);
         curl_setopt($this->instance->curl, CURLOPT_COOKIEFILE, $filePath);
     }

@@ -5,8 +5,6 @@ namespace Digua\Traits;
 trait Output
 {
     /**
-     * Start buffer.
-     *
      * @return bool
      */
     public function startBuffer(): bool
@@ -25,7 +23,7 @@ trait Output
     }
 
     /**
-     * Clean buffer.
+     * @return void
      */
     public function cleanBuffer(): void
     {

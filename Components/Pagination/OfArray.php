@@ -16,15 +16,11 @@ class OfArray implements JsonSerializable
     protected array $array = [];
 
     /**
-     * Offset.
-     *
      * @var int
      */
     protected int $offset = 0;
 
     /**
-     * Limit.
-     *
      * @var int
      */
     protected int $limit = 0;
@@ -44,15 +40,11 @@ class OfArray implements JsonSerializable
     protected int $current = 1;
 
     /**
-     * Request instance.
-     *
      * @var Request
      */
     private Request $request;
 
     /**
-     * PaginationArray constructor.
-     *
      * @param Request $request
      */
     public function __construct(Request $request)
@@ -111,8 +103,6 @@ class OfArray implements JsonSerializable
     }
 
     /**
-     * Has pages.
-     *
      * @return bool
      */
     public function hasPages(): bool
@@ -141,9 +131,7 @@ class OfArray implements JsonSerializable
     }
 
     /**
-     * Get next page.
-     *
-     * @param string|null $url
+     * @param string|null $url Prepend url path before /page/
      * @return string
      */
     public function getNextPage(string $url = null): string
@@ -152,9 +140,7 @@ class OfArray implements JsonSerializable
     }
 
     /**
-     * Get prev page.
-     *
-     * @param string|null $url
+     * @param string|null $url Prepend url path before /page/
      * @return string
      */
     public function getPrevPage(string $url = null): string
@@ -163,9 +149,9 @@ class OfArray implements JsonSerializable
     }
 
     /**
-     * Get navigation list.
+     * Get generation navigation list.
      *
-     * @param string|null $url
+     * @param string|null $url Prepend url path before /page/
      * @return Generator
      */
     public function getNavigation(string $url = null): Generator

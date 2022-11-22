@@ -7,8 +7,6 @@ use Stringable;
 interface Response extends Stringable
 {
     /**
-     * Add header.
-     *
      * @param string $type  Header type
      * @param string $value Header value
      * @param int    $code  Response code
@@ -17,15 +15,11 @@ interface Response extends Stringable
     public function addHeader(string $type, string $value, int $code): self;
 
     /**
-     * Get headers list.
-     *
      * @return array
      */
     public function getHeaders(): array;
 
     /**
-     * Set redirect.
-     *
      * @param string $url
      * @param int    $code
      * @return self
@@ -33,8 +27,6 @@ interface Response extends Stringable
     public function redirectTo(string $url, int $code): self;
 
     /**
-     * Has redirect to.
-     *
      * @return string|false
      */
     public function hasRedirect(): string|false;
@@ -55,7 +47,7 @@ interface Response extends Stringable
     public function getData(): mixed;
 
     /**
-     * Build response.
+     * Create response instance.
      *
      * @param mixed $data
      * @return self
@@ -63,8 +55,6 @@ interface Response extends Stringable
     public static function create(mixed $data): self;
 
     /**
-     * Output.
-     *
      * @return self
      */
     public function build(): self;
@@ -78,8 +68,8 @@ interface Response extends Stringable
     /**
      * Set data content.
      *
-     * @param string $name      Method name
-     * @param array  $arguments Method arguments
+     * @param string $name
+     * @param array  $arguments
      * @return self
      */
     public function __call(string $name, array $arguments): self;

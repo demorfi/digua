@@ -10,8 +10,6 @@ class Config
     use Data, StaticPath;
 
     /**
-     * Config constructor.
-     *
      * @param string $name Config name
      * @throws PathException
      */

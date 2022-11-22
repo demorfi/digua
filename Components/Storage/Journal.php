@@ -10,6 +10,11 @@ use Digua\Traits\Singleton;
 use Digua\Enums\SortType;
 use Generator;
 
+/**
+ * @method static void staticPush(string ...$message);
+ * @method static void staticFlush(int $offset = 0);
+ * @method static Generator staticGetJournal(int $limit = 0, SortType $sort = SortType::DESC);
+ */
 class Journal
 {
     use Singleton;
@@ -22,15 +27,11 @@ class Journal
     private readonly array $original;
 
     /**
-     * Storage instance.
-     *
      * @var Json
      */
     protected readonly Json $storage;
 
     /**
-     * Initialize.
-     *
      * @throws PathException
      * @throws StorageException
      */
@@ -64,7 +65,7 @@ class Journal
     }
 
     /**
-     * Get journal.
+     * Get all journal.
      *
      * @param int      $limit
      * @param SortType $sort
@@ -84,8 +85,6 @@ class Journal
     }
 
     /**
-     * Get journal.
-     *
      * @param int      $limit
      * @param SortType $sort
      * @return Generator

@@ -12,8 +12,6 @@ class InArray
     private array $array;
 
     /**
-     * SearchInArray constructor.
-     *
      * @param array $array
      */
     public function __construct(array $array)

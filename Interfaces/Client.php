@@ -5,23 +5,17 @@ namespace Digua\Interfaces;
 interface Client
 {
     /**
-     * Set url.
-     *
      * @param string $url
      */
     public function setUrl(string $url): void;
 
     /**
-     * Add query.
-     *
      * @param string $name
      * @param string $value
      */
     public function addQuery(string $name, string $value): void;
 
     /**
-     * Add field.
-     *
      * @param string $name
      * @param string $value
      */
@@ -44,15 +38,11 @@ interface Client
     public function getOption(string $name): mixed;
 
     /**
-     * Get url.
-     *
      * @return string
      */
     public function getUrl(): string;
 
     /**
-     * Get response.
-     *
      * @return string
      */
     public function getResponse(): string;

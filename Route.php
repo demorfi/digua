@@ -15,36 +15,26 @@ use Digua\Controllers\{
 class Route implements RouteInterface
 {
     /**
-     * Request instance.
-     *
      * @var Request
      */
     protected Request $request;
 
     /**
-     * Controller name.
-     *
      * @var BaseController|string
      */
     protected BaseController|string $name;
 
     /**
-     * Action name.
-     *
      * @var string
      */
     protected string $action;
 
     /**
-     * Accessible controller.
-     *
      * @var bool
      */
     protected bool $accessible;
 
     /**
-     * Route constructor.
-     *
      * @param BaseController|string|null $defName
      * @param ?string|null     $defAction
      */
@@ -76,33 +66,31 @@ class Route implements RouteInterface
 
             try {
                 if (!class_exists($name)) {
-                    throw new RouteException($name . ' - controller not found');
+                    throw new RouteException($name . ' - controller not found!');
                 }
             } catch (LoaderException $e) {
-                throw new RouteException($name . ' - controller not found');
+                throw new RouteException($name . ' - controller not found!');
             }
 
             if (!is_subclass_of($name, BaseController::class)) {
-                throw new RouteException($name . ' - controller not implemented');
+                throw new RouteException($name . ' - controller not implemented!');
             }
 
             $controller = new $name($this->request);
         }
 
         if (!$this->accessible && !$controller->accessible) {
-            throw new RouteException($controller::class . ' - controller not accessible');
+            throw new RouteException($controller::class . ' - controller not accessible!');
         }
 
         if (!method_exists($controller, $action)) {
-            throw new RouteException($controller::class . '->' . $action . ' - action not found');
+            throw new RouteException($controller::class . '->' . $action . ' - action not found!');
         }
 
         return Response::create(call_user_func([$controller, $action]))->build();
     }
 
     /**
-     * Try route.
-     *
      * @param ErrorController|string|null $error
      * @return Response
      * @throws RouteException

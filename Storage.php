@@ -21,8 +21,6 @@ class Storage
     protected string $filePath;
 
     /**
-     * Storage content.
-     *
      * @var array|string|null
      */
     protected array|string|null $content = null;
@@ -44,8 +42,6 @@ class Storage
     }
 
     /**
-     * Get storage file name.
-     *
      * @return string
      */
     public function getFileName(): string
@@ -54,8 +50,6 @@ class Storage
     }
 
     /**
-     * Get storage file path.
-     *
      * @return string
      */
     public function getFilePath(): string
@@ -64,8 +58,6 @@ class Storage
     }
 
     /**
-     * Get storage content type.
-     *
      * @return ContentType
      */
     public function getContentType(): ContentType
@@ -74,8 +66,6 @@ class Storage
     }
 
     /**
-     * Get storage content.
-     *
      * @return array|string|null
      */
     public function getContent(): array|string|null
@@ -84,8 +74,6 @@ class Storage
     }
 
     /**
-     * Read storage content.
-     *
      * @return array|string|null
      * @throws StorageException
      */
@@ -104,8 +92,6 @@ class Storage
     }
 
     /**
-     * Set storage content.
-     *
      * @param array|string $content
      * @return void
      */
@@ -115,8 +101,6 @@ class Storage
     }
 
     /**
-     * Append storage content.
-     *
      * @param array|string $content
      * @return void
      */
@@ -129,8 +113,6 @@ class Storage
     }
 
     /**
-     * Rewrite storage content.
-     *
      * @param bool $rewrite Add to the end of the storage or overwrite completely
      * @return void
      * @throws StorageException

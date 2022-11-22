@@ -7,15 +7,11 @@ use Digua\Request\{Cookies, Data, Query};
 class Request
 {
     /**
-     * Query instance.
-     *
      * @var Query
      */
     private Query $query;
 
     /**
-     * Data instance.
-     *
      * @var Data
      */
     private Data $data;
@@ -25,9 +21,6 @@ class Request
      */
     private Cookies $cookies;
 
-    /**
-     * Request constructor.
-     */
     public function __construct()
     {
         $this->query   = new Query();
@@ -36,8 +29,6 @@ class Request
     }
 
     /**
-     * Get data instance.
-     *
      * @return Data
      */
     public function getData(): Data
@@ -46,8 +37,6 @@ class Request
     }
 
     /**
-     * Get query instance.
-     *
      * @return Query
      */
     public function getQuery(): Query
@@ -56,8 +45,6 @@ class Request
     }
 
     /**
-     * Get cookies instance.
-     *
      * @return Cookies
      */
     public function getCookies(): Cookies

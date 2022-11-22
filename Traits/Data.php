@@ -98,7 +98,7 @@ trait Data
     }
 
     /**
-     * Get values.
+     * Get all list.
      *
      * @return array
      */
@@ -108,8 +108,6 @@ trait Data
     }
 
     /**
-     * Get keys.
-     *
      * @return array
      */
     public function getKeys(): array
@@ -118,8 +116,6 @@ trait Data
     }
 
     /**
-     * Get size.
-     *
      * @return int
      */
     public function size(): int
@@ -128,7 +124,7 @@ trait Data
     }
 
     /**
-     * Flush values.
+     * Flush data.
      */
     public function flush(): void
     {
@@ -136,7 +132,7 @@ trait Data
     }
 
     /**
-     * Overwrite values.
+     * Overwrite data.
      *
      * @param array $array
      */

@@ -59,6 +59,7 @@ class Json extends Storage implements JsonSerializable
     /**
      * Save storage.
      *
+     * @param bool $rewrite Add to the end of the storage or overwrite completely
      * @return void
      * @throws StorageException
      */

@@ -8,9 +8,6 @@ class Query
 {
     use Data;
 
-    /**
-     * Query constructor.
-     */
     public function __construct()
     {
         $this->array = (array)filter_input_array(INPUT_GET, FILTER_SANITIZE_SPECIAL_CHARS);
@@ -90,8 +87,6 @@ class Query
     }
 
     /**
-     * Get route.
-     *
      * @return string
      */
     public function getRoute(): string
@@ -100,8 +95,6 @@ class Query
     }
 
     /**
-     * Has route.
-     *
      * @param string $path Route path
      * @return bool
      */

@@ -20,33 +20,22 @@ class Response implements ResponseInterface
     protected ?string $redirectTo = null;
 
     /**
-     * Data.
-     *
      * @var mixed
      */
     protected mixed $data = null;
 
     /**
-     * Headers.
-     *
      * @var array
      */
     protected array $headers = [];
 
     /**
-     * Content type.
-     *
      * @var ContentType
      */
     protected ContentType $contentType = ContentType::HTML;
 
     /**
-     * Add header.
-     *
-     * @param string $type  Header type
-     * @param string $value Header value
-     * @param int    $code  Response code
-     * @return self
+     * @inheritdoc
      */
     public function addHeader(string $type, string $value, int $code = 0): self
     {
@@ -55,9 +44,7 @@ class Response implements ResponseInterface
     }
 
     /**
-     * Get headers list.
-     *
-     * @return array
+     * @inheritdoc
      */
     public function getHeaders(): array
     {
@@ -65,11 +52,7 @@ class Response implements ResponseInterface
     }
 
     /**
-     * Set redirect.
-     *
-     * @param string $url
-     * @param int    $code
-     * @return self
+     * @inheritdoc
      */
     public function redirectTo(string $url, int $code = 302): self
     {
@@ -79,9 +62,7 @@ class Response implements ResponseInterface
     }
 
     /**
-     * Has redirect to.
-     *
-     * @return string|false
+     * @inheritdoc
      */
     public function hasRedirect(): string|false
     {
@@ -89,10 +70,7 @@ class Response implements ResponseInterface
     }
 
     /**
-     * Set data content.
-     *
-     * @param mixed $data
-     * @return void
+     * @inheritdoc
      */
     public function setData(mixed $data): void
     {
@@ -108,9 +86,7 @@ class Response implements ResponseInterface
     }
 
     /**
-     * Get data content.
-     *
-     * @return mixed
+     * @inheritdoc
      */
     public function getData(): mixed
     {
@@ -118,10 +94,7 @@ class Response implements ResponseInterface
     }
 
     /**
-     * Build response.
-     *
-     * @param mixed $data
-     * @return self
+     * @inheritdoc
      */
     public static function create(mixed $data): self
     {
@@ -131,9 +104,7 @@ class Response implements ResponseInterface
     }
 
     /**
-     * Output.
-     *
-     * @return self
+     * @inheritdoc
      */
     public function build(): self
     {
@@ -156,7 +127,6 @@ class Response implements ResponseInterface
 
     /**
      * @inheritdoc
-     * @return string
      */
     public function __toString(): string
     {
@@ -166,11 +136,7 @@ class Response implements ResponseInterface
     }
 
     /**
-     * Set data content.
-     *
-     * @param string $name      Method name
-     * @param array  $arguments Method arguments
-     * @return self
+     * @inheritdoc
      */
     public function __call(string $name, array $arguments): self
     {

@@ -23,43 +23,31 @@ class Memory implements JsonSerializable
     private int|float $size;
 
     /**
-     * Semaphore key.
-     *
      * @var int
      */
     private int $semKey;
 
     /**
-     * Shared memory key.
-     *
      * @var int
      */
     private int $shmKey;
 
     /**
-     * Semaphore id.
-     *
      * @var SysvSemaphore|false
      */
     private SysvSemaphore|false $semId;
 
     /**
-     * Shared memory id.
-     *
      * @var SysvSharedMemory|false
      */
     private SysvSharedMemory|false $shmId;
 
     /**
-     * Offset key.
-     *
      * @var int
      */
     private int $offset = 1;
 
     /**
-     * Memory constructor.
-     *
      * @param int $semKey
      * @param int $shmKey
      * @param int $size
@@ -75,8 +63,6 @@ class Memory implements JsonSerializable
     }
 
     /**
-     * Create memory.
-     *
      * @param int $size
      * @return self
      * @throws MemoryException
@@ -94,8 +80,6 @@ class Memory implements JsonSerializable
     }
 
     /**
-     * Restore memory.
-     *
      * @param string $hash
      * @return self
      * @throws MemoryException
@@ -103,7 +87,7 @@ class Memory implements JsonSerializable
     public static function restore(string $hash): self
     {
         if (!str_contains($hash, ':')) {
-            throw new MemoryException('error restore hash!');
+            throw new MemoryException('Error restore hash!');
         }
 
         [$semKey, $shmKey, $size] = explode(':', $hash);
@@ -111,53 +95,47 @@ class Memory implements JsonSerializable
     }
 
     /**
-     * Attach.
-     *
      * @throws MemoryException
      */
     protected function attach(): void
     {
         $this->semId = sem_get($this->semKey);
         if ($this->semId === false) {
-            throw new MemorySemaphoreException('error creating semaphore!');
+            throw new MemorySemaphoreException('Error creating semaphore!');
         }
 
         if (!sem_acquire($this->semId)) {
             sem_remove($this->semId);
-            throw new MemorySemaphoreException('error when trying to take a semaphore ' . $this->semId . '!');
+            throw new MemorySemaphoreException('Error when trying to take a semaphore ' . $this->semId . '!');
         }
 
         $this->shmId = shm_attach($this->shmKey, $this->size);
         if ($this->shmId === false) {
-            throw new MemorySharedException('error when connecting to shared memory!');
+            throw new MemorySharedException('Error when connecting to shared memory!');
         }
     }
 
     /**
-     * Detach memory.
-     *
      * @throws MemoryException
      */
     public function detach(): void
     {
         if (!sem_release($this->semId)) {
-            throw new MemorySemaphoreException('error while trying to release the semaphore ' . $this->semId . '!');
+            throw new MemorySemaphoreException('Error while trying to release the semaphore ' . $this->semId . '!');
         }
 
         if (!shm_remove($this->shmId)) {
             throw new MemorySharedException(
-                'error when trying to delete the shared memory segment ' . $this->shmId . '!'
+                'Error when trying to delete the shared memory segment ' . $this->shmId . '!'
             );
         }
 
         if (!sem_remove($this->semId)) {
-            throw new MemorySemaphoreException('error when attempting to delete the semaphore ' . $this->semId . '!');
+            throw new MemorySemaphoreException('Error when attempting to delete the semaphore ' . $this->semId . '!');
         }
     }
 
     /**
-     * Detach memory.
-     *
      * @throws MemoryException
      */
     public function free(): void
@@ -166,8 +144,6 @@ class Memory implements JsonSerializable
     }
 
     /**
-     * Get semaphore key.
-     *
      * @return SysvSemaphore|false
      */
     public function getSemKey(): SysvSemaphore|false
@@ -176,8 +152,6 @@ class Memory implements JsonSerializable
     }
 
     /**
-     * Get shared memory key.
-     *
      * @return int
      */
     public function getShmKey(): int
@@ -195,8 +169,6 @@ class Memory implements JsonSerializable
     }
 
     /**
-     * Get memory hash.
-     *
      * @return string
      */
     public function getHash(): string
@@ -213,8 +185,6 @@ class Memory implements JsonSerializable
     }
 
     /**
-     * Push.
-     *
      * @param mixed $data
      * @throws MemorySharedException
      */
@@ -235,13 +205,11 @@ class Memory implements JsonSerializable
         } catch (MemoryException) {
             sem_remove($this->semId);
             shm_remove($this->shmId);
-            throw new MemorySharedException('error when trying to write to shared memory ' . $this->shmId . '!');
+            throw new MemorySharedException('Error when trying to write to shared memory ' . $this->shmId . '!');
         }
     }
 
     /**
-     * Get.
-     *
      * @return mixed
      * @throws MemorySharedException
      */
@@ -260,8 +228,6 @@ class Memory implements JsonSerializable
     }
 
     /**
-     * Pull.
-     *
      * @return mixed
      * @throws MemorySharedException
      */
@@ -280,13 +246,11 @@ class Memory implements JsonSerializable
 
             return $data;
         } catch (MemoryException) {
-            throw new MemorySharedException('error attempting to read from shared memory ' . $this->shmId . '!');
+            throw new MemorySharedException('Error attempting to read from shared memory ' . $this->shmId . '!');
         }
     }
 
     /**
-     * Shift.
-     *
      * @return mixed
      * @throws MemorySharedException
      */
@@ -305,13 +269,11 @@ class Memory implements JsonSerializable
 
             return $data;
         } catch (MemoryException) {
-            throw new MemorySharedException('error attempting to read from shared memory ' . $this->shmId . '!');
+            throw new MemorySharedException('Error attempting to read from shared memory ' . $this->shmId . '!');
         }
     }
 
     /**
-     * Read.
-     *
      * @return Generator|false
      * @throws MemorySharedException
      */
@@ -328,8 +290,6 @@ class Memory implements JsonSerializable
     }
 
     /**
-     * Read.
-     *
      * @return array|false
      * @throws MemorySharedException
      */
@@ -343,13 +303,11 @@ class Memory implements JsonSerializable
 
             return $stack;
         } catch (MemoryException) {
-            throw new MemorySharedException('error attempting to read from shared memory ' . $this->shmId . '!');
+            throw new MemorySharedException('Error attempting to read from shared memory ' . $this->shmId . '!');
         }
     }
 
     /**
-     * Get size.
-     *
      * @return int
      */
     public function size(): int
