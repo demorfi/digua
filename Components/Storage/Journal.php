@@ -1,32 +1,44 @@
 <?php
 
-namespace Digua\Components\Journal;
+namespace Digua\Components\Storage;
 
-use Digua\Storage as StorageBase;
+use Digua\Exceptions\{
+    Path as PathException,
+    Storage as StorageException
+};
 use Digua\Traits\Singleton;
 use Digua\Enums\SortType;
-use Digua\Exceptions\Path as PathException;
 use Generator;
 
-class Storage
+class Journal
 {
     use Singleton;
 
     /**
+     * Original data for diff.
+     *
+     * @var array
+     */
+    private readonly array $original;
+
+    /**
      * Storage instance.
      *
-     * @var StorageBase
+     * @var Json
      */
-    protected StorageBase $journal;
+    protected readonly Json $journal;
 
     /**
      * Initialize.
      *
+     * @return void
      * @throws PathException
+     * @throws StorageException
      */
     protected function __init(): void
     {
-        $this->journal = StorageBase::load('journal');
+        $this->journal  = Json::load('journal');
+        $this->original = $this->journal->getAll();
     }
 
     /**
@@ -84,6 +96,20 @@ class Storage
         foreach ($journal as $key => $item) {
             $item['date'] = date('Y-m-d H:m:s', $item['time']);
             yield $key => $item;
+        }
+    }
+
+    /**
+     * Auto save storage.
+     *
+     * @throws StorageException
+     */
+    public function __destruct()
+    {
+        if ($this->journal->size() != sizeof($this->original)
+            || sizeof(@array_diff_assoc($this->journal->getAll(), $this->original))
+        ) {
+            $this->journal->save();
         }
     }
 }

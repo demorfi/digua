@@ -2,82 +2,118 @@
 
 namespace Digua;
 
-use Digua\Traits\{Data, StaticPath};
-use JsonSerializable;
-use Digua\Exceptions\Path as PathException;
-use Digua\Enums\FileExtension;
+use Digua\Exceptions\{
+    Path as PathException,
+    Storage as StorageException
+};
+use Digua\Enums\ContentType;
+use Digua\Traits\StaticPath;
 
-class Storage implements JsonSerializable
+class Storage
 {
-    use Data, StaticPath;
+    use StaticPath;
 
     /**
-     * Original data for diff.
-     *
-     * @var array
-     */
-    private array $original = [];
-
-    /**
-     * Storage name.
+     * Storage full file path.
      *
      * @var string
      */
-    private string $name;
+    protected string $filePath;
 
     /**
-     * Storage constructor.
+     * Storage content.
      *
-     * @param string $name Storage name
-     * @throws PathException
+     * @var mixed
      */
-    public function __construct(string $name)
+    protected mixed $content;
+
+    /**
+     * @param string      $fileName    Storage file name
+     * @param ContentType $contentType Storage type
+     * @throws PathException
+     * @throws StorageException
+     */
+    public function __construct(protected string $fileName, protected ContentType $contentType)
     {
         self::isEmptyPath();
+        $this->filePath = static::$path . DIRECTORY_SEPARATOR . $this->fileName;
 
-        $this->name = $name . FileExtension::JSON->value;
-        if (file_exists(static::$path . $this->name)) {
-            $this->array = $this->original = json_decode(file_get_contents(static::$path . $this->name), true);
+        if (!is_file($this->filePath)) {
+            $this->create();
         }
     }
 
     /**
-     * Load storage.
+     * Read storage content.
      *
-     * @param string $name Storage name
-     * @return Storage
-     * @throws PathException
+     * @return mixed
+     * @throws StorageException
      */
-    public static function load(string $name): self
+    public function read(): mixed
     {
-        return new self($name);
-    }
-
-    /**
-     * Save storage.
-     */
-    public function __destruct()
-    {
-        if (sizeof($this->array) != sizeof($this->original)
-            || sizeof(@array_diff_assoc($this->array, $this->original))
-        ) {
-            file_put_contents(static::$path . $this->name, json_encode($this->array), LOCK_EX);
+        if (!is_readable($this->filePath)) {
+            throw new StorageException($this->filePath . ' - file is not readable!');
         }
+
+        $this->content = match ($this->contentType) {
+            ContentType::JSON => json_decode(file_get_contents($this->filePath), true),
+            default => file_get_contents($this->filePath)
+        };
+
+        return $this->content;
     }
 
     /**
-     * Save storage.
+     * Set storage content.
+     *
+     * @param mixed $content
+     * @return void
+     * @throws StorageException
+     */
+    public function replace(mixed $content): void
+    {
+        $byType = match ($this->contentType) {
+            ContentType::JSON => is_object($content) || is_array($content),
+            default => is_string($content)
+        };
+
+        if (!$byType) {
+            throw new StorageException($this->filePath . ' - type mismatch!');
+        }
+
+        $this->content = $content;
+    }
+
+    /**
+     * Rewrite storage content.
+     *
+     * @return void
+     * @throws StorageException
      */
     public function save(): void
     {
-        file_put_contents(static::$path . $this->name, json_encode($this->array), LOCK_EX);
+        if (!is_writable($this->filePath)) {
+            throw new StorageException($this->filePath . ' - not writable!');
+        }
+
+        match ($this->contentType) {
+            ContentType::JSON => file_put_contents($this->filePath, json_encode($this->content), LOCK_EX),
+            default => file_put_contents($this->filePath, $this->content, LOCK_EX)
+        };
     }
 
     /**
-     * @inheritdoc
+     * Create empty storage.
+     *
+     * @return bool
+     * @throws StorageException
      */
-    public function jsonSerialize(): array
+    public function create(): bool
     {
-        return $this->array;
+        if (!is_readable(self::$path)) {
+            throw new StorageException(self::$path . ' - not writable!');
+        }
+
+        return (bool)file_put_contents($this->filePath, null, LOCK_EX);
     }
 }
