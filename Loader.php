@@ -20,24 +20,10 @@ class Loader
     public function __construct(string ...$includePath)
     {
         $this->includePaths = $includePath;
-        spl_autoload_register($this->__autoload(...));
+        spl_autoload_register((fn(string $className) => self::load($className, ...$this->includePaths))(...));
     }
 
     /**
-     * Load class.
-     *
-     * @param string $className
-     * @return bool
-     * @throws LoaderException
-     */
-    private function __autoload(string $className): bool
-    {
-        return self::load($className, ...$this->includePaths);
-    }
-
-    /**
-     * Prepare file path.
-     *
      * @param string $filePath
      * @return string
      */
@@ -47,8 +33,6 @@ class Loader
     }
 
     /**
-     * Load class.
-     *
      * @param string $className
      * @param string ...$includePath File search path
      * @return bool
