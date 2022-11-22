@@ -26,7 +26,7 @@ class Journal
      *
      * @var Json
      */
-    protected readonly Json $journal;
+    protected readonly Json $storage;
 
     /**
      * Initialize.
@@ -37,8 +37,9 @@ class Journal
      */
     protected function __init(): void
     {
-        $this->journal  = Json::load('journal');
-        $this->original = $this->journal->getAll();
+        $this->storage  = Json::load('journal');
+        $this->storage->read();
+        $this->original = $this->storage->getAll();
     }
 
     /**
@@ -50,7 +51,7 @@ class Journal
     {
         $time    = time();
         $message = sizeof($message) < 2 ? array_shift($message) : $message;
-        $this->journal->__set($this->journal->size() + 1, compact('message', 'time'));
+        $this->storage->__set($this->storage->size() + 1, compact('message', 'time'));
     }
 
     /**
@@ -59,8 +60,8 @@ class Journal
     public function flush(int $offset = 0): void
     {
         $offset > 0
-            ? $this->journal->overwrite(array_reverse($this->getAll($offset, SortType::DESC)))
-            : $this->journal->flush();
+            ? $this->storage->overwrite(array_reverse($this->getAll($offset, SortType::DESC)))
+            : $this->storage->flush();
     }
 
     /**
@@ -72,7 +73,7 @@ class Journal
      */
     protected function getAll(int $limit = 0, SortType $sort = SortType::DESC): array
     {
-        $journal = $this->journal->getAll();
+        $journal = $this->storage->getAll();
 
         if ($sort == SortType::DESC) {
             $journal = array_reverse($journal, true);
@@ -106,10 +107,10 @@ class Journal
      */
     public function __destruct()
     {
-        if ($this->journal->size() != sizeof($this->original)
-            || sizeof(@array_diff_assoc($this->journal->getAll(), $this->original))
+        if ($this->storage->size() != sizeof($this->original)
+            || sizeof(@array_diff_assoc($this->storage->getAll(), $this->original))
         ) {
-            $this->journal->save();
+            $this->storage->save();
         }
     }
 }

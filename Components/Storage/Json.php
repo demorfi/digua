@@ -42,9 +42,7 @@ class Json extends Storage implements JsonSerializable
      */
     public static function load(string $fileName): self
     {
-        $instance = new self($fileName);
-        $instance->read();
-        return $instance;
+        return new self($fileName);
     }
 
     /**
@@ -64,10 +62,10 @@ class Json extends Storage implements JsonSerializable
      * @return void
      * @throws StorageException
      */
-    public function save(): void
+    public function save(bool $rewrite = true): void
     {
         parent::replace($this->array);
-        parent::save();
+        parent::save($rewrite);
     }
 
     /**
