@@ -13,4 +13,9 @@ enum FileExtension: string
      * Json file type.
      */
     case JSON = '.json';
+
+    /**
+     * Log file type
+     */
+    case LOG = '.log';
 }

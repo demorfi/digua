@@ -101,7 +101,7 @@ class Journal
     }
 
     /**
-     * Auto save storage.
+     * Auto save journal.
      *
      * @throws StorageException
      */

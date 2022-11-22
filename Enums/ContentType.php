@@ -13,4 +13,9 @@ enum ContentType: string
      * Content type html.
      */
     case HTML = 'text/html';
+
+    /**
+     * Content type text.
+     */
+    case TEXT = 'text';
 }
