@@ -11,6 +11,9 @@ use Digua\Storage;
 use Digua\Enums\ContentType;
 use Digua\Enums\FileExtension;
 
+/**
+ * @method static void staticPush()
+ */
 class Logger
 {
     use Singleton;
@@ -25,11 +28,10 @@ class Logger
     /**
      * Initialize.
      *
-     * @return void
      * @throws PathException
      * @throws StorageException
      */
-    protected function __init(): void
+    private function __construct()
     {
         $this->storage = new Storage('digua' . FileExtension::LOG->value, ContentType::TEXT);
     }

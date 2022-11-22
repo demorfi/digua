@@ -31,11 +31,10 @@ class Journal
     /**
      * Initialize.
      *
-     * @return void
      * @throws PathException
      * @throws StorageException
      */
-    protected function __init(): void
+    private function __construct()
     {
         $this->storage  = Json::load('journal');
         $this->storage->read();
