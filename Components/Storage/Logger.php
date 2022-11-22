@@ -31,7 +31,7 @@ class Logger
      */
     protected function __init(): void
     {
-        $this->storage = new Storage('debug' . FileExtension::LOG->value, ContentType::TEXT);
+        $this->storage = new Storage('digua' . FileExtension::LOG->value, ContentType::TEXT);
     }
 
     /**
