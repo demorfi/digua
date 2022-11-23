@@ -8,7 +8,7 @@ use Digua\Exceptions\{
     Storage as StorageException
 };
 use Digua\Traits\Data;
-use Digua\Storage;
+use Digua\Components\Storage;
 use JsonSerializable;
 
 class Json extends Storage implements JsonSerializable

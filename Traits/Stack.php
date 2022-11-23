@@ -6,7 +6,7 @@ use Digua\Exceptions\{
     Memory as MemoryException,
     MemoryShared as MemorySharedException
 };
-use Digua\Memory;
+use Digua\Components\Memory;
 
 trait Stack
 {

@@ -7,7 +7,7 @@ use Digua\Exceptions\{
     Storage as StorageException
 };
 use Digua\Traits\Singleton;
-use Digua\Storage;
+use Digua\Components\Storage;
 use Digua\Enums\ContentType;
 use Digua\Enums\FileExtension;
 use Digua\Interfaces\Logger as LoggerInterface;

@@ -1,6 +1,6 @@
 <?php declare(strict_types = 1);
 
-namespace Digua;
+namespace Digua\Components;
 
 use Digua\Exceptions\{
     Path as PathException,
