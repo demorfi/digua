@@ -98,7 +98,7 @@ class Env
         );
 
         // Subscribe all exception message
-        Event::subscribe(
+        LateEvent::subscribe(
             'logger',
             BaseException::class,
             (function (Throwable $exception) {

@@ -4,7 +4,7 @@ namespace Digua\Exceptions;
 
 use Exception;
 use Throwable;
-use Digua\Event;
+use Digua\LateEvent;
 
 class Base extends Exception
 {
@@ -12,11 +12,11 @@ class Base extends Exception
      * @param string         $message
      * @param int            $code
      * @param Throwable|null $previous
-     * @uses Event::register()
+     * @uses LateEvent::register()
      */
     public function __construct(string $message = '', int $code = 0, ?Throwable $previous = null)
     {
         parent::__construct($message, $code, $previous);
-        Event::register([__CLASS__, get_called_class()], $this);
+        LateEvent::notify([__CLASS__, get_called_class()], $this);
     }
 }

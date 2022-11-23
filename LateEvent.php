@@ -2,7 +2,7 @@
 
 namespace Digua;
 
-class Event
+class LateEvent
 {
     /**
      * @var array
@@ -10,13 +10,13 @@ class Event
     private static array $events = [];
 
     /**
-     * Register event.
+     * Notify event.
      *
      * @param string|array $eventName
      * @param mixed        ...$arguments Arguments passed to the handler
      * @return void
      */
-    public static function register(string|array $eventName, mixed ...$arguments): void
+    public static function notify(string|array $eventName, mixed ...$arguments): void
     {
         $events = is_string($eventName) ? [$eventName] : $eventName;
         foreach ($events as $event) {
@@ -41,23 +41,6 @@ class Event
         $events = is_string($eventName) ? [$eventName] : $eventName;
         foreach ($events as $event) {
             self::$events[$event][$handlerId] ??= $handler;
-        }
-    }
-
-    /**
-     * Unsubscribe from an event.
-     *
-     * @param string            $handlerId
-     * @param string|array|null $eventName
-     * @return void
-     */
-    public static function unsubscribe(string $handlerId, string|array $eventName = null): void
-    {
-        $events = is_string($eventName) ? [$eventName] : (empty($eventName) ? [] : $eventName);
-        foreach (self::$events as $name => $event) {
-            if (isset($event[$handlerId]) && (empty($events) || in_array($name, $events))) {
-                unset(self::$events[$name][$handlerId]);
-            }
         }
     }
 }
