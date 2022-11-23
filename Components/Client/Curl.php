@@ -2,11 +2,11 @@
 
 namespace Digua\Components\Client;
 
+use CurlHandle;
 use Digua\Traits\StaticPath;
 use Digua\Interfaces\Client;
 use Digua\Exceptions\Path as PathException;
 use Digua\Enums\FileExtension;
-use stdClass;
 
 class Curl implements Client
 {
@@ -18,11 +18,29 @@ class Curl implements Client
     const DEFAULT_USER_AGENT = 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/535 (KHTML, like Gecko) Chrome/14 Safari/535';
 
     /**
-     * Object instance.
-     *
-     * @var stdClass
+     * @var CurlHandle|false
      */
-    protected stdClass $instance;
+    private CurlHandle|false $curl;
+
+    /**
+     * @var string|null
+     */
+    private ?string $response = null;
+
+    /**
+     * @var string|null
+     */
+    private ?string $url = null;
+
+    /**
+     * @var array
+     */
+    private array $fields = [];
+
+    /**
+     * @var array
+     */
+    private array $query = [];
 
     /**
      * @throws PathException
@@ -30,30 +48,23 @@ class Curl implements Client
     public function __construct()
     {
         self::isEmptyPath();
-
-        $this->instance = new stdClass;
-
-        $this->instance->curl     = curl_init();
-        $this->instance->response = null;
-        $this->instance->url      = null;
-        $this->instance->fields   = [];
-        $this->instance->query    = [];
+        $this->curl = curl_init();
 
         // Set default curl options
-        curl_setopt($this->instance->curl, CURLOPT_HEADER, false);
-        curl_setopt($this->instance->curl, CURLOPT_SSL_VERIFYPEER, false);
-        curl_setopt($this->instance->curl, CURLOPT_SSL_VERIFYHOST, false);
-        curl_setopt($this->instance->curl, CURLOPT_CONNECTTIMEOUT, 20);
-        curl_setopt($this->instance->curl, CURLOPT_TIMEOUT, 20);
-        curl_setopt($this->instance->curl, CURLOPT_USERAGENT, self::DEFAULT_USER_AGENT);
-        curl_setopt($this->instance->curl, CURLOPT_FOLLOWLOCATION, true);
-        curl_setopt($this->instance->curl, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($this->curl, CURLOPT_HEADER, false);
+        curl_setopt($this->curl, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($this->curl, CURLOPT_SSL_VERIFYHOST, false);
+        curl_setopt($this->curl, CURLOPT_CONNECTTIMEOUT, 20);
+        curl_setopt($this->curl, CURLOPT_TIMEOUT, 20);
+        curl_setopt($this->curl, CURLOPT_USERAGENT, self::DEFAULT_USER_AGENT);
+        curl_setopt($this->curl, CURLOPT_FOLLOWLOCATION, true);
+        curl_setopt($this->curl, CURLOPT_RETURNTRANSFER, true);
     }
 
     public function __destruct()
     {
-        if (is_resource($this->instance->curl)) {
-            curl_close($this->instance->curl);
+        if ($this->curl instanceof CurlHandle) {
+            curl_close($this->curl);
         }
     }
 
@@ -62,7 +73,7 @@ class Curl implements Client
      */
     public function setUrl(string $url): void
     {
-        $this->instance->url = $url;
+        $this->url = $url;
     }
 
     /**
@@ -70,7 +81,7 @@ class Curl implements Client
      */
     public function addQuery(string $name, string $value): void
     {
-        $this->instance->query[$name] = $value;
+        $this->query[$name] = $value;
     }
 
     /**
@@ -78,7 +89,7 @@ class Curl implements Client
      */
     public function addField(string $name, string $value): void
     {
-        $this->instance->fields[$name] = $value;
+        $this->fields[$name] = $value;
     }
 
     /**
@@ -86,7 +97,7 @@ class Curl implements Client
      */
     public function setOption(string $name, mixed $value): void
     {
-        curl_setopt($this->instance->curl, $name, $value);
+        curl_setopt($this->curl, $name, $value);
     }
 
     /**
@@ -94,7 +105,7 @@ class Curl implements Client
      */
     public function getOption(string $name): mixed
     {
-        return curl_getinfo($this->instance->curl, $name);
+        return curl_getinfo($this->curl, $name);
     }
 
     /**
@@ -105,8 +116,8 @@ class Curl implements Client
     public function useCookie(string $fileName): void
     {
         $filePath = static::$path . $this->cleanFileName($fileName) . FileExtension::COOKIE->value;
-        curl_setopt($this->instance->curl, CURLOPT_COOKIEJAR, $filePath);
-        curl_setopt($this->instance->curl, CURLOPT_COOKIEFILE, $filePath);
+        curl_setopt($this->curl, CURLOPT_COOKIEJAR, $filePath);
+        curl_setopt($this->curl, CURLOPT_COOKIEFILE, $filePath);
     }
 
     /**
@@ -129,9 +140,9 @@ class Curl implements Client
      */
     public function getUrl(): string
     {
-        $url = $this->instance->url;
-        if (!empty($this->instance->query)) {
-            $url .= ((!str_contains($url, '?') ? '?' : '&') . http_build_query($this->instance->query));
+        $url = $this->url;
+        if (!empty($this->query)) {
+            $url .= ((!str_contains($url, '?') ? '?' : '&') . http_build_query($this->query));
         }
 
         return $url;
@@ -142,7 +153,7 @@ class Curl implements Client
      */
     public function getResponse(): string
     {
-        return $this->instance->response;
+        return $this->response;
     }
 
     /**
@@ -150,14 +161,14 @@ class Curl implements Client
      */
     public function send(): void
     {
-        curl_setopt($this->instance->curl, CURLOPT_URL, str_replace(' ', '%20', $this->getUrl()));
+        curl_setopt($this->curl, CURLOPT_URL, str_replace(' ', '%20', $this->getUrl()));
 
-        if (!empty($this->instance->fields)) {
-            curl_setopt($this->instance->curl, CURLOPT_POST, true);
-            curl_setopt($this->instance->curl, CURLOPT_POSTFIELDS, http_build_query($this->instance->fields));
+        if (!empty($this->fields)) {
+            curl_setopt($this->curl, CURLOPT_POST, true);
+            curl_setopt($this->curl, CURLOPT_POSTFIELDS, http_build_query($this->fields));
         }
 
-        $this->instance->response = curl_exec($this->instance->curl);
+        $this->response = curl_exec($this->curl);
     }
 
     /**
