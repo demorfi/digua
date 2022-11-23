@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 
 namespace Digua\Components\Pagination;
 
@@ -61,11 +61,11 @@ class OfArray implements JsonSerializable
      */
     public function setElements(array $array, int $limit): self
     {
-        $page = $this->request->getQuery()->get('page');
+        $page = (int)$this->request->getQuery()->get('page');
 
         $this->array   = $array;
         $this->limit   = $limit;
-        $this->total   = ceil(sizeof($array) / ($limit ?: 1));
+        $this->total   = (int)ceil(sizeof($array) / ($limit ?: 1));
         $this->current = (!$page ? 1 : $page);
         $this->offset  = ($this->current > 1 ? ($this->current - 1) * $this->limit : 0);
 
@@ -160,7 +160,7 @@ class OfArray implements JsonSerializable
             yield [
                 'page'   => $i,
                 'url'    => (!empty($url) ? $url . '/page/' : '') . $i,
-                'active' => $i == $this->current
+                'active' => $i === $this->current
             ];
         }
     }

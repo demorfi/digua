@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 
 namespace Digua\Components\Client;
 
@@ -95,7 +95,7 @@ class Curl implements Client
     /**
      * @inheritdoc
      */
-    public function setOption(string $name, mixed $value): void
+    public function setOption(int $name, mixed $value): void
     {
         curl_setopt($this->curl, $name, $value);
     }
@@ -103,7 +103,7 @@ class Curl implements Client
     /**
      * @inheritdoc
      */
-    public function getOption(string $name): mixed
+    public function getOption(int $name): mixed
     {
         return curl_getinfo($this->curl, $name);
     }

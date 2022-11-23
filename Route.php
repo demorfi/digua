@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 
 namespace Digua;
 
@@ -68,7 +68,7 @@ class Route implements RouteInterface
                 if (!class_exists($name)) {
                     throw new RouteException($name . ' - controller not found!');
                 }
-            } catch (LoaderException $e) {
+            } catch (LoaderException) {
                 throw new RouteException($name . ' - controller not found!');
             }
 

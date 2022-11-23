@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 
 namespace Digua;
 
@@ -91,7 +91,7 @@ class Memory implements JsonSerializable
         }
 
         [$semKey, $shmKey, $size] = explode(':', $hash);
-        return new self($semKey, $shmKey, $size);
+        return new self((int)$semKey, (int)$shmKey, (int)$size);
     }
 
     /**

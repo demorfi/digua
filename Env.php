@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Digua;
 
@@ -10,11 +10,16 @@ use Digua\Exceptions\Base as BaseException;
 class Env
 {
     /**
+     * @var EnvEnum
+     */
+    private static EnvEnum $mode;
+
+    /**
      * @return void
      */
     public static function prod(): void
     {
-        self::setMode(EnvEnum::Prod);
+        self::setMode(self::$mode = EnvEnum::Prod);
     }
 
     /**
@@ -22,7 +27,15 @@ class Env
      */
     public static function dev(): void
     {
-        self::setMode(EnvEnum::Dev);
+        self::setMode(self::$mode = EnvEnum::Dev);
+    }
+
+    /**
+     * @return bool
+     */
+    public static function isDev(): bool
+    {
+        return self::$mode === EnvEnum::Dev;
     }
 
     /**
@@ -34,7 +47,6 @@ class Env
         $isDev = EnvEnum::Dev === $env;
         ini_set('display_errors', (int)$isDev);
         ini_set('display_startup_errors', (int)$isDev);
-        ini_set('log_errors', 1);
         error_reporting($isDev ? E_ALL : (E_ALL & ~E_DEPRECATED & ~E_STRICT));
 
         self::addHandlerError();
@@ -47,7 +59,7 @@ class Env
     public static function addHandlerError(): void
     {
         set_error_handler(
-            (function ($code, $message, $file, $line) {
+            function ($code, $message, $file, $line) {
                 if (!(error_reporting() & $code)) {
                     return false;
                 }
@@ -62,7 +74,7 @@ class Env
 
                 LoggerStorage::staticPush($type . ': ' . $message . ' in ' . $file . ':' . $line);
                 return false;
-            })(...)
+            }
         );
     }
 
@@ -71,14 +83,26 @@ class Env
      */
     public static function addHandlerException(): void
     {
-        set_exception_handler((fn(Throwable $exception) => LoggerStorage::staticPush($exception->__toString()))(...));
+        set_exception_handler(
+            (function (Throwable $exception) {
+                LoggerStorage::staticPush((string)$exception);
+                if (self::isDev()) {
+                    printf(
+                        '<b>Fatal error</b>: Uncaught %s thrown in <b>%s</b> on line <b>%d</b>',
+                        $exception,
+                        $exception->getFile(),
+                        $exception->getLine()
+                    );
+                }
+            })(...)
+        );
+
+        // Subscribe all exception message
         Event::subscribe(
             'logger',
             BaseException::class,
             (function (Throwable $exception) {
-                if (error_reporting() === E_ALL) {
-                    LoggerStorage::staticPush('Notice: ' . $exception->__toString());
-                }
+                    self::isDev() ?? LoggerStorage::staticPush('Notice: ' . $exception);
             })(...)
         );
     }

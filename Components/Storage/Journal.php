@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Digua\Components\Storage;
 
@@ -37,7 +37,7 @@ class Journal
      */
     private function __construct()
     {
-        $this->storage  = Json::load('journal');
+        $this->storage = Json::load('journal');
         $this->storage->read();
         $this->original = $this->storage->getAll();
     }
@@ -51,7 +51,7 @@ class Journal
     {
         $time    = time();
         $message = sizeof($message) < 2 ? array_shift($message) : $message;
-        $this->storage->__set($this->storage->size() + 1, compact('message', 'time'));
+        $this->storage->__set(strval($this->storage->size() + 1), compact('message', 'time'));
     }
 
     /**
@@ -60,7 +60,7 @@ class Journal
     public function flush(int $offset = 0): void
     {
         $offset > 0
-            ? $this->storage->overwrite(array_reverse($this->getAll($offset, SortType::DESC)))
+            ? $this->storage->overwrite(array_reverse($this->getAll($offset)))
             : $this->storage->flush();
     }
 
@@ -93,7 +93,7 @@ class Journal
     {
         $journal = $this->getAll($limit, $sort);
         foreach ($journal as $key => $item) {
-            $item['date'] = date('Y-m-d H:m:s', $item['time']);
+            $item['date'] = date('Y-m-d H:m:s', $item['time'] ?? 0);
             yield $key => $item;
         }
     }

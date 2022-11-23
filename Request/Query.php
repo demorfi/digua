@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 
 namespace Digua\Request;
 
@@ -51,7 +51,7 @@ class Query
                     // Var value
                     if ($i % 2) {
                         if (!empty($name)) {
-                            $this->array[$name] = $uriData[$i] == 'default' ? null : $uriData[$i];
+                            $this->array[$name] = $uriData[$i] === 'default' ? null : $uriData[$i];
                         }
                     } else {
 
