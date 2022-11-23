@@ -10,12 +10,13 @@ use Digua\Traits\Singleton;
 use Digua\Storage;
 use Digua\Enums\ContentType;
 use Digua\Enums\FileExtension;
+use Digua\Interfaces\Logger as LoggerInterface;
 
 /**
  * @method static void staticPush(string $message);
  * @method static void staticSave();
  */
-class Logger
+class Logger implements LoggerInterface
 {
     use Singleton;
 
@@ -36,8 +37,7 @@ class Logger
     /**
      * Add message to log.
      *
-     * @param string $message
-     * @return void
+     * @inheritdoc
      */
     public function push(string $message): void
     {
