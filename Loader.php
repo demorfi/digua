@@ -2,8 +2,6 @@
 
 namespace Digua;
 
-use Digua\Exceptions\Loader as LoaderException;
-
 class Loader
 {
     /**
@@ -36,12 +34,11 @@ class Loader
      * @param string $className
      * @param string ...$includePath File search path
      * @return bool
-     * @throws LoaderException
      */
     public static function load(string $className, string ...$includePath): bool
     {
         $filePath    = self::prepareFilePath($className);
-        $defPath     = '..' . DIRECTORY_SEPARATOR . (stripos($className, 'app') === false ? 'vendors' : '');
+        $defPath     = '..' . DIRECTORY_SEPARATOR . (stripos($className, 'app') === false ? 'vendor' : '');
         $includePath = array_filter(array_map(fn($path) => realpath($path), array_merge($includePath, [$defPath])));
 
         foreach ($includePath as $dirPath) {
@@ -52,8 +49,6 @@ class Loader
             }
         }
 
-        throw new LoaderException(
-            $filePath . ' - not found file in directories: (' . implode(', ', $includePath) . ');'
-        );
+        return false;
     }
 }

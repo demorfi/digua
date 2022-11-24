@@ -2,7 +2,7 @@
 
 namespace Digua\Exceptions;
 
-class Route extends Loader
+class Route extends Base
 {
 
 }

@@ -1,11 +1,8 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types=1);
 
 namespace Digua;
 
-use Digua\Exceptions\{
-    Loader as LoaderException,
-    Route as RouteException
-};
+use Digua\Exceptions\Route as RouteException;
 use Digua\Interfaces\Route as RouteInterface;
 use Digua\Controllers\{
     Base as BaseController,
@@ -36,7 +33,7 @@ class Route implements RouteInterface
 
     /**
      * @param BaseController|string|null $defName
-     * @param ?string|null     $defAction
+     * @param ?string|null               $defAction
      */
     public function __construct(BaseController|string|null $defName = null, ?string $defAction = null)
     {
@@ -64,11 +61,7 @@ class Route implements RouteInterface
                 ? $this->name
                 : ('\App\Controllers\\' . ucfirst($this->name));
 
-            try {
-                if (!class_exists($name)) {
-                    throw new RouteException($name . ' - controller not found!');
-                }
-            } catch (LoaderException) {
+            if (!class_exists($name)) {
                 throw new RouteException($name . ' - controller not found!');
             }
 
