@@ -1,5 +1,5 @@
 .idea
-vendor
-*.phar
-*.cache
+vendor/
 *.lock
+*.cache
+*.phar

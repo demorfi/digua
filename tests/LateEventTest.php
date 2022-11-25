@@ -1,9 +1,7 @@
 <?php
 
-namespace Digua\Tests;
-
-use PHPUnit\Framework\TestCase;
 use Digua\LateEvent;
+use PHPUnit\Framework\TestCase;
 
 class LateEventTest extends TestCase
 {
