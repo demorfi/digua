@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types=1);
 
 namespace Digua\Interfaces;
 
@@ -24,8 +24,8 @@ interface Client
     /**
      * Set client option.
      *
-     * @param int $name
-     * @param mixed  $value
+     * @param int   $name
+     * @param mixed $value
      */
     public function setOption(int $name, mixed $value): void;
 

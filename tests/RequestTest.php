@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 use Digua\Request;
 use Digua\Request\{Data, Query, Cookies};

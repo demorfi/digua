@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types=1);
 
 namespace Digua\Request;
 
@@ -106,8 +106,8 @@ class Query
     /**
      * Get URI path.
      *
-     * @internal Not use INPUT_SERVER as not always available with cli.
      * @return string
+     * @internal Not use INPUT_SERVER as not always available with cli.
      */
     public function getUri(): string
     {
@@ -117,8 +117,8 @@ class Query
     /**
      * Get host path.
      *
-     * @internal Not use INPUT_SERVER as not always available with cli.
      * @return string
+     * @internal Not use INPUT_SERVER as not always available with cli.
      */
     public static function getHost(): string
     {
@@ -138,8 +138,8 @@ class Query
     /**
      * Is request ajax.
      *
-     * @internal Not use INPUT_SERVER as not always available with cli.
      * @return bool
+     * @internal Not use INPUT_SERVER as not always available with cli.
      */
     public function isAjax(): bool
     {
