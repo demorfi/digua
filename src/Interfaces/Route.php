@@ -1,12 +1,25 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types=1);
 
 namespace Digua\Interfaces;
 
 interface Route
 {
     /**
-     * @param Route $route
-     * @return Response
+     * @return string
      */
-    public function delegate(Route $route): Response;
+    public function getControllerName(): string;
+
+    /**
+     * @return string
+     */
+    public function getControllerAction(): string;
+
+    /**
+     * Switch active controller.
+     *
+     * @param string $controller Controller name
+     * @param string $action     Controller action name
+     * @return void
+     */
+    public function switch(string $controller, string $action): void;
 }

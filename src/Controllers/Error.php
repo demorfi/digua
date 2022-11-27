@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types=1);
 
 namespace Digua\Controllers;
 
@@ -7,11 +7,6 @@ use Digua\Template;
 
 class Error extends Base
 {
-    /**
-     * @inheritdoc
-     */
-    public bool $accessible = false;
-
     /**
      * @return Response
      */
