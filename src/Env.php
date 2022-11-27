@@ -99,7 +99,6 @@ class Env
 
         // Subscribe all exception message
         LateEvent::subscribe(
-            'logger',
             BaseException::class,
             (function (Throwable $exception) {
                     self::isDev() ?? LoggerStorage::staticPush('Notice: ' . $exception);

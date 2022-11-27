@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types=1);
 
 namespace Digua\Exceptions;
 
@@ -17,6 +17,6 @@ class Base extends Exception
     public function __construct(string $message = '', int $code = 0, ?Throwable $previous = null)
     {
         parent::__construct($message, $code, $previous);
-        LateEvent::notify([__CLASS__, get_called_class()], $this);
+        LateEvent::notify(get_called_class(), $this);
     }
 }
