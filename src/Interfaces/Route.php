@@ -5,14 +5,19 @@ namespace Digua\Interfaces;
 interface Route
 {
     /**
-     * @return string
+     * @param RouteBuilder $builder
      */
-    public function getControllerName(): string;
+    public function __construct(RouteBuilder $builder);
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getControllerAction(): string;
+    public function getControllerName(): ?string;
+
+    /**
+     * @return string|null
+     */
+    public function getControllerAction(): ?string;
 
     /**
      * Switch active controller.
@@ -22,4 +27,30 @@ interface Route
      * @return void
      */
     public function switch(string $controller, string $action): void;
+
+    /**
+     * @param string $route
+     * @return bool
+     */
+    public function hasRoute(string $route): bool;
+
+    /**
+     * @return RouteBuilder
+     */
+    public function builder(): RouteBuilder;
+
+    /**
+     * @return string|null
+     */
+    public function getBaseName(): ?string;
+
+    /**
+     * @return string|null
+     */
+    public function getBaseAction(): ?string;
+
+    /**
+     * @return string|null
+     */
+    public function getBasePath(): ?string;
 }
