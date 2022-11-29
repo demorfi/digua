@@ -8,10 +8,11 @@ use Digua\Exceptions\{
 };
 use Digua\Interfaces\{
     Route as RouteInterface,
-    Controller as ControllerInterface
+    Controller as ControllerInterface,
+    RouteBuilder as RouteBuilderInterface
 };
 use Digua\Controllers\Error as ErrorController;
-use Digua\Routes\RouteAsName;
+use Digua\Routes\{RouteAsName, RouteAsNameBuilder};
 
 class RouteDispatcher
 {
@@ -28,19 +29,22 @@ class RouteDispatcher
     /**
      * @param Request $request
      */
-    public function __construct(private readonly Request $request = new Request())
+    public function __construct(private readonly Request $request = new Request)
     {
     }
 
     /**
-     * @param string|null $controller Forced controller
-     * @param string|null $action     Forced controller action
+     * @param RouteBuilderInterface|null $builder
      * @return Response
      * @throws RouteException
      */
-    public function default(string $controller = null, string $action = null): Response
+    public function default(?RouteBuilderInterface $builder = null): Response
     {
-        return $this->try(new RouteAsName($this->request, $controller, $action), ErrorController::class, 'default');
+        return $this->try(
+            new RouteAsName($builder ?? new RouteAsNameBuilder($this->request)),
+            ErrorController::class,
+            'default'
+        );
     }
 
     /**
@@ -66,19 +70,22 @@ class RouteDispatcher
      */
     public function delegate(RouteInterface $route): Response
     {
-        $this->route    = $route;
+        $this->route = $route;
+        $this->request->setRoute($route);
+
         $controllerName = $this->route->getControllerName();
         $actionName     = $this->route->getControllerAction();
 
-        if (!is_subclass_of($controllerName, ControllerInterface::class)) {
+        if (empty($controllerName) || !is_subclass_of($controllerName, ControllerInterface::class)) {
             throw new RouteException($controllerName . ' - controller not found!');
         }
 
         $this->controller = new $controllerName($this->request);
-        if (!method_exists($this->controller, $actionName)) {
+        if (empty($actionName) || !method_exists($this->controller, $actionName)) {
             throw new RouteException($controllerName . '->' . $actionName . ' - action not found!');
         }
 
+        $this->request->setController($this->controller);
         return Response::create(call_user_func([$this->controller, $actionName]))->build();
     }
 

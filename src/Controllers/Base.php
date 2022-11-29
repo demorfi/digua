@@ -2,10 +2,15 @@
 
 namespace Digua\Controllers;
 
-use Digua\Request;
-use Digua\Interfaces\Controller as ControllerInterface;
+use Digua\Exceptions\Path;
+use Digua\{Request, Template};
+use Digua\Interfaces\{
+    Controller as ControllerInterface,
+    RequestData as RequestDataInterface,
+    Template as TemplateInterface
+};
 
-abstract class Base implements ControllerInterface
+abstract class Base implements ControllerInterface, TemplateInterface
 {
     /**
      * @param Request $request
@@ -15,10 +20,35 @@ abstract class Base implements ControllerInterface
     }
 
     /**
-     * @return string
+     * @inheritdoc
      */
     public function getName(): string
     {
         return static::class;
+    }
+
+    /**
+     * @inheritdoc
+     * @throws Path
+     */
+    public function render(string $name, array $variables = []): TemplateInterface
+    {
+        return ((new Template($this->request))->render($name, $variables));
+    }
+
+    /**
+     * @return Request
+     */
+    public function request(): Request
+    {
+        return $this->request;
+    }
+
+    /**
+     * @return RequestDataInterface
+     */
+    public function dataRequest(): RequestDataInterface
+    {
+        return $this->request->getData();
     }
 }

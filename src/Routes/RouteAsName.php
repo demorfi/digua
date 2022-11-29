@@ -2,54 +2,30 @@
 
 namespace Digua\Routes;
 
-use Digua\Interfaces\Route as RouteInterface;
-use Digua\Request;
+use Digua\Interfaces\{
+    Route as RouteInterface,
+    RouteBuilder as RouteBuilderInterface
+};
 
 class RouteAsName implements RouteInterface
 {
     /**
-     * @var Request
+     * @var string|null
      */
-    protected Request $request;
+    private ?string $controllerName;
 
     /**
-     * @var string
+     * @var string|null
      */
-    private string $controllerName;
+    private ?string $actionName;
 
     /**
-     * @var string
+     * @param RouteBuilderInterface $builder
      */
-    private string $actionName;
-
-    /**
-     * @param Request     $request
-     * @param string|null $controller Forced controller
-     * @param string|null $action     Forced controller action
-     */
-    public function __construct(Request $request, ?string $controller = null, ?string $action = null)
+    public function __construct(private readonly RouteBuilderInterface $builder)
     {
-        $this->request        = $request;
-        $this->controllerName = $controller ?: $this->request->getQuery()->getName();
-        $this->actionName     = $action ?: $this->request->getQuery()->getAction();
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getControllerName(): string
-    {
-        return str_contains($this->controllerName, '\\')
-            ? $this->controllerName
-            : ('\App\Controllers\\' . ucfirst($this->controllerName));
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getControllerAction(): string
-    {
-        return $this->actionName . 'Action';
+        $this->controllerName = $this->builder->getControllerName();
+        $this->actionName     = $this->builder->getActionName();
     }
 
     /**
@@ -59,5 +35,74 @@ class RouteAsName implements RouteInterface
     {
         $this->controllerName = $controller;
         $this->actionName     = $action;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function builder(): RouteBuilderInterface
+    {
+        return $this->builder;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getControllerName(): ?string
+    {
+        if (!empty($this->controllerName)) {
+            if (str_contains($this->controllerName, '\\')) {
+                return $this->controllerName;
+            }
+
+            return (defined('APP_CONTROLLERS_PATH')
+                    ? constant('APP_CONTROLLERS_PATH')
+                    : '\App\Controllers\\') . ucfirst($this->controllerName);
+        }
+
+        return null;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getControllerAction(): ?string
+    {
+        return !empty($this->actionName) ? ($this->actionName . 'Action') : null;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getBaseName(): ?string
+    {
+        return !empty($this->controllerName) ? strtolower(basename($this->controllerName)) : null;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getBaseAction(): ?string
+    {
+        return !empty($this->actionName) ? strtolower(basename($this->actionName)) : null;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getBasePath(): ?string
+    {
+        $baseName   = $this->getBaseName();
+        $baseAction = $this->getBaseAction();
+        return !empty($baseName) && !empty($baseAction) ? ($baseName . '.' . $baseAction) : null;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function hasRoute(string $route): bool
+    {
+        $basePath = $this->getBasePath();
+        return !empty($basePath) && preg_match('/^' . preg_quote($route, '/') . '/', $basePath) > 0;
     }
 }

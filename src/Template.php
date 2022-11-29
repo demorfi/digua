@@ -2,6 +2,8 @@
 
 namespace Digua;
 
+use Digua\Interfaces\Request as RequestInterface;
+use Digua\Interfaces\Template as TemplateInterface;
 use Digua\Traits\{Data, Output, StaticPath};
 use Digua\Exceptions\{
     Path as PathException,
@@ -9,7 +11,7 @@ use Digua\Exceptions\{
 };
 use Stringable;
 
-class Template implements Stringable
+class Template implements TemplateInterface, Stringable
 {
     use Output, Data, StaticPath;
 
@@ -36,18 +38,12 @@ class Template implements Stringable
     private string $tpl = '';
 
     /**
-     * @var Request
-     */
-    private Request $request;
-
-    /**
      * @throws PathException
      */
-    public function __construct()
+    public function __construct(private readonly RequestInterface $request)
     {
         self::isEmptyPath();
         $this->startBuffer();
-        $this->request = new Request();
     }
 
     /**
@@ -93,12 +89,20 @@ class Template implements Stringable
     /**
      * Has active route.
      *
-     * @param string $path Route path
+     * @param string $route Route path
      * @return bool
      */
-    public function hasRoute(string $path): bool
+    public function hasRoute(string $route): bool
     {
-        return $this->request->getQuery()->hasRoute($path);
+        return $this->request->getRoute()->hasRoute($route);
+    }
+
+    /**
+     * @return RequestInterface
+     */
+    public function request(): RequestInterface
+    {
+        return $this->request;
     }
 
     /**
@@ -108,7 +112,7 @@ class Template implements Stringable
      */
     public function getUri(): string
     {
-        return $this->request->getQuery()->getUri();
+        return $this->request->getData()->query()->getUri();
     }
 
     /**

@@ -61,7 +61,7 @@ class OfArray implements JsonSerializable
      */
     public function setElements(array $array, int $limit): self
     {
-        $page = (int)$this->request->getQuery()->get('page');
+        $page = (int)$this->request->getData()->query()->get('page');
 
         $this->array   = $array;
         $this->limit   = $limit;

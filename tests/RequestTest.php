@@ -1,7 +1,11 @@
 <?php declare(strict_types=1);
 
+use Digua\Interfaces\{
+    Controller as ControllerInterface,
+    RequestData as RequestDataInterface,
+    Route as RouteInterface
+};
 use Digua\Request;
-use Digua\Request\{Data, Query, Cookies};
 use PHPUnit\Framework\TestCase;
 
 class RequestTest extends TestCase
@@ -9,18 +13,20 @@ class RequestTest extends TestCase
     public function testDataObjectIsReturned()
     {
         $request = new Request();
-        $this->assertInstanceOf(Data::class, $request->getData());
+        $this->assertInstanceOf(RequestDataInterface::class, $request->getData());
     }
 
-    public function testQueryObjectIsReturned()
+    public function testRouteObjectIsReturned()
     {
         $request = new Request();
-        $this->assertInstanceOf(Query::class, $request->getQuery());
+        $request->setRoute($this->createMock(RouteInterface::class));
+        $this->assertInstanceOf(RouteInterface::class, $request->getRoute());
     }
 
-    public function testCookiesObjectIsReturned()
+    public function testControllerObjectIsReturned()
     {
         $request = new Request();
-        $this->assertInstanceOf(Cookies::class, $request->getCookies());
+        $request->setController($this->createMock(ControllerInterface::class));
+        $this->assertInstanceOf(ControllerInterface::class, $request->getController());
     }
 }

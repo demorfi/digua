@@ -1,16 +1,16 @@
-<?php declare(strict_types=1);
+<?php
 
 namespace Digua\Request;
 
 use Digua\Traits\Data as DataTrait;
 use Digua\Interfaces\NamedCollection as NamedCollectionInterface;
 
-class Cookies implements NamedCollectionInterface
+class Post implements NamedCollectionInterface
 {
     use DataTrait;
 
     public function __construct()
     {
-        $this->array = (array)filter_input_array(INPUT_COOKIE, FILTER_SANITIZE_SPECIAL_CHARS);
+        $this->array = (array)filter_input_array(INPUT_POST, FILTER_SANITIZE_SPECIAL_CHARS);
     }
 }

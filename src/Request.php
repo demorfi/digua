@@ -2,53 +2,68 @@
 
 namespace Digua;
 
-use Digua\Request\{Cookies, Data, Query};
+use Digua\Request\Data as DataRequest;
+use Digua\Interfaces\Route as RouteInterface;
+use Digua\Interfaces\Request as RequestInterface;
+use Digua\Interfaces\RequestData as RequestDataInterface;
+use Digua\Interfaces\Controller as ControllerInterface;
 
-class Request
+class Request implements RequestInterface
 {
     /**
-     * @var Query
+     * @var RouteInterface
      */
-    private Query $query;
+    private RouteInterface $route;
 
     /**
-     * @var Data
+     * @var ControllerInterface
      */
-    private Data $data;
+    private ControllerInterface $controller;
 
     /**
-     * @var Cookies
+     * @param RequestDataInterface $dataRequest
      */
-    private Cookies $cookies;
-
-    public function __construct()
+    public function __construct(private readonly RequestDataInterface $dataRequest = new DataRequest)
     {
-        $this->query   = new Query();
-        $this->data    = new Data();
-        $this->cookies = new Cookies();
     }
 
     /**
-     * @return Data
+     * @inheritdoc
      */
-    public function getData(): Data
+    public function getData(): RequestDataInterface
     {
-        return $this->data;
+        return $this->dataRequest;
     }
 
     /**
-     * @return Query
+     * @inheritdoc
      */
-    public function getQuery(): Query
+    public function getRoute(): RouteInterface
     {
-        return $this->query;
+        return $this->route;
     }
 
     /**
-     * @return Cookies
+     * @inheritdoc
      */
-    public function getCookies(): Cookies
+    public function setRoute(RouteInterface $route): void
     {
-        return $this->cookies;
+        $this->route = $route;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setController(ControllerInterface $controller): void
+    {
+        $this->controller = $controller;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getController(): ControllerInterface
+    {
+        return $this->controller;
     }
 }

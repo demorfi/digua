@@ -2,14 +2,43 @@
 
 namespace Digua\Request;
 
-use Digua\Traits\Data as DataTrait;
+use Digua\Interfaces\RequestData as RequestDataInterface;
 
-class Data
+class Data implements RequestDataInterface
 {
-    use DataTrait;
+    /**
+     * @param Post    $post
+     * @param Query   $query
+     * @param Cookies $cookies
+     */
+    public function __construct(
+        private readonly Post $post = new Post,
+        private readonly Query $query = new Query,
+        private readonly Cookies $cookies = new Cookies
+    ) {
+    }
 
-    public function __construct()
+    /**
+     * @return Post
+     */
+    public function post(): Post
     {
-        $this->array = (array)filter_input_array(INPUT_POST, FILTER_SANITIZE_SPECIAL_CHARS);
+        return $this->post;
+    }
+
+    /**
+     * @return Query
+     */
+    public function query(): Query
+    {
+        return $this->query;
+    }
+
+    /**
+     * @return Cookies
+     */
+    public function cookies(): Cookies
+    {
+        return $this->cookies;
     }
 }
