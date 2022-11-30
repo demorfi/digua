@@ -6,10 +6,6 @@ use Digua\Enums\ContentType;
 use Digua\Interfaces\Response as ResponseInterface;
 use Stringable;
 
-/**
- * @method json(mixed $data) Print JSON
- * @method html(mixed $data) Print HTML
- */
 class Response implements ResponseInterface
 {
     /**
@@ -88,6 +84,33 @@ class Response implements ResponseInterface
     /**
      * @inheritdoc
      */
+    public function json(array $data): self
+    {
+        $this->setData($data);
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function html(string $content): self
+    {
+        $this->setData($content);
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function text(string $content): self
+    {
+        $this->setData($content);
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function getData(): mixed
     {
         return $this->data;
@@ -133,14 +156,5 @@ class Response implements ResponseInterface
         return $this->contentType === ContentType::HTML
             ? strval($this->data)
             : json_encode($this->data);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function __call(string $name, array $arguments): self
-    {
-        $this->setData($arguments[0]);
-        return $this;
     }
 }

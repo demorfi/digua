@@ -40,6 +40,24 @@ interface Response extends Stringable
     public function setData(mixed $data): void;
 
     /**
+     * @param array $data
+     * @return self
+     */
+    public function json(array $data): self;
+
+    /**
+     * @param string $content
+     * @return self
+     */
+    public function html(string $content): self;
+
+    /**
+     * @param string $content
+     * @return self
+     */
+    public function text(string $content): self;
+
+    /**
      * Get data content.
      *
      * @return mixed
@@ -64,13 +82,4 @@ interface Response extends Stringable
      * @return string
      */
     public function __toString(): string;
-
-    /**
-     * Set data content.
-     *
-     * @param string $name
-     * @param array  $arguments
-     * @return self
-     */
-    public function __call(string $name, array $arguments): self;
 }
