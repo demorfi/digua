@@ -3,4 +3,6 @@
 use Digua\Loader;
 
 require_once __DIR__ . '/src/Loader.php';
-return new Loader();
+$loader = new Loader;
+$loader->register();
+return $loader;
