@@ -2,6 +2,7 @@
 
 namespace Digua;
 
+use Digua\Enums\FileExtension;
 use Digua\Interfaces\Request as RequestInterface;
 use Digua\Interfaces\Template as TemplateInterface;
 use Digua\Traits\{Data, Output, StaticPath};
@@ -42,7 +43,7 @@ class Template implements TemplateInterface, Stringable
      */
     public function __construct(private readonly RequestInterface $request)
     {
-        self::isEmptyPath();
+        self::throwIsEmptyPath();
         $this->startBuffer();
     }
 
@@ -137,7 +138,7 @@ class Template implements TemplateInterface, Stringable
      */
     public function view(string $name): void
     {
-        $filePath = static::$path . $name . '.tpl.php';
+        $filePath = self::getPathToFile($name . FileExtension::TPL->value);
         if (!is_readable($filePath)) {
             throw new TemplateException($filePath . ' - template not found!');
         }

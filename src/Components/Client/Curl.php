@@ -47,7 +47,7 @@ class Curl implements Client
      */
     public function __construct()
     {
-        self::isEmptyPath();
+        self::throwIsEmptyPath();
         $this->curl = curl_init();
 
         // Set default curl options
@@ -115,24 +115,9 @@ class Curl implements Client
      */
     public function useCookie(string $fileName): void
     {
-        $filePath = static::$path . $this->cleanFileName($fileName) . FileExtension::COOKIE->value;
+        $filePath = self::getPathToFile($fileName . FileExtension::COOKIE->value);
         curl_setopt($this->curl, CURLOPT_COOKIEJAR, $filePath);
         curl_setopt($this->curl, CURLOPT_COOKIEFILE, $filePath);
-    }
-
-    /**
-     * Get safe name file.
-     *
-     * @param string $fileName
-     * @return string
-     */
-    protected function cleanFileName(string $fileName): string
-    {
-        return strtr(
-            mb_convert_encoding($fileName, 'ASCII'),
-            ' ,;:?*#!§$%&/(){}<>=`´|\\\'"',
-            '____________________________'
-        );
     }
 
     /**

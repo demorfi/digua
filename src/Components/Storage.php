@@ -33,8 +33,8 @@ class Storage
      */
     public function __construct(protected string $fileName, protected ContentType $contentType)
     {
-        self::isEmptyPath();
-        $this->filePath = static::$path . DIRECTORY_SEPARATOR . $this->fileName;
+        self::throwIsEmptyPath();
+        $this->filePath = self::getPathToFile($this->fileName);
 
         if (!is_file($this->filePath)) {
             $this->create();
@@ -145,8 +145,8 @@ class Storage
      */
     public function create(): bool
     {
-        if (!is_readable(self::$path)) {
-            throw new StorageException(self::$path . ' - not writable!');
+        if (!self::isReadablePath()) {
+            throw new StorageException(self::getPath() . ' - not writable!');
         }
 
         return (bool)file_put_contents($this->filePath, null, LOCK_EX);

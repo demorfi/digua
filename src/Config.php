@@ -4,6 +4,7 @@ namespace Digua;
 
 use Digua\Traits\{Data, StaticPath};
 use Digua\Exceptions\Path as PathException;
+use Digua\Enums\FileExtension;
 
 class Config
 {
@@ -15,7 +16,7 @@ class Config
      */
     public function __construct(string $name)
     {
-        self::isEmptyPath();
-        $this->array = require(static::$path . $name . '.php');
+        self::throwIsEmptyPath();
+        $this->array = require(self::getPathToFile($name . FileExtension::PHP->value));
     }
 }
