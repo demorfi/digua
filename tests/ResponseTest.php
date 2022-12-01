@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 use Digua\Response;
 use Digua\Enums\ContentType;
@@ -39,14 +39,14 @@ class ResponseTest extends TestCase
             $response->redirectTo('https://url.test', 301)
         );
 
-        $this->assertEquals('https://url.test', $response->hasRedirect());
+        $this->assertSame('https://url.test', $response->hasRedirect());
     }
 
     public function testIsItPossibleToAddDataContent()
     {
         $response = new Response();
         $response->setData(['key' => 'value']);
-        $this->assertEquals(ContentType::JSON, $response->getContentType());
+        $this->assertSame(ContentType::JSON, $response->getContentType());
         $this->assertEqualsCanonicalizing(
             [
                 'content-type' => ['Content-Type', ContentType::JSON->value . '; charset=UTF-8', 0]
@@ -56,7 +56,7 @@ class ResponseTest extends TestCase
         $this->assertIsArray($response->getData());
 
         $response->setData('text data');
-        $this->assertEquals(ContentType::HTML, $response->getContentType());
+        $this->assertSame(ContentType::HTML, $response->getContentType());
         $this->assertEqualsCanonicalizing(
             [
                 'content-type' => ['Content-Type', ContentType::HTML->value . '; charset=UTF-8', 0]
@@ -70,7 +70,7 @@ class ResponseTest extends TestCase
     {
         $response = new Response();
         $this->assertInstanceOf(Response::class, $response->json(['key' => 'value']));
-        $this->assertEquals(ContentType::JSON, $response->getContentType());
+        $this->assertSame(ContentType::JSON, $response->getContentType());
         $this->assertEqualsCanonicalizing(
             [
                 'content-type' => ['Content-Type', ContentType::JSON->value . '; charset=UTF-8', 0]
@@ -80,7 +80,7 @@ class ResponseTest extends TestCase
         $this->assertIsArray($response->getData());
 
         $this->assertInstanceOf(Response::class, $response->html('text data'));
-        $this->assertEquals(ContentType::HTML, $response->getContentType());
+        $this->assertSame(ContentType::HTML, $response->getContentType());
         $this->assertEqualsCanonicalizing(
             [
                 'content-type' => ['Content-Type', ContentType::HTML->value . '; charset=UTF-8', 0]
@@ -90,7 +90,7 @@ class ResponseTest extends TestCase
         $this->assertIsString($response->getData());
 
         $this->assertInstanceOf(Response::class, $response->text('text data'));
-        $this->assertEquals(ContentType::HTML, $response->getContentType());
+        $this->assertSame(ContentType::HTML, $response->getContentType());
         $this->assertEqualsCanonicalizing(
             [
                 'content-type' => ['Content-Type', ContentType::HTML->value . '; charset=UTF-8', 0]
@@ -105,7 +105,7 @@ class ResponseTest extends TestCase
         $response = Response::create(['key' => 'value']);
         $this->assertInstanceOf(Response::class, $response);
         $this->assertIsArray($response->getData());
-        $this->assertEquals(ContentType::JSON, $response->getContentType());
+        $this->assertSame(ContentType::JSON, $response->getContentType());
         $this->assertEqualsCanonicalizing(
             [
                 'content-type' => ['Content-Type', ContentType::JSON->value . '; charset=UTF-8', 0]
@@ -133,7 +133,7 @@ class ResponseTest extends TestCase
 
         $response->json(['key' => 'val']);
         $response->redirectTo('https://url.test', 301);
-        $this->assertEquals(json_encode(['key' => 'val']), (string)$response);
+        $this->assertSame(json_encode(['key' => 'val']), (string)$response);
         $this->assertEqualsCanonicalizing([
             ['Content-Type: application/json; charset=UTF-8', true, 0],
             ['Location: https://url.test', true, 301]
@@ -143,13 +143,12 @@ class ResponseTest extends TestCase
         $response->html('text content');
         $response->addHeader('Header-Other', 'test header string', 201);
         $response->addHeader('Location', 'https://url2.test', 302);
-        $this->assertEquals('text content', (string)$response);
+        $this->assertSame('text content', (string)$response);
 
         $this->assertEqualsCanonicalizing([
             ['Content-Type: text/html; charset=UTF-8', true, 0],
             ['Location: https://url2.test', true, 302],
             ['Header-Other: test header string', true, 201]
         ], $headersSent);
-
     }
 }

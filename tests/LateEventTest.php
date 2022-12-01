@@ -15,18 +15,15 @@ class LateEventTest extends TestCase
         LateEvent::subscribe('eventName', fn() => null);
         $this->assertTrue(LateEvent::hasSubscribers('eventName'));
 
-        $countSubscribers = sizeof(LateEvent::getSubscribers('eventName'));
-        $this->assertEquals(1, $countSubscribers);
+        $this->assertSame(1, sizeof(LateEvent::getSubscribers('eventName')));
 
         LateEvent::clean();
         $this->assertFalse(LateEvent::hasSubscribers('eventName'));
-        $countSubscribers = sizeof(LateEvent::getSubscribers('eventName'));
-        $this->assertEquals(0, $countSubscribers);
+        $this->assertSame(0, sizeof(LateEvent::getSubscribers('eventName')));
 
         LateEvent::subscribe('eventName', fn() => null);
         $this->assertTrue(LateEvent::hasSubscribers('eventName'));
-
-        $this->assertEquals(1, LateEvent::removeSubscribers('eventName'));
+        $this->assertSame(1, LateEvent::removeSubscribers('eventName'));
         $this->assertFalse(LateEvent::hasSubscribers('eventName'));
     }
 
@@ -59,16 +56,16 @@ class LateEventTest extends TestCase
                 $this->assertEquals(array_fill(0, $count, $handler), LateEvent::getSubscribers($event));
 
                 $countNotifications = LateEvent::notify($event, ...$arguments);
-                $this->assertEquals($count, $countNotifications);
+                $this->assertSame($count, $countNotifications);
             }
-            $this->assertEquals(sizeof($eventName), $success);
+            $this->assertSame(sizeof($eventName), $success);
         } else {
             $this->assertTrue(LateEvent::hasSubscribers($eventName));
             $this->assertEquals([$handler], LateEvent::getSubscribers($eventName));
 
             $countNotifications = LateEvent::notify($eventName, ...$arguments);
-            $this->assertEquals(1, $success);
-            $this->assertEquals(1, $countNotifications);
+            $this->assertSame(1, $success);
+            $this->assertSame(1, $countNotifications);
         }
     }
 }
