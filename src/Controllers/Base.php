@@ -3,9 +3,10 @@
 namespace Digua\Controllers;
 
 use Digua\Exceptions\Path;
-use Digua\{Request, Template};
+use Digua\Template;
 use Digua\Interfaces\{
     Controller as ControllerInterface,
+    Request as RequestInterface,
     RequestData as RequestDataInterface,
     Template as TemplateInterface
 };
@@ -13,9 +14,9 @@ use Digua\Interfaces\{
 abstract class Base implements ControllerInterface, TemplateInterface
 {
     /**
-     * @param Request $request
+     * @param RequestInterface $request
      */
-    public function __construct(protected Request $request)
+    public function __construct(protected RequestInterface $request)
     {
     }
 
@@ -31,15 +32,15 @@ abstract class Base implements ControllerInterface, TemplateInterface
      * @inheritdoc
      * @throws Path
      */
-    public function render(string $name, array $variables = []): TemplateInterface
+    public function render(string $name, array $variables = []): Template
     {
         return ((new Template($this->request))->render($name, $variables));
     }
 
     /**
-     * @return Request
+     * @return RequestInterface
      */
-    public function request(): Request
+    public function request(): RequestInterface
     {
         return $this->request;
     }
