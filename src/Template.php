@@ -168,6 +168,15 @@ class Template implements TemplateInterface, Stringable
     }
 
     /**
+     * @param string $name
+     * @return bool
+     */
+    public function hasBlock(string $name): bool
+    {
+        return isset($this->sections[$name]);
+    }
+
+    /**
      * Start section.
      *
      * @param string $name Section name
