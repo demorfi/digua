@@ -55,7 +55,7 @@ class Loader
                     if (isset($names[$number - 1])) {
                         // The last mask in the path is simply cleared
                         $rootPath = (int)$number === sizeof($names)
-                            ? str_replace($matches['mask'][$index] . '/', '', $rootPath)
+                            ? str_replace($matches['mask'][$index], '', $rootPath)
                             : str_replace($matches['mask'][$index], strtolower($names[$number - 1]), $rootPath);
                     }
                 }
