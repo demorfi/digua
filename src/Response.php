@@ -50,6 +50,14 @@ class Response implements ResponseInterface
     /**
      * @inheritdoc
      */
+    public function getContentType(): ContentType
+    {
+        return $this->contentType;
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function redirectTo(string $url, int $code = 302): self
     {
         $this->redirectTo = $url;
@@ -127,14 +135,12 @@ class Response implements ResponseInterface
     }
 
     /**
-     * @inheritdoc
+     * Build headers.
+     *
+     * @return void
      */
-    public function build(): self
+    protected function build(): void
     {
-        if ($this->data instanceof ResponseInterface) {
-            $this->data->build();
-        }
-
         foreach ($this->headers as $header) {
             [$type, $value, $code] = $header;
             $header = match ($type) {
@@ -142,10 +148,20 @@ class Response implements ResponseInterface
                 default => sprintf('%s: %s', ucfirst($type), $value)
             };
 
-            header($header, true, $code);
+            $this->sendHeader($header, true, $code);
         }
+    }
 
-        return $this;
+    /**
+     * @param string $header
+     * @param bool   $replace
+     * @param int    $code
+     * @return void
+     * @uses header
+     */
+    protected function sendHeader(string $header, bool $replace = true, int $code = 0): void
+    {
+        header($header, $replace, $code);
     }
 
     /**
@@ -153,6 +169,7 @@ class Response implements ResponseInterface
      */
     public function __toString(): string
     {
+        $this->build();
         return $this->contentType === ContentType::HTML
             ? strval($this->data)
             : json_encode($this->data);

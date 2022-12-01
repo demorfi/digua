@@ -3,6 +3,7 @@
 namespace Digua\Interfaces;
 
 use Stringable;
+use Digua\Enums\ContentType;
 
 interface Response extends Stringable
 {
@@ -18,6 +19,11 @@ interface Response extends Stringable
      * @return array
      */
     public function getHeaders(): array;
+
+    /**
+     * @return ContentType
+     */
+    public function getContentType(): ContentType;
 
     /**
      * @param string $url
@@ -71,15 +77,4 @@ interface Response extends Stringable
      * @return self
      */
     public static function create(mixed $data): self;
-
-    /**
-     * @return self
-     */
-    public function build(): self;
-
-    /**
-     * @inheritdoc
-     * @return string
-     */
-    public function __toString(): string;
 }

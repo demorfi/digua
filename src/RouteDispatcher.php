@@ -86,7 +86,7 @@ class RouteDispatcher
         }
 
         $this->request->setController($this->controller);
-        return Response::create(call_user_func([$this->controller, $actionName]))->build();
+        return Response::create(call_user_func([$this->controller, $actionName]));
     }
 
     /**
