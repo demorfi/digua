@@ -9,4 +9,8 @@ enum FileExtension: string
     case JSON = '.json';
 
     case LOG = '.log';
+
+    case PHP = '.php';
+
+    case TPL = '.tpl.php';
 }
