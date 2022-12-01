@@ -133,16 +133,18 @@ class Template implements TemplateInterface, Stringable
     /**
      * Include template.
      *
-     * @param string $name Template name
+     * @param string $name      Template name
+     * @param array  $arguments Template arguments
      * @throws TemplateException
      */
-    public function view(string $name): void
+    public function view(string $name, array $arguments = []): void
     {
         $filePath = self::getPathToFile($name . FileExtension::TPL->value);
         if (!is_readable($filePath)) {
             throw new TemplateException($filePath . ' - template not found!');
         }
 
+        $this->set('self', $arguments);
         require($filePath);
     }
 
@@ -164,7 +166,7 @@ class Template implements TemplateInterface, Stringable
      */
     public function block(string $name): string|null
     {
-        return $this->sections[$name] ?? null;
+        return isset($this->sections[$name]) && !is_bool($this->sections[$name]) ? $this->sections[$name] : null;
     }
 
     /**
