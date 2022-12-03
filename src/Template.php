@@ -220,8 +220,11 @@ class Template implements TemplateInterface, Stringable
      */
     public function __call(string $name, array $arguments): mixed
     {
-        return empty($arguments)
-            ? ($this->data[$name] ?? [])
-            : $this->data[$name] = $arguments[0];
+        if (empty($arguments)) {
+            return $this->data[$name] ?? [];
+        }
+
+        $this->data[$name] = $arguments[0];
+        return $this;
     }
 }
