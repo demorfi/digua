@@ -43,7 +43,7 @@ class Template implements TemplateInterface, Stringable
      */
     public function __construct(private readonly RequestInterface $request)
     {
-        self::throwIsEmptyPath();
+        self::throwIsBrokenPath();
         $this->startBuffer();
     }
 

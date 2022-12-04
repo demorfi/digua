@@ -16,7 +16,7 @@ class Config
      */
     public function __construct(string $name)
     {
-        self::throwIsEmptyPath();
+        self::throwIsBrokenPath();
         $this->array = require(self::getPathToFile($name . FileExtension::PHP->value));
     }
 }

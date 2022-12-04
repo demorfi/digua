@@ -47,7 +47,7 @@ class Curl implements Client
      */
     public function __construct()
     {
-        self::throwIsEmptyPath();
+        self::throwIsBrokenPath();
         $this->curl = curl_init();
 
         // Set default curl options

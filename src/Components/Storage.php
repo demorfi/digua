@@ -33,7 +33,7 @@ class Storage
      */
     public function __construct(protected string $fileName, protected ContentType $contentType)
     {
-        self::throwIsEmptyPath();
+        self::throwIsBrokenPath();
         $this->filePath = self::getPathToFile($this->fileName);
 
         if (!is_file($this->filePath)) {
