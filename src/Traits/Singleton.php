@@ -8,7 +8,7 @@ trait Singleton
 {
     private static ?self $instance = null;
 
-    private function __construct()
+    protected function __construct()
     {
     }
 
@@ -22,7 +22,7 @@ trait Singleton
     /**
      * @throws SingletonException
      */
-    public function __wakeup()
+    final public function __wakeup()
     {
         throw new SingletonException('Object unserialize forbidden!');
     }
@@ -30,7 +30,7 @@ trait Singleton
     /**
      * @throws SingletonException
      */
-    public function __sleep()
+    final public function __sleep()
     {
         throw new SingletonException('Object serialize forbidden!');
     }
@@ -40,10 +40,10 @@ trait Singleton
      * @param array  $arguments
      * @return mixed
      */
-    public static function __callStatic(string $method, array $arguments): mixed
+    final public static function __callStatic(string $method, array $arguments): mixed
     {
         return call_user_func_array([
-            static::getInstance(),
+            self::getInstance(),
             preg_replace('/^static/', '', $method)
         ], $arguments);
     }
@@ -51,10 +51,10 @@ trait Singleton
     /**
      * @return static
      */
-    public static function getInstance(): static
+    final public static function getInstance(): static
     {
         return static::$instance === null
-            ? static::$instance = new static()
+            ? static::$instance = new static
             : static::$instance;
     }
 }

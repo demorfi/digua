@@ -29,7 +29,7 @@ class Logger implements LoggerInterface
      * @throws PathException
      * @throws StorageException
      */
-    private function __construct()
+    protected function __construct()
     {
         $this->storage = new Storage('digua' . FileExtension::LOG->value, ContentType::TEXT);
     }

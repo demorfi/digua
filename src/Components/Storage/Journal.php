@@ -35,7 +35,7 @@ class Journal
      * @throws PathException
      * @throws StorageException
      */
-    private function __construct()
+    protected function __construct()
     {
         $this->storage = Json::load('journal');
         $this->storage->read();
