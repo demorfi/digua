@@ -19,7 +19,7 @@ class Env
      */
     public static function prod(): void
     {
-        self::setMode(self::$mode = EnvEnum::Prod);
+        self::setMode(EnvEnum::Prod);
     }
 
     /**
@@ -27,7 +27,7 @@ class Env
      */
     public static function dev(): void
     {
-        self::setMode(self::$mode = EnvEnum::Dev);
+        self::setMode(EnvEnum::Dev);
     }
 
     /**
@@ -44,6 +44,7 @@ class Env
      */
     public static function setMode(EnvEnum $env): void
     {
+        self::$mode = $env;
         $isDev = EnvEnum::Dev === $env;
         ini_set('display_errors', (int)$isDev);
         ini_set('display_startup_errors', (int)$isDev);
