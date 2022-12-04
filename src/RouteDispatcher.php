@@ -98,6 +98,10 @@ class RouteDispatcher
      */
     public function try(RouteInterface $route, string $controller, string $action): Response
     {
+        if (Env::isDev()) {
+            return $this->delegate($route);
+        }
+
         try {
             return $this->delegate($route);
         } catch (BaseException) {
