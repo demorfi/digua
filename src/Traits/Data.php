@@ -57,6 +57,20 @@ trait Data
     }
 
     /**
+     * @param string ...$names
+     * @return array
+     */
+    public function only(string ...$names): array
+    {
+        $array = [];
+        foreach ($names as $name) {
+            $array[] = $this->array[$name] ?? null;
+        }
+
+        return $array;
+    }
+
+    /**
      * Set value.
      *
      * @param string $name  Name key
