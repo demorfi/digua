@@ -2,6 +2,7 @@
 
 namespace Digua\Traits;
 
+use BadMethodCallException;
 use Digua\Exceptions\{
     Memory as MemoryException,
     MemoryShared as MemorySharedException
@@ -85,6 +86,10 @@ trait Stack
      */
     public function __call(string $name, array $arguments): mixed
     {
-        return call_user_func_array([$this->memory, $name], $arguments);
+        if (!method_exists($this->memory, $name)) {
+            throw new BadMethodCallException('method ' . $name . ' does not exist!');
+        }
+
+        return $this->memory->$name(...$arguments);
     }
 }

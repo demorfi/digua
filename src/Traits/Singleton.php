@@ -2,6 +2,7 @@
 
 namespace Digua\Traits;
 
+use BadMethodCallException;
 use Digua\Exceptions\Singleton as SingletonException;
 
 trait Singleton
@@ -36,16 +37,18 @@ trait Singleton
     }
 
     /**
-     * @param string $method
+     * @param string $name
      * @param array  $arguments
      * @return mixed
      */
-    final public static function __callStatic(string $method, array $arguments): mixed
+    final public static function __callStatic(string $name, array $arguments): mixed
     {
-        return call_user_func_array([
-            self::getInstance(),
-            preg_replace('/^static/', '', $method)
-        ], $arguments);
+        $name = preg_replace('/^static/', '', $name);
+        if (!method_exists(self::getInstance(), $name)) {
+            throw new BadMethodCallException('method ' . $name . ' does not exist!');
+        }
+
+        return self::getInstance()->$name(...$arguments);
     }
 
     /**
