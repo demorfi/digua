@@ -8,9 +8,6 @@ use Digua\Exceptions\{
 };
 use Digua\Components\Memory;
 
-/**
- * @mixin Memory
- */
 trait Stack
 {
     /**
