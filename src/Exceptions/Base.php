@@ -4,9 +4,10 @@ namespace Digua\Exceptions;
 
 use Exception;
 use Throwable;
+use Digua\Interfaces\Exception as ExceptionInterface;
 use Digua\LateEvent;
 
-class Base extends Exception
+class Base extends Exception implements ExceptionInterface
 {
     /**
      * @param string         $message
