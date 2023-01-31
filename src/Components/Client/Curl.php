@@ -23,14 +23,14 @@ class Curl implements Client
     private CurlHandle|false $curl;
 
     /**
-     * @var string|null
+     * @var string
      */
-    private ?string $response = null;
+    private string $response = '';
 
     /**
-     * @var string|null
+     * @var string
      */
-    private ?string $url = null;
+    private string $url;
 
     /**
      * @var array
@@ -153,7 +153,7 @@ class Curl implements Client
             curl_setopt($this->curl, CURLOPT_POSTFIELDS, http_build_query($this->fields));
         }
 
-        $this->response = curl_exec($this->curl);
+        $this->response = (string)curl_exec($this->curl);
     }
 
     /**
