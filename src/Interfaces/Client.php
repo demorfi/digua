@@ -48,6 +48,11 @@ interface Client
     public function getResponse(): string;
 
     /**
+     * @return int
+     */
+    public function getErrorCode(): int;
+
+    /**
      * Send request.
      */
     public function send(): void;

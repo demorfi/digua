@@ -144,6 +144,14 @@ class Curl implements Client
     /**
      * @inheritdoc
      */
+    public function getErrorCode(): int
+    {
+        return curl_errno($this->curl);
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function send(): void
     {
         curl_setopt($this->curl, CURLOPT_URL, str_replace(' ', '%20', $this->getUrl()));
