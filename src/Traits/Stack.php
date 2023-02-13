@@ -8,7 +8,11 @@ use Digua\Exceptions\{
     MemoryShared as MemorySharedException
 };
 use Digua\Components\Memory;
+use Generator;
 
+/**
+ * @mixin Memory
+ */
 trait Stack
 {
     /**
@@ -16,12 +20,12 @@ trait Stack
      *
      * @var int
      */
-    protected int $defaultSize = 1024;
+    private int $defaultSize = 1024;
 
     /**
      * @var Memory
      */
-    protected Memory $memory;
+    private Memory $memory;
 
     /**
      * @param string|null $hash
@@ -36,45 +40,115 @@ trait Stack
     }
 
     /**
-     * Get memory hash.
-     *
      * @return string
      */
     public function getHash(): string
     {
-        $size = ($this->size ?? $this->defaultSize);
-        return preg_replace('/:' . $size . '$/', '', $this->memory->getHash());
+        [$hash,] = explode(':', $this->memory->getHash());
+        return $hash;
     }
 
     /**
-     * Set finished flag.
-     *
-     * @throws MemorySharedException
-     */
-    public function setEndFlag(): void
-    {
-        $this->memory->push(-1);
-    }
-
-    /**
-     * Is finished flag.
-     *
-     * @param mixed $data
-     * @return bool
-     */
-    public function isEndFlag(mixed $data): bool
-    {
-        return $data === -1;
-    }
-
-    /**
-     * Free stack.
-     *
+     * @return string
      * @throws MemoryException
      */
-    public function free(): void
+    public static function genHash(): string
     {
-        $this->memory->free();
+        [$hash,] = explode(':', Memory::genHash());
+        return $hash;
+    }
+
+    /**
+     * @return array
+     */
+    protected function get(): array
+    {
+        $stack = $this->memory->read();
+        return !empty($stack) ? unserialize($stack) : [];
+    }
+
+    /**
+     * @param mixed $data
+     * @return bool
+     * @throws MemorySharedException
+     */
+    public function push(mixed $data): bool
+    {
+        return $this->memory->rewrite(function ($stack) use ($data) {
+            $stack   = !empty($stack) ? unserialize($stack) : [];
+            $stack[] = $data;
+            return serialize($stack);
+        });
+    }
+
+    /**
+     * @return mixed
+     * @throws MemorySharedException
+     */
+    public function pull(): mixed
+    {
+        $this->memory->rewrite(function ($stack) use (&$data) {
+            $stack = !empty($stack) ? unserialize($stack) : [];
+            $data  = sizeof($stack) < 1 ? false : array_pop($stack);
+            return serialize($stack);
+        });
+
+        return $data;
+    }
+
+    /**
+     * @return mixed
+     * @throws MemorySharedException
+     */
+    public function shift(): mixed
+    {
+        $this->memory->rewrite(function ($stack) use (&$data) {
+            $stack = !empty($stack) ? unserialize($stack) : [];
+            $data  = sizeof($stack) < 1 ? false : array_shift($stack);
+            return serialize($stack);
+        });
+
+        return $data;
+    }
+
+    /**
+     * @return Generator|false
+     * @throws MemorySharedException
+     */
+    public function read(): Generator|false
+    {
+        while (true) {
+            $data = $this->pull();
+            if (!$data) {
+                return false;
+            }
+
+            yield $data;
+        }
+    }
+
+    /**
+     * @return Generator|false
+     * @throws MemorySharedException
+     */
+    public function readReverse(): Generator|false
+    {
+        while (true) {
+            $data = $this->shift();
+            if (!$data) {
+                return false;
+            }
+
+            yield $data;
+        }
+    }
+
+    /**
+     * @return int
+     */
+    public function size(): int
+    {
+        return sizeof($this->get());
     }
 
     /**

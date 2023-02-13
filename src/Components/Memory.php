@@ -4,61 +4,52 @@ namespace Digua\Components;
 
 use Digua\Exceptions\{
     Memory as MemoryException,
-    MemorySemaphore as MemorySemaphoreException,
     MemoryShared as MemorySharedException
 };
-use SysvSemaphore;
-use SysvSharedMemory;
+use Shmop;
 use JsonSerializable;
-use Generator;
 use Exception;
+use ValueError;
 
 class Memory implements JsonSerializable
 {
     /**
-     * Memory size.
-     *
-     * @var int|float
+     * @var string
      */
-    private int|float $size;
+    private const FLAG_LOCK = "\1";
+
+    /**
+     * @var string
+     */
+    private const FLAG_UNLOCK = "\0";
+
+    /**
+     * @var string
+     */
+    private const FLAG_EOF = "\2";
 
     /**
      * @var int
      */
-    private int $semKey;
+    public const DEFAULT_SIZE = 1024;
+
+    /**
+     * @var Shmop|false
+     */
+    private Shmop|false $shmId;
 
     /**
      * @var int
      */
-    private int $shmKey;
+    private int $offset = 2;
 
     /**
-     * @var SysvSemaphore|false
-     */
-    private SysvSemaphore|false $semId;
-
-    /**
-     * @var SysvSharedMemory|false
-     */
-    private SysvSharedMemory|false $shmId;
-
-    /**
-     * @var int
-     */
-    private int $offset = 1;
-
-    /**
-     * @param int $semKey
      * @param int $shmKey
      * @param int $size
      * @throws MemoryException
      */
-    public function __construct(int $semKey, int $shmKey, int $size = 1024)
+    public function __construct(private readonly int $shmKey, private readonly int $size = self::DEFAULT_SIZE)
     {
-        $this->semKey = $semKey;
-        $this->shmKey = $shmKey;
-        $this->size   = abs($size);
-
         $this->attach();
     }
 
@@ -67,16 +58,10 @@ class Memory implements JsonSerializable
      * @return self
      * @throws MemoryException
      */
-    public static function create(int $size = 1024): self
+    public static function create(int $size = self::DEFAULT_SIZE): self
     {
-        try {
-            $semKey = random_int(time(), PHP_INT_MAX);
-            $shmKey = random_int(time() + 1, PHP_INT_MAX);
-        } catch (Exception $e) {
-            throw new MemoryException($e->getMessage());
-        }
-
-        return new self($semKey, $shmKey, $size);
+        [$shmKey, $size] = explode(':', self::genHash($size));
+        return new self((int)$shmKey, (int)$size);
     }
 
     /**
@@ -90,71 +75,48 @@ class Memory implements JsonSerializable
             throw new MemoryException('Error restore hash!');
         }
 
-        [$semKey, $shmKey, $size] = explode(':', $hash);
-        return new self((int)$semKey, (int)$shmKey, (int)$size);
+        [$shmKey, $size] = explode(':', $hash);
+        return new self((int)$shmKey, (int)$size);
     }
 
     /**
+     * @param int $size
+     * @return string
      * @throws MemoryException
      */
-    protected function attach(): void
+    public static function genHash(int $size = self::DEFAULT_SIZE): string
     {
-        $this->semId = sem_get($this->semKey);
-        if ($this->semId === false) {
-            throw new MemorySemaphoreException('Error creating semaphore!');
+        try {
+            return random_int(time(), PHP_INT_MAX) . ':' . $size;
+        } catch (Exception $e) {
+            throw new MemoryException('Error generating memory key - ' . $e->getMessage());
         }
+    }
 
-        if (!sem_acquire($this->semId)) {
-            sem_remove($this->semId);
-            throw new MemorySemaphoreException('Error when trying to take a semaphore ' . $this->semId . '!');
-        }
-
-        $this->shmId = shm_attach($this->shmKey, $this->size);
+    /**
+     * @return void
+     * @throws MemorySharedException
+     */
+    private function attach(): void
+    {
+        $this->shmId = shmop_open($this->shmKey, 'c', 0644, $this->size + $this->offset);
         if ($this->shmId === false) {
-            throw new MemorySharedException('Error when connecting to shared memory!');
+            throw new MemorySharedException('Error when connecting to shared memory through the key ' . $this->shmKey);
         }
     }
 
     /**
-     * @throws MemoryException
+     * @return bool
      */
-    public function detach(): void
+    public function free(): bool
     {
-        if (!sem_release($this->semId)) {
-            throw new MemorySemaphoreException('Error while trying to release the semaphore ' . $this->semId . '!');
-        }
-
-        if (!shm_remove($this->shmId)) {
-            throw new MemorySharedException(
-                'Error when trying to delete the shared memory segment ' . $this->shmId . '!'
-            );
-        }
-
-        if (!sem_remove($this->semId)) {
-            throw new MemorySemaphoreException('Error when attempting to delete the semaphore ' . $this->semId . '!');
-        }
-    }
-
-    /**
-     * @throws MemoryException
-     */
-    public function free(): void
-    {
-        $this->detach();
-    }
-
-    /**
-     * @return SysvSemaphore|false
-     */
-    public function getSemKey(): SysvSemaphore|false
-    {
-        return $this->semId;
+        return shmop_delete($this->shmId);
     }
 
     /**
      * @return int
      */
-    public function getShmKey(): int
+    public function getKey(): int
     {
         return $this->shmKey;
     }
@@ -165,7 +127,7 @@ class Memory implements JsonSerializable
      */
     public function jsonSerialize(): string
     {
-        return $this->__toString();
+        return $this->getHash();
     }
 
     /**
@@ -173,7 +135,7 @@ class Memory implements JsonSerializable
      */
     public function getHash(): string
     {
-        return $this->__toString();
+        return $this->shmKey . ':' . $this->size;
     }
 
     /**
@@ -181,142 +143,127 @@ class Memory implements JsonSerializable
      */
     public function __toString(): string
     {
-        return $this->semKey . ':' . $this->shmKey . ':' . $this->size;
+        return $this->getHash();
     }
 
     /**
-     * @param mixed $data
-     * @throws MemorySharedException
+     * @return bool
      */
-    public function push(mixed $data): void
+    public function hasEof(): bool
     {
-        try {
-            if (!shm_has_var($this->shmId, $this->offset)) {
-                if (!shm_put_var($this->shmId, $this->offset, [])) {
-                    throw new MemoryException;
-                }
-            }
-
-            $stack   = shm_get_var($this->shmId, $this->offset);
-            $stack[] = $data;
-            if (!shm_put_var($this->shmId, $this->offset, $stack)) {
-                throw new MemoryException;
-            }
-        } catch (MemoryException) {
-            sem_remove($this->semId);
-            shm_remove($this->shmId);
-            throw new MemorySharedException('Error when trying to write to shared memory ' . $this->shmId . '!');
-        }
+        return shmop_read($this->shmId, 1, 1) === self::FLAG_EOF;
     }
 
     /**
-     * @return mixed
-     * @throws MemorySharedException
+     * @param bool|string $data
+     * @return string
      */
-    protected function get(): mixed
+    private function clean(bool|string $data): string
     {
-        if (!shm_has_var($this->shmId, $this->offset)) {
-            return false;
-        }
-
-        $stack = shm_get_var($this->shmId, $this->offset);
-        if ($stack === false) {
-            throw new MemorySharedException;
-        }
-
-        return $stack;
+        return !empty($data) ? rtrim($data, "\0") : '';
     }
 
     /**
-     * @return mixed
+     * @param string $data
+     * @param        $size
+     * @return void
      * @throws MemorySharedException
      */
-    public function pull(): mixed
+    private function allowedSize(string $data, &$size = null): void
     {
-        try {
-            $stack = $this->get();
-            if (is_bool($stack) || sizeof($stack) < 1) {
-                return false;
-            }
-
-            $data = array_pop($stack);
-            if (!shm_put_var($this->shmId, $this->offset, $stack)) {
-                throw new MemoryException;
-            }
-
-            return $data;
-        } catch (MemoryException) {
-            throw new MemorySharedException('Error attempting to read from shared memory ' . $this->shmId . '!');
+        $size = mb_strlen($data);
+        if ($size > $this->size) {
+            throw new MemorySharedException(
+                sprintf(
+                    'The allowed memory limit has been exceeded. Requested %d out of %d possible',
+                    $size,
+                    $this->size
+                )
+            );
         }
     }
 
     /**
-     * @return mixed
-     * @throws MemorySharedException
+     * @return string
      */
-    public function shift(): mixed
-    {
-        try {
-            $stack = $this->get();
-            if (is_bool($stack) || sizeof($stack) < 1) {
-                return false;
-            }
-
-            $data = array_shift($stack);
-            if (!shm_put_var($this->shmId, $this->offset, $stack)) {
-                throw new MemoryException;
-            }
-
-            return $data;
-        } catch (MemoryException) {
-            throw new MemorySharedException('Error attempting to read from shared memory ' . $this->shmId . '!');
-        }
-    }
-
-    /**
-     * @return Generator|false
-     * @throws MemorySharedException
-     */
-    public function read(): Generator|false
+    public function read(): string
     {
         while (true) {
-            $data = $this->shift();
-            if (!$data) {
-                return false;
+            if (shmop_read($this->shmId, 0, 1) === self::FLAG_LOCK) {
+                continue;
             }
-
-            yield $data;
+            return $this->clean(shmop_read($this->shmId, $this->offset, $this->size));
         }
     }
 
     /**
-     * @return array|false
+     * @param string $data
+     * @return bool
      * @throws MemorySharedException
      */
-    public function readToArray(): array|false
+    public function write(string $data): bool
     {
-        try {
-            $stack = $this->get();
-            if (is_bool($stack) || sizeof($stack) < 1) {
-                return false;
+        while (true) {
+            if (shmop_read($this->shmId, 0, 1) === self::FLAG_LOCK) {
+                continue;
             }
 
-            return $stack;
-        } catch (MemoryException) {
-            throw new MemorySharedException('Error attempting to read from shared memory ' . $this->shmId . '!');
+            $this->allowedSize($data, $dataSize);
+            $data .= str_repeat("\0", $this->size - $dataSize);
+
+            try {
+                shmop_write($this->shmId, self::FLAG_LOCK, 0);
+                shmop_write($this->shmId, $data, $this->offset);
+            } catch (ValueError $e) {
+                throw new MemorySharedException('Error when trying to write to shared memory - ' . $e->getMessage());
+            } finally {
+                shmop_write($this->shmId, self::FLAG_UNLOCK, 0);
+            }
+
+            return true;
         }
     }
 
     /**
-     * @return int
+     * @param callable $callable
+     * @return bool
+     * @throws MemorySharedException
      */
-    public function size(): int
+    public function rewrite(callable $callable): bool
     {
-        if (!shm_has_var($this->shmId, $this->offset)) {
-            return 0;
-        }
+        while (true) {
+            if (shmop_read($this->shmId, 0, 1) === self::FLAG_LOCK) {
+                continue;
+            }
 
-        $stack = shm_get_var($this->shmId, $this->offset);
-        return $stack !== false ? sizeof($stack) : 0;
+            try {
+                shmop_write($this->shmId, self::FLAG_LOCK, 0);
+                $rewriteData = (string)$callable($this->clean(shmop_read($this->shmId, $this->offset, $this->size)));
+
+                $this->allowedSize($rewriteData, $dataSize);
+                $rewriteData .= str_repeat("\0", $this->size - $dataSize);
+
+                shmop_write($this->shmId, $rewriteData, $this->offset);
+            } catch (MemoryException|ValueError $e) {
+                throw new MemorySharedException('Error when trying to write to shared memory - ' . $e->getMessage());
+            } finally {
+                shmop_write($this->shmId, self::FLAG_UNLOCK, 0);
+            }
+
+            return true;
+        }
+    }
+
+    /**
+     * @return bool
+     */
+    public function setEof(): bool
+    {
+        while (true) {
+            if (shmop_read($this->shmId, 0, 1) === self::FLAG_LOCK) {
+                continue;
+            }
+            return (bool)shmop_write($this->shmId, self::FLAG_EOF, 1);
+        }
     }
 }
