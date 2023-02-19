@@ -1,10 +1,10 @@
 <?php declare(strict_types=1);
 
-namespace Digua\Interfaces;
+namespace Digua\Interfaces\Request;
 
-use Digua\Request\{Post, Query, Cookies};
+use Digua\Request\{Cookies, Post, Query};
 
-interface RequestData
+interface Data
 {
     /**
      * @return Post

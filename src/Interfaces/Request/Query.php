@@ -1,8 +1,8 @@
 <?php declare(strict_types=1);
 
-namespace Digua\Interfaces;
+namespace Digua\Interfaces\Request;
 
-interface RequestQuery
+interface Query
 {
     /**
      * @return string

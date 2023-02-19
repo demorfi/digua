@@ -2,11 +2,13 @@
 
 namespace Digua;
 
+use Digua\Interfaces\{
+    Controller as ControllerInterface,
+    Request as RequestInterface,
+    Request\Data as RequestDataInterface,
+    Route as RouteInterface
+};
 use Digua\Request\Data as DataRequest;
-use Digua\Interfaces\Route as RouteInterface;
-use Digua\Interfaces\Request as RequestInterface;
-use Digua\Interfaces\RequestData as RequestDataInterface;
-use Digua\Interfaces\Controller as ControllerInterface;
 
 class Request implements RequestInterface
 {

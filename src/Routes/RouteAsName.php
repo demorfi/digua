@@ -4,7 +4,7 @@ namespace Digua\Routes;
 
 use Digua\Interfaces\{
     Route as RouteInterface,
-    RouteBuilder as RouteBuilderInterface
+    Route\Builder as RouteBuilderInterface
 };
 
 class RouteAsName implements RouteInterface

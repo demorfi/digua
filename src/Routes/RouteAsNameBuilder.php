@@ -2,8 +2,10 @@
 
 namespace Digua\Routes;
 
-use Digua\Interfaces\RouteBuilder as RouteBuilderInterface;
-use Digua\Interfaces\Request as RequestInterface;
+use Digua\Interfaces\{
+    Request as RequestInterface,
+    Route\Builder as RouteBuilderInterface
+};
 
 class RouteAsNameBuilder implements RouteBuilderInterface
 {

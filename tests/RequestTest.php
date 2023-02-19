@@ -2,7 +2,7 @@
 
 use Digua\Interfaces\{
     Controller as ControllerInterface,
-    RequestData as RequestDataInterface,
+    Request\Data as RequestDataInterface,
     Route as RouteInterface
 };
 use Digua\Request;

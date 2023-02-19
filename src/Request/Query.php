@@ -2,9 +2,11 @@
 
 namespace Digua\Request;
 
+use Digua\Interfaces\{
+    NamedCollection as NamedCollectionInterface,
+    Request\Query as RequestQueryInterface
+};
 use Digua\Traits\Data as DataTrait;
-use Digua\Interfaces\NamedCollection as NamedCollectionInterface;
-use Digua\Interfaces\RequestQuery as RequestQueryInterface;
 
 class Query implements RequestQueryInterface, NamedCollectionInterface
 {

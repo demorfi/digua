@@ -2,7 +2,7 @@
 
 namespace Digua\Request;
 
-use Digua\Interfaces\RequestData as RequestDataInterface;
+use Digua\Interfaces\Request\Data as RequestDataInterface;
 
 class Data implements RequestDataInterface
 {

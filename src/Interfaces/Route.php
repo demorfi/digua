@@ -2,6 +2,8 @@
 
 namespace Digua\Interfaces;
 
+use Digua\Interfaces\Route\Builder as RouteBuilder;
+
 interface Route
 {
     /**

@@ -2,14 +2,14 @@
 
 namespace Digua\Controllers;
 
-use Digua\Exceptions\Path;
-use Digua\Template;
 use Digua\Interfaces\{
     Controller as ControllerInterface,
     Request as RequestInterface,
-    RequestData as RequestDataInterface,
+    Request\Data as RequestDataInterface,
     Template as TemplateInterface
 };
+use Digua\Template;
+use Digua\Exceptions\Path;
 
 abstract class Base implements ControllerInterface, TemplateInterface
 {

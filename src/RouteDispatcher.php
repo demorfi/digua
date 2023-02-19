@@ -2,16 +2,16 @@
 
 namespace Digua;
 
-use Digua\Exceptions\{
-    Route as RouteException,
-    Base as BaseException
-};
-use Digua\Interfaces\{
-    Route as RouteInterface,
-    Controller as ControllerInterface,
-    RouteBuilder as RouteBuilderInterface
-};
 use Digua\Controllers\Error as ErrorController;
+use Digua\Interfaces\{
+    Controller as ControllerInterface,
+    Route as RouteInterface,
+    Route\Builder as RouteBuilderInterface
+};
+use Digua\Exceptions\{
+    Base as BaseException,
+    Route as RouteException
+};
 use Digua\Routes\{RouteAsName, RouteAsNameBuilder};
 
 class RouteDispatcher

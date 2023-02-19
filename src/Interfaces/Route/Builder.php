@@ -1,18 +1,18 @@
 <?php declare(strict_types=1);
 
-namespace Digua\Interfaces;
+namespace Digua\Interfaces\Route;
 
 use Digua\Interfaces\Request as RequestInterface;
 
-interface RouteBuilder
+interface Builder
 {
     /**
-     * @param Request $request
+     * @param RequestInterface $request
      */
     public function __construct(RequestInterface $request);
 
     /**
-     * @return Request
+     * @return RequestInterface
      */
     public function request(): RequestInterface;
 
