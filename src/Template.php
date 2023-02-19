@@ -5,7 +5,7 @@ namespace Digua;
 use Digua\Enums\FileExtension;
 use Digua\Interfaces\Request as RequestInterface;
 use Digua\Interfaces\Template as TemplateInterface;
-use Digua\Traits\{Data, Output, StaticPath};
+use Digua\Traits\{Data, Output, Configurable, DiskPath};
 use Digua\Exceptions\{
     Path as PathException,
     Template as TemplateException
@@ -14,7 +14,14 @@ use Stringable;
 
 class Template implements TemplateInterface, Stringable
 {
-    use Output, Data, StaticPath;
+    use Output, Data, Configurable, DiskPath;
+
+    /**
+     * @var string[]
+     */
+    protected static array $defaults = [
+        'diskPath' => ROOT_PATH . '/resource/views'
+    ];
 
     /**
      * @var array
@@ -43,7 +50,7 @@ class Template implements TemplateInterface, Stringable
      */
     public function __construct(private readonly RequestInterface $request)
     {
-        self::throwIsBrokenPath();
+        self::throwIsBrokenDiskPath();
         $this->startBuffer();
     }
 
@@ -139,7 +146,7 @@ class Template implements TemplateInterface, Stringable
      */
     public function view(string $name, array $arguments = []): void
     {
-        $filePath = self::getPathToFile($name . FileExtension::TPL->value);
+        $filePath = self::getDiskPath(Helper::filterFileName($name) . FileExtension::TPL->value);
         if (!is_readable($filePath)) {
             throw new TemplateException($filePath . ' - template not found!');
         }

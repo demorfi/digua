@@ -2,16 +2,24 @@
 
 namespace Digua\Components;
 
+use Digua\Helper;
 use Digua\Exceptions\{
     Path as PathException,
     Storage as StorageException
 };
 use Digua\Enums\ContentType;
-use Digua\Traits\StaticPath;
+use Digua\Traits\{Configurable, DiskPath};
 
 class Storage
 {
-    use StaticPath;
+    use Configurable, DiskPath;
+
+    /**
+     * @var string[]
+     */
+    protected static array $defaults = [
+        'diskPath' => ROOT_PATH . '/storage'
+    ];
 
     /**
      * Storage full file path.
@@ -33,8 +41,8 @@ class Storage
      */
     public function __construct(protected string $fileName, protected ContentType $contentType)
     {
-        self::throwIsBrokenPath();
-        $this->filePath = self::getPathToFile($this->fileName);
+        self::throwIsBrokenDiskPath();
+        $this->filePath = self::getDiskPath(Helper::filterFileName($this->fileName));
 
         if (!is_file($this->filePath)) {
             $this->create();
@@ -145,8 +153,8 @@ class Storage
      */
     public function create(): bool
     {
-        if (!self::isReadablePath()) {
-            throw new StorageException(self::getPath() . ' - not writable!');
+        if (!self::isReadableDiskPath()) {
+            throw new StorageException(self::getDiskPath() . ' - not writable!');
         }
 
         return (bool)file_put_contents($this->filePath, null, LOCK_EX);

@@ -3,19 +3,27 @@
 namespace Digua\Components\Client;
 
 use CurlHandle;
-use Digua\Traits\StaticPath;
+use Digua\Traits\{Configurable, DiskPath};
+use Digua\Helper;
 use Digua\Interfaces\Client;
 use Digua\Exceptions\Path as PathException;
 use Digua\Enums\FileExtension;
 
 class Curl implements Client
 {
-    use StaticPath;
+    use Configurable, DiskPath;
 
     /**
      * @var string
      */
     const DEFAULT_USER_AGENT = 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/535 (KHTML, like Gecko) Chrome/14 Safari/535';
+
+    /**
+     * @var string[]
+     */
+    protected static array $defaults = [
+        'diskPath' => ROOT_PATH . '/storage'
+    ];
 
     /**
      * @var CurlHandle|false
@@ -47,7 +55,7 @@ class Curl implements Client
      */
     public function __construct()
     {
-        self::throwIsBrokenPath();
+        self::throwIsBrokenDiskPath();
         $this->curl = curl_init();
 
         // Set default curl options
@@ -115,7 +123,7 @@ class Curl implements Client
      */
     public function useCookie(string $fileName): void
     {
-        $filePath = self::getPathToFile($fileName . FileExtension::COOKIE->value);
+        $filePath = self::getDiskPath(Helper::filterFileName($fileName) . FileExtension::COOKIE->value);
         curl_setopt($this->curl, CURLOPT_COOKIEJAR, $filePath);
         curl_setopt($this->curl, CURLOPT_COOKIEFILE, $filePath);
     }

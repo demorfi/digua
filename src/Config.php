@@ -2,13 +2,20 @@
 
 namespace Digua;
 
-use Digua\Traits\{Data, StaticPath};
+use Digua\Traits\{Data, Configurable, DiskPath};
 use Digua\Exceptions\Path as PathException;
 use Digua\Enums\FileExtension;
 
 class Config
 {
-    use Data, StaticPath;
+    use Data, Configurable, DiskPath;
+
+    /**
+     * @var string[]
+     */
+    protected static array $defaults = [
+        'diskPath' => ROOT_PATH . '/config'
+    ];
 
     /**
      * @param string $name Config name
@@ -16,7 +23,7 @@ class Config
      */
     public function __construct(string $name)
     {
-        self::throwIsBrokenPath();
-        $this->array = require(self::getPathToFile($name . FileExtension::PHP->value));
+        self::throwIsBrokenDiskPath();
+        $this->array = require(self::getDiskPath(Helper::filterFileName($name) . FileExtension::PHP->value));
     }
 }
