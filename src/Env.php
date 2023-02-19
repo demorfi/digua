@@ -49,9 +49,6 @@ class Env
         ini_set('display_errors', (int)$isDev);
         ini_set('display_startup_errors', (int)$isDev);
         error_reporting($isDev ? E_ALL : (E_ALL & ~E_DEPRECATED & ~E_STRICT));
-
-        self::addHandlerError();
-        self::addHandlerException();
     }
 
     /**
