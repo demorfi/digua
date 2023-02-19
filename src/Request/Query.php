@@ -63,7 +63,7 @@ class Query implements RequestQueryInterface, NamedCollectionInterface
      */
     public static function getHost(): string
     {
-        return strtolower(($_SERVER['REQUEST_SCHEME'] ?? 'http') . '://' . $_SERVER['HTTP_HOST']);
+        return strtolower(($_SERVER['REQUEST_SCHEME'] ?? 'http') . '://' . ($_SERVER['HTTP_HOST'] ?? ''));
     }
 
     /**
