@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
     <meta charset="utf-8">
@@ -11,6 +11,13 @@
     <link rel="stylesheet" href="/stylesheet/main.css"/>
     <?php foreach ($this->styles() as $style) { ?>
         <link rel="stylesheet" href="/stylesheet/<?php echo $style; ?>.css"/>
+    <?php } ?>
+    <script defer src="/javascript/jquery.min.js"></script>
+    <script defer src="/javascript/jquery.storageapi.min.js"></script>
+    <script defer src="/javascript/bootstrap.min.js"></script>
+    <script defer src="/javascript/main.js"></script>
+    <?php foreach ($this->javascripts() as $javascript) { ?>
+        <script src="/javascript/<?php echo $javascript; ?>.js" type="module"></script>
     <?php } ?>
 </head>
 <body class="bg-success">
@@ -41,13 +48,5 @@
         <p class="text-muted"><i class="fa fa-code"></i> with <i class="fa fa-heart"></i> in Siberia.</p>
     </div>
 </footer>
-
-<script src="/javascript/jquery.min.js"></script>
-<script src="/javascript/jquery.storageapi.min.js"></script>
-<script src="/javascript/bootstrap.min.js"></script>
-<?php foreach ($this->javascripts() as $javascript) { ?>
-    <script src="/javascript/<?php echo $javascript; ?>.js"></script>
-<?php } ?>
-<script src="/javascript/main.js"></script>
 </body>
 </html>
