@@ -34,6 +34,15 @@ class Loader
     }
 
     /**
+     * @param string ...$includePath
+     * @return void
+     */
+    public function addIncludePath(string ...$includePath): void
+    {
+        $this->includePaths = array_merge($this->includePaths, $includePath);
+    }
+
+    /**
      * @param string $filePath
      * @return array
      */
