@@ -5,10 +5,19 @@ use Digua\Loader;
 
 class LoaderTest extends TestCase
 {
+    /**
+     * @var Loader
+     */
     protected Loader $loader;
 
+    /**
+     * @var string
+     */
     protected string $filePath;
 
+    /**
+     * @return void
+     */
     protected function setUp(): void
     {
         $this->loader = $this
@@ -45,7 +54,10 @@ class LoaderTest extends TestCase
             );
     }
 
-    public function testExistingFile()
+    /**
+     * @return void
+     */
+    public function testExistingFile(): void
     {
         $this->loader->load('App\Components\File1');
         $this->assertSame('../App/Components/File1.php', $this->filePath);
@@ -60,7 +72,10 @@ class LoaderTest extends TestCase
         $this->assertSame('../vendor/components/src/app/dir/File4.php', $this->filePath);
     }
 
-    public function testMissingFile()
+    /**
+     * @return void
+     */
+    public function testMissingFile(): void
     {
         $this->assertFalse($this->loader->load('App1\Components\File1'));
     }

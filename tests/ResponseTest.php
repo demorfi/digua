@@ -6,7 +6,10 @@ use PHPUnit\Framework\TestCase;
 
 class ResponseTest extends TestCase
 {
-    public function testIsItPossibleToManageHeaders()
+    /**
+     * @return void
+     */
+    public function testIsItPossibleToManageHeaders(): void
     {
         $response = new Response();
         $this->assertEmpty($response->getHeaders());
@@ -29,7 +32,10 @@ class ResponseTest extends TestCase
         );
     }
 
-    public function testIsItPossibleToAddRedirectHeader()
+    /**
+     * @return void
+     */
+    public function testIsItPossibleToAddRedirectHeader(): void
     {
         $response = new Response();
         $this->assertFalse($response->hasRedirect());
@@ -42,7 +48,10 @@ class ResponseTest extends TestCase
         $this->assertSame('https://url.test', $response->hasRedirect());
     }
 
-    public function testIsItPossibleToAddDataContent()
+    /**
+     * @return void
+     */
+    public function testIsItPossibleToAddDataContent(): void
     {
         $response = new Response();
         $response->setData(['key' => 'value']);
@@ -66,7 +75,10 @@ class ResponseTest extends TestCase
         $this->assertIsString($response->getData());
     }
 
-    public function testIsItPossibleAliasesToAddDataContent()
+    /**
+     * @return void
+     */
+    public function testIsItPossibleAliasesToAddDataContent(): void
     {
         $response = new Response();
         $this->assertInstanceOf(Response::class, $response->json(['key' => 'value']));
@@ -100,7 +112,10 @@ class ResponseTest extends TestCase
         $this->assertIsString($response->getData());
     }
 
-    public function testIsItPossibleToCreateStaticInstance()
+    /**
+     * @return void
+     */
+    public function testIsItPossibleToCreateStaticInstance(): void
     {
         $response = Response::create(['key' => 'value']);
         $this->assertInstanceOf(Response::class, $response);
@@ -114,7 +129,10 @@ class ResponseTest extends TestCase
         );
     }
 
-    public function testIsItPossibleToPrintResponse()
+    /**
+     * @return void
+     */
+    public function testIsItPossibleToPrintResponse(): void
     {
         $response = $this
             ->getMockBuilder(Response::class)

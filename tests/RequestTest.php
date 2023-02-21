@@ -10,20 +10,29 @@ use PHPUnit\Framework\TestCase;
 
 class RequestTest extends TestCase
 {
-    public function testDataObjectIsReturned()
+    /**
+     * @return void
+     */
+    public function testDataObjectIsReturned(): void
     {
         $request = new Request();
         $this->assertInstanceOf(RequestDataInterface::class, $request->getData());
     }
 
-    public function testRouteObjectIsReturned()
+    /**
+     * @return void
+     */
+    public function testRouteObjectIsReturned(): void
     {
         $request = new Request();
         $request->setRoute($this->createMock(RouteInterface::class));
         $this->assertInstanceOf(RouteInterface::class, $request->getRoute());
     }
 
-    public function testControllerObjectIsReturned()
+    /**
+     * @return void
+     */
+    public function testControllerObjectIsReturned(): void
     {
         $request = new Request();
         $request->setController($this->createMock(ControllerInterface::class));
