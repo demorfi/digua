@@ -1,13 +1,11 @@
 <?php declare(strict_types=1);
 
-namespace Digua\Components\Storage;
+namespace Digua\Components;
 
-use Digua\Exceptions\{
-    Path as PathException,
-    Storage as StorageException
-};
-use Digua\Traits\Singleton;
+use Digua\Components\DataFile as DiskFileJsonStorage;
 use Digua\Enums\SortType;
+use Digua\Exceptions\Storage as StorageException;
+use Digua\Traits\Singleton;
 use Generator;
 
 /**
@@ -27,19 +25,18 @@ class Journal
     private readonly array $original;
 
     /**
-     * @var Json
+     * @var Storage|DiskFileJsonStorage
      */
-    protected readonly Json $storage;
+    protected readonly Storage|DiskFileJsonStorage $dataFile;
 
     /**
-     * @throws PathException
      * @throws StorageException
      */
     protected function __construct()
     {
-        $this->storage = Json::load('journal');
-        $this->storage->read();
-        $this->original = $this->storage->getAll();
+        $this->dataFile = new DataFile('journal');
+        $this->dataFile->read();
+        $this->original = $this->dataFile->getAll();
     }
 
     /**
@@ -51,7 +48,7 @@ class Journal
     {
         $time    = time();
         $message = sizeof($message) < 2 ? array_shift($message) : $message;
-        $this->storage->__set(strval($this->storage->size() + 1), compact('message', 'time'));
+        $this->dataFile->set(strval($this->dataFile->size() + 1), compact('message', 'time'));
     }
 
     /**
@@ -60,8 +57,8 @@ class Journal
     public function flush(int $offset = 0): void
     {
         $offset > 0
-            ? $this->storage->overwrite(array_reverse($this->getAll($offset)))
-            : $this->storage->flush();
+            ? $this->dataFile->overwrite(array_reverse($this->getAll($offset)))
+            : $this->dataFile->flush();
     }
 
     /**
@@ -73,7 +70,7 @@ class Journal
      */
     protected function getAll(int $limit = 0, SortType $sort = SortType::DESC): array
     {
-        $journal = $this->storage->getAll();
+        $journal = $this->dataFile->getAll();
 
         if ($sort == SortType::DESC) {
             $journal = array_reverse($journal, true);
@@ -105,10 +102,10 @@ class Journal
      */
     public function __destruct()
     {
-        if ($this->storage->size() != sizeof($this->original)
-            || sizeof(@array_diff_assoc($this->storage->getAll(), $this->original))
+        if ($this->dataFile->size() != sizeof($this->original)
+            || sizeof(@array_diff_assoc($this->dataFile->getAll(), $this->original))
         ) {
-            $this->storage->save();
+            $this->dataFile->save();
         }
     }
 }

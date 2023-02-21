@@ -1,16 +1,14 @@
 <?php declare(strict_types=1);
 
-namespace Digua\Components\Storage;
+namespace Digua\Components;
 
-use Digua\Exceptions\{
-    Path as PathException,
-    Storage as StorageException
+use Digua\Enums\FileExtension;
+use Digua\Interfaces\{
+    Logger as LoggerInterface,
+    Storage as StorageInterface
 };
 use Digua\Traits\Singleton;
-use Digua\Components\Storage;
-use Digua\Enums\ContentType;
-use Digua\Enums\FileExtension;
-use Digua\Interfaces\Logger as LoggerInterface;
+use Digua\Exceptions\Storage as StorageException;
 
 /**
  * @method static void staticPush(string $message);
@@ -21,17 +19,21 @@ class Logger implements LoggerInterface
     use Singleton;
 
     /**
-     * @var Storage
+     * @var Storage|StorageInterface
      */
-    protected readonly Storage $storage;
+    protected readonly Storage|StorageInterface $storage;
 
     /**
-     * @throws PathException
+     * @var array
+     */
+    private array $pushed = [];
+
+    /**
      * @throws StorageException
      */
-    protected function __construct()
+    protected function __construct(Storage $storage = null)
     {
-        $this->storage = new Storage('digua' . FileExtension::LOG->value, ContentType::TEXT);
+        $this->storage = $storage ?: Storage::makeDiskFile('digua' . FileExtension::LOG->value);
     }
 
     /**
@@ -41,7 +43,7 @@ class Logger implements LoggerInterface
      */
     public function push(string $message): void
     {
-        $this->storage->append('[' . date('Y-m-d H:m:s', time()) . '] ' . $message . "\r\n");
+        $this->pushed[] = '[' . date('Y-m-d H:m:s', time()) . '] ' . $message;
     }
 
     /**
@@ -52,7 +54,7 @@ class Logger implements LoggerInterface
      */
     public function save(): void
     {
-        $this->storage->save(false);
+        $this->storage->write(implode("\n", $this->pushed) . "\n");
     }
 
     /**
@@ -62,7 +64,7 @@ class Logger implements LoggerInterface
      */
     public function __destruct()
     {
-        if (!empty($this->storage->getContent())) {
+        if (!empty($this->pushed)) {
             $this->save();
         }
     }

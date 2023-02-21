@@ -1,17 +1,18 @@
 <?php declare(strict_types=1);
 
-namespace Digua\Components;
+namespace Digua\Components\Storage;
 
+use Digua\Helper;
+use Digua\Interfaces\Storage as StorageInterface;
 use Digua\Exceptions\{
     Memory as MemoryException,
     MemoryShared as MemorySharedException
 };
 use Shmop;
 use JsonSerializable;
-use Exception;
 use ValueError;
 
-class Memory implements JsonSerializable
+class SharedMemory implements StorageInterface, JsonSerializable
 {
     /**
      * @var string
@@ -44,11 +45,11 @@ class Memory implements JsonSerializable
     private int $offset = 2;
 
     /**
-     * @param int $shmKey
-     * @param int $size
+     * @param string $name
+     * @param int    $size
      * @throws MemoryException
      */
-    public function __construct(private readonly int $shmKey, private readonly int $size = self::DEFAULT_SIZE)
+    public function __construct(private readonly string $name, private readonly int $size = self::DEFAULT_SIZE)
     {
         $this->attach();
     }
@@ -60,37 +61,7 @@ class Memory implements JsonSerializable
      */
     public static function create(int $size = self::DEFAULT_SIZE): self
     {
-        [$shmKey, $size] = explode(':', self::genHash($size));
-        return new self((int)$shmKey, (int)$size);
-    }
-
-    /**
-     * @param string $hash
-     * @return self
-     * @throws MemoryException
-     */
-    public static function restore(string $hash): self
-    {
-        if (!str_contains($hash, ':')) {
-            throw new MemoryException('Error restore hash!');
-        }
-
-        [$shmKey, $size] = explode(':', $hash);
-        return new self((int)$shmKey, (int)$size);
-    }
-
-    /**
-     * @param int $size
-     * @return string
-     * @throws MemoryException
-     */
-    public static function genHash(int $size = self::DEFAULT_SIZE): string
-    {
-        try {
-            return random_int(time(), PHP_INT_MAX) . ':' . $size;
-        } catch (Exception $e) {
-            throw new MemoryException('Error generating memory key - ' . $e->getMessage());
-        }
+        return new self((string)Helper::makeIntHash(), $size);
     }
 
     /**
@@ -99,68 +70,19 @@ class Memory implements JsonSerializable
      */
     private function attach(): void
     {
-        $this->shmId = shmop_open($this->shmKey, 'c', 0644, $this->size + $this->offset);
+        $this->shmId = shmop_open(crc32($this->name), 'c', 0644, $this->size + $this->offset);
         if ($this->shmId === false) {
-            throw new MemorySharedException('Error when connecting to shared memory through the key ' . $this->shmKey);
+            throw new MemorySharedException('Error when connecting to shared memory through the key ' . $this->name);
         }
     }
 
     /**
-     * @return bool
-     */
-    public function free(): bool
-    {
-        return shmop_delete($this->shmId);
-    }
-
-    /**
-     * @return int
-     */
-    public function getKey(): int
-    {
-        return $this->shmKey;
-    }
-
-    /**
-     * @inheritdoc
-     * @return string
-     */
-    public function jsonSerialize(): string
-    {
-        return $this->getHash();
-    }
-
-    /**
-     * @return string
-     */
-    public function getHash(): string
-    {
-        return $this->shmKey . ':' . $this->size;
-    }
-
-    /**
-     * @return string
-     */
-    public function __toString(): string
-    {
-        return $this->getHash();
-    }
-
-    /**
-     * @return bool
-     */
-    public function hasEof(): bool
-    {
-        return shmop_read($this->shmId, 1, 1) === self::FLAG_EOF;
-    }
-
-    /**
      * @param bool|string $data
-     * @return string
+     * @return ?string
      */
-    private function clean(bool|string $data): string
+    private function clean(bool|string $data): ?string
     {
-        return !empty($data) ? rtrim($data, "\0") : '';
+        return !empty($data) ? rtrim($data, "\0") : null;
     }
 
     /**
@@ -184,21 +106,62 @@ class Memory implements JsonSerializable
     }
 
     /**
+     * @inheritdoc
+     */
+    public function free(): bool
+    {
+        return shmop_delete($this->shmId);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+    /**
+     * @inheritdoc
      * @return string
      */
-    public function read(): string
+    public function jsonSerialize(): string
+    {
+        return $this->getName();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getPath(): string
+    {
+        return $this->name . ':' . $this->size;
+    }
+
+    /**
+     * @return string
+     */
+    public function __toString(): string
+    {
+        return $this->getName();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function read(): ?string
     {
         while (true) {
             if (shmop_read($this->shmId, 0, 1) === self::FLAG_LOCK) {
                 continue;
             }
+
             return $this->clean(shmop_read($this->shmId, $this->offset, $this->size));
         }
     }
 
     /**
-     * @param string $data
-     * @return bool
+     * @inheritdoc
      * @throws MemorySharedException
      */
     public function write(string $data): bool
@@ -208,6 +171,7 @@ class Memory implements JsonSerializable
                 continue;
             }
 
+            $data = $this->clean(shmop_read($this->shmId, $this->offset, $this->size)) . $data;
             $this->allowedSize($data, $dataSize);
             $data .= str_repeat("\0", $this->size - $dataSize);
 
@@ -225,11 +189,10 @@ class Memory implements JsonSerializable
     }
 
     /**
-     * @param callable $callable
-     * @return bool
+     * @inheritdoc
      * @throws MemorySharedException
      */
-    public function rewrite(callable $callable): bool
+    public function rewrite(string|callable $data): bool
     {
         while (true) {
             if (shmop_read($this->shmId, 0, 1) === self::FLAG_LOCK) {
@@ -238,12 +201,14 @@ class Memory implements JsonSerializable
 
             try {
                 shmop_write($this->shmId, self::FLAG_LOCK, 0);
-                $rewriteData = (string)$callable($this->clean(shmop_read($this->shmId, $this->offset, $this->size)));
+                $data = is_callable($data)
+                    ? (string)$data($this->clean(shmop_read($this->shmId, $this->offset, $this->size)))
+                    : $data;
 
-                $this->allowedSize($rewriteData, $dataSize);
-                $rewriteData .= str_repeat("\0", $this->size - $dataSize);
+                $this->allowedSize($data, $dataSize);
+                $data .= str_repeat("\0", $this->size - $dataSize);
 
-                shmop_write($this->shmId, $rewriteData, $this->offset);
+                shmop_write($this->shmId, $data, $this->offset);
             } catch (MemoryException|ValueError $e) {
                 throw new MemorySharedException('Error when trying to write to shared memory - ' . $e->getMessage());
             } finally {
@@ -255,7 +220,15 @@ class Memory implements JsonSerializable
     }
 
     /**
-     * @return bool
+     * @inheritdoc
+     */
+    public function hasEof(): bool
+    {
+        return shmop_read($this->shmId, 1, 1) === self::FLAG_EOF;
+    }
+
+    /**
+     * @inheritdoc
      */
     public function setEof(): bool
     {
@@ -263,6 +236,7 @@ class Memory implements JsonSerializable
             if (shmop_read($this->shmId, 0, 1) === self::FLAG_LOCK) {
                 continue;
             }
+
             return (bool)shmop_write($this->shmId, self::FLAG_EOF, 1);
         }
     }

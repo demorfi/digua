@@ -2,161 +2,80 @@
 
 namespace Digua\Components;
 
-use Digua\Helper;
-use Digua\Exceptions\{
-    Path as PathException,
-    Storage as StorageException
+use Digua\Interfaces\Storage as StorageInterface;
+use Digua\Exceptions\Storage as StorageException;
+use Digua\Components\Storage\{
+    DiskFile as DiskFileStorage,
+    SharedMemory as SharedMemoryStorage
 };
-use Digua\Enums\ContentType;
-use Digua\Traits\{Configurable, DiskPath};
+use BadMethodCallException;
 
+/**
+ * @mixin StorageInterface
+ */
 class Storage
 {
-    use Configurable, DiskPath;
-
     /**
-     * @var string[]
+     * @var StorageInterface
      */
-    protected static array $defaults = [
-        'diskPath' => ROOT_PATH . '/storage'
-    ];
+    protected StorageInterface $storage;
 
     /**
-     * Storage full file path.
-     *
-     * @var string
-     */
-    protected string $filePath;
-
-    /**
-     * @var array|string|null
-     */
-    protected array|string|null $content = null;
-
-    /**
-     * @param string      $fileName    Storage file name
-     * @param ContentType $contentType Storage type
-     * @throws PathException
+     * @param string $storageName
+     * @param mixed  ...$arguments
      * @throws StorageException
      */
-    public function __construct(protected string $fileName, protected ContentType $contentType)
+    public function __construct(string $storageName, mixed ...$arguments)
     {
-        self::throwIsBrokenDiskPath();
-        $this->filePath = self::getDiskPath(Helper::filterFileName($this->fileName));
-
-        if (!is_file($this->filePath)) {
-            $this->create();
+        if (!is_subclass_of($storageName, StorageInterface::class)) {
+            throw new StorageException($storageName . ' - storage not found!');
         }
+
+        $this->storage = new $storageName(...$arguments);
     }
 
     /**
-     * @return string
-     */
-    public function getFileName(): string
-    {
-        return $this->fileName;
-    }
-
-    /**
-     * @return string
-     */
-    public function getFilePath(): string
-    {
-        return $this->filePath;
-    }
-
-    /**
-     * @return ContentType
-     */
-    public function getContentType(): ContentType
-    {
-        return $this->contentType;
-    }
-
-    /**
-     * @return array|string|null
-     */
-    public function getContent(): array|string|null
-    {
-        return $this->content;
-    }
-
-    /**
-     * @return array|string|null
+     * @param string $storage
+     * @param mixed  ...$arguments
+     * @return static
      * @throws StorageException
      */
-    public function read(): array|string|null
+    public static function make(string $storage, mixed ...$arguments): self
     {
-        if (!is_readable($this->filePath)) {
-            throw new StorageException($this->filePath . ' - file is not readable!');
-        }
-
-        $content = match ($this->contentType) {
-            ContentType::JSON => json_decode(file_get_contents($this->filePath), true),
-            default => file_get_contents($this->filePath)
-        };
-
-        return $this->content = (is_bool($content) ? null : $content);
+        return new self($storage, ...$arguments);
     }
 
     /**
-     * @param array|string $content
-     * @return void
-     */
-    public function replace(array|string $content): void
-    {
-        $this->content = $content;
-    }
-
-    /**
-     * @param array|string $content
-     * @return void
-     */
-    public function append(array|string $content): void
-    {
-        $this->content = match ($this->contentType) {
-            ContentType::JSON => $this->content + $content,
-            default => $this->content . $content
-        };
-    }
-
-    /**
-     * @param bool $rewrite Add to the end of the storage or overwrite completely
-     * @return void
+     * @param ...$arguments
+     * @return DiskFileStorage|self
      * @throws StorageException
      */
-    public function save(bool $rewrite = true): void
+    public static function makeDiskFile(...$arguments): self|DiskFileStorage
     {
-        if (!is_writable($this->filePath)) {
-            throw new StorageException($this->filePath . ' - not writable!');
-        }
-
-        $content = $this->content;
-        switch ($this->contentType) {
-            case (ContentType::JSON):
-                file_put_contents(
-                    $this->filePath,
-                    json_encode(!$rewrite ? array_merge($this->read(), $content) : $content),
-                    LOCK_EX
-                );
-                break;
-            default:
-                file_put_contents($this->filePath, $content, (!$rewrite ? FILE_APPEND : 0) | LOCK_EX);
-        }
+        return new self(DiskFileStorage::class, ...$arguments);
     }
 
     /**
-     * Create empty storage.
-     *
-     * @return bool
+     * @param ...$arguments
+     * @return SharedMemoryStorage|self
      * @throws StorageException
      */
-    public function create(): bool
+    public static function makeSharedMemory(...$arguments): self|SharedMemoryStorage
     {
-        if (!self::isReadableDiskPath()) {
-            throw new StorageException(self::getDiskPath() . ' - not writable!');
+        return new self(SharedMemoryStorage::class, ...$arguments);
+    }
+
+    /**
+     * @param string $name
+     * @param array  $arguments
+     * @return mixed
+     */
+    public function __call(string $name, array $arguments): mixed
+    {
+        if (!is_callable([$this->storage, $name])) {
+            throw new BadMethodCallException('method ' . $name . ' does not exist!');
         }
 
-        return (bool)file_put_contents($this->filePath, null, LOCK_EX);
+        return $this->storage->$name(...$arguments);
     }
 }

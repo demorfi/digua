@@ -2,10 +2,10 @@
 
 namespace Digua;
 
+use Digua\Components\Logger as LoggerStorage;
 use Digua\Enums\Env as EnvEnum;
-use Throwable;
-use Digua\Components\Storage\Logger as LoggerStorage;
 use Digua\Exceptions\Base as BaseException;
+use Throwable;
 
 class Env
 {
