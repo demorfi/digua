@@ -4,9 +4,12 @@ namespace Digua;
 
 use Digua\Exceptions\Path as PathException;
 use BadMethodCallException;
+use ValueError;
+use Exception;
 
 /**
  * @method static string filterFileName(string $fileName);
+ * @method static int makeIntHash();
  */
 class Helper
 {
@@ -18,10 +21,16 @@ class Helper
     /**
      * @param string   $name
      * @param callable $callable
+     * @param bool     $force
      * @return void
+     * @throws ValueError If helper already exists and the force argument is not set
      */
-    public static function addHelper(string $name, callable $callable): void
+    public static function addHelper(string $name, callable $callable, bool $force = false): void
     {
+        if (!$force && isset(self::$helpers[$name])) {
+            throw new ValueError('Helper (' . $name . ') already exists!');
+        }
+
         self::$helpers[$name] = $callable;
     }
 
@@ -32,6 +41,15 @@ class Helper
     protected static function defaultFilterFileName(string $fileName): string
     {
         return preg_replace(['/[^A-Za-z0-9\-_.\/]/', '/\.{2,}/', '/\/{2,}|\/$/', '/\.+\//'], '', $fileName);
+    }
+
+    /**
+     * @return int
+     * @throws Exception
+     */
+    public static function defaultMakeIntHash(): int
+    {
+        return random_int(time(), PHP_INT_MAX);
     }
 
     /**
@@ -51,13 +69,15 @@ class Helper
      */
     public static function __callStatic(string $name, array $arguments)
     {
-        $defName = 'default' . ucfirst($name);
-        $helper  = self::$helpers[$name] ?? method_exists(self::class, $defName) ? $defName : null;
-
-        if (empty($helper)) {
-            throw new BadMethodCallException('helper method ' . $name . ' does not exist!');
+        if (isset(self::$helpers[$name])) {
+            return self::$helpers[$name](...$arguments);
         }
 
-        return self::$helper(...$arguments);
+        $defName = 'default' . ucfirst($name);
+        if (method_exists(self::class, $defName)) {
+            return self::$defName(...$arguments);
+        }
+
+        throw new BadMethodCallException('helper method ' . $name . ' does not exist!');
     }
 }
