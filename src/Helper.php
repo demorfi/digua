@@ -25,13 +25,22 @@ class Helper
      * @return void
      * @throws ValueError If helper already exists and the force argument is not set
      */
-    public static function addHelper(string $name, callable $callable, bool $force = false): void
+    public static function register(string $name, callable $callable, bool $force = false): void
     {
         if (!$force && isset(self::$helpers[$name])) {
             throw new ValueError('Helper (' . $name . ') already exists!');
         }
 
         self::$helpers[$name] = $callable;
+    }
+
+    /**
+     * @param string $name
+     * @return ?callable
+     */
+    public static function get(string $name): ?callable
+    {
+        return self::$helpers[$name] ?? null;
     }
 
     /**
