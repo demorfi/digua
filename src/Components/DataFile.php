@@ -46,7 +46,7 @@ class DataFile implements JsonSerializable
      */
     public function read(): array
     {
-        $this->array = (array)json_decode((string)$this->storage->read());
+        $this->array = (array)json_decode((string)$this->storage->read(), true);
         return $this->array;
     }
 
