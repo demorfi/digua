@@ -3,7 +3,6 @@
 namespace Components\Storage;
 
 use Digua\Components\Storage\DiskFile;
-use Digua\Exceptions\{Path as PathException, Storage as StorageException};
 use Digua\Helper;
 use Exception;
 use PHPUnit\Framework\TestCase;
@@ -31,7 +30,7 @@ class DiskFileTest extends TestCase
      * @return void
      * @throws Exception
      */
-    public function testReadMemory(int $length): void
+    public function testReadFile(int $length): void
     {
         $data   = bin2hex(random_bytes($length / 2));
         $storage = DiskFile::create((string)Helper::makeIntHash());
@@ -52,7 +51,7 @@ class DiskFileTest extends TestCase
      * @return void
      * @throws Exception
      */
-    public function testWriteMemory(int $length): void
+    public function testWriteFile(int $length): void
     {
         $append = '!test string!';
         $data   = bin2hex(random_bytes(($length / 2) - strlen($append)));
@@ -75,7 +74,7 @@ class DiskFileTest extends TestCase
      * @return void
      * @throws Exception
      */
-    public function testRewriteMemory(int $length): void
+    public function testRewriteFile(int $length): void
     {
         $data   = bin2hex(random_bytes($length / 2));
         $storage = DiskFile::create((string)Helper::makeIntHash());
@@ -93,8 +92,7 @@ class DiskFileTest extends TestCase
 
     /**
      * @return void
-     * @throws PathException
-     * @throws StorageException
+     * @throws Exception
      */
     public function testEof(): void
     {
