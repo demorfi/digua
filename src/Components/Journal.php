@@ -12,6 +12,7 @@ use Generator;
  * @method static void staticPush(string ...$message);
  * @method static void staticFlush(int $offset = 0);
  * @method static Generator staticGetJournal(int $limit = 0, SortType $sort = SortType::DESC);
+ * @method static int staticSize();
  */
 class Journal
 {
@@ -48,7 +49,7 @@ class Journal
     {
         $time    = time();
         $message = sizeof($message) < 2 ? array_shift($message) : $message;
-        $this->dataFile->set(strval($this->dataFile->size() + 1), compact('message', 'time'));
+        $this->dataFile->set('L' . ($this->dataFile->size() + 1), compact('message', 'time'));
     }
 
     /**
@@ -96,16 +97,22 @@ class Journal
     }
 
     /**
+     * @return int
+     */
+    public function size(): int
+    {
+        return $this->dataFile->size();
+    }
+
+    /**
      * Auto save journal.
      *
      * @throws StorageException
      */
     public function __destruct()
     {
-        if ($this->dataFile->size() != sizeof($this->original)
-            || sizeof(@array_diff_assoc($this->dataFile->getAll(), $this->original))
-        ) {
-            $this->dataFile->save();
+        if (sizeof(array_diff_assoc($this->dataFile->getAll(), $this->original))) {
+            $this->dataFile->rewrite(fn($fileData, $currentData) => array_merge($fileData, $currentData));
         }
     }
 }
