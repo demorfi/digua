@@ -15,16 +15,6 @@ if (!defined('ROOT_PATH')) {
 class Journal extends JournalComponent
 {
     /**
-     * @return void
-     * @throws StorageException
-     */
-    public function reload(): void
-    {
-        $this->__destruct();
-        $this->dataFile->read();
-    }
-
-    /**
      * @return bool
      */
     public function free(): bool
@@ -46,26 +36,24 @@ class JournalTest extends TestCase
 
     /**
      * @return void
+     * @throws StorageException
      */
     public function testPushToJournal(): void
     {
-        Journal::staticFlush();
+        $this->assertTrue(Journal::staticFlush());
 
-        Journal::staticPush('test message!');
-        Journal::staticPush('test message 2!');
-        Journal::getInstance()->push('test message 3!');
+        $this->assertTrue(Journal::staticPush('test message!'));
+        $this->assertTrue(Journal::staticPush('test message 2!'));
+        $this->assertTrue(Journal::getInstance()->push('test message 3!'));
 
         $this->assertSame(3, Journal::staticSize());
     }
 
     /**
      * @return void
-     * @throws StorageException
      */
     public function testReadingJournal(): void
     {
-        Journal::getInstance()->reload();
-
         $messages = [];
         foreach (Journal::staticGetJournal(2) as $message) {
             $messages[] = $message['message'];

@@ -9,21 +9,14 @@ use Digua\Traits\Singleton;
 use Generator;
 
 /**
- * @method static void staticPush(string ...$message);
- * @method static void staticFlush(int $offset = 0);
+ * @method static bool staticPush(string ...$message);
+ * @method static bool staticFlush(int $offset = 0);
  * @method static Generator staticGetJournal(int $limit = 0, SortType $sort = SortType::DESC);
  * @method static int staticSize();
  */
 class Journal
 {
     use Singleton;
-
-    /**
-     * Original data for diff.
-     *
-     * @var array
-     */
-    private readonly array $original;
 
     /**
      * @var Storage|DiskFileJsonStorage
@@ -37,29 +30,41 @@ class Journal
     {
         $this->dataFile = new DataFile('journal');
         $this->dataFile->read();
-        $this->original = $this->dataFile->getAll();
     }
 
     /**
      * Add message to journal.
      *
      * @param string ...$message
+     * @return bool
+     * @throws StorageException
      */
-    public function push(string ...$message): void
+    public function push(string ...$message): bool
     {
         $time    = time();
         $message = sizeof($message) < 2 ? array_shift($message) : $message;
-        $this->dataFile->set('L' . ($this->dataFile->size() + 1), compact('message', 'time'));
+        $dataSet = compact('message', 'time');
+        return $this->dataFile->rewrite(function ($fileData) use ($dataSet) {
+            $id = 'L' . (sizeof($fileData) + 1);
+            $this->dataFile->overwrite($fileData);
+            $this->dataFile->set($id, $dataSet);
+            return array_merge($fileData, [$id => $dataSet]);
+        });
     }
 
     /**
      * Flush journal.
+     *
+     * @param int $offset
+     * @return bool
+     * @throws StorageException
      */
-    public function flush(int $offset = 0): void
+    public function flush(int $offset = 0): bool
     {
         $offset > 0
             ? $this->dataFile->overwrite(array_reverse($this->getAll($offset)))
             : $this->dataFile->flush();
+        return $this->dataFile->save();
     }
 
     /**
@@ -102,17 +107,5 @@ class Journal
     public function size(): int
     {
         return $this->dataFile->size();
-    }
-
-    /**
-     * Auto save journal.
-     *
-     * @throws StorageException
-     */
-    public function __destruct()
-    {
-        if (sizeof(array_diff_assoc($this->dataFile->getAll(), $this->original))) {
-            $this->dataFile->rewrite(fn($fileData, $currentData) => array_merge($fileData, $currentData));
-        }
     }
 }
