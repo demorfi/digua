@@ -3,11 +3,13 @@
 namespace Digua\Components\Storage;
 
 use Digua\Helper;
+use Digua\Components\File;
 use Digua\Traits\{Configurable, DiskPath};
 use Digua\Interfaces\Storage as StorageInterface;
 use Digua\Exceptions\{
     Path as PathException,
-    Storage as StorageException
+    Storage as StorageException,
+    File as FileException
 };
 
 class DiskFile implements StorageInterface
@@ -39,7 +41,6 @@ class DiskFile implements StorageInterface
     /**
      * @param string $name Storage file name
      * @throws PathException
-     * @throws StorageException
      */
     public function __construct(private readonly string $name)
     {
@@ -47,7 +48,7 @@ class DiskFile implements StorageInterface
         $this->filePath = self::getDiskPath(Helper::filterFileName($this->name));
 
         if (!is_file($this->filePath)) {
-            $this->empty();
+            file_put_contents($this->filePath, "\0\0", LOCK_EX);
         }
     }
 
@@ -55,7 +56,6 @@ class DiskFile implements StorageInterface
      * @param string $name
      * @return self
      * @throws PathException
-     * @throws StorageException
      */
     public static function create(string $name): self
     {
@@ -84,11 +84,15 @@ class DiskFile implements StorageInterface
      */
     public function read(): ?string
     {
-        if (!is_readable($this->filePath)) {
-            throw new StorageException($this->filePath . ' - file is not readable!');
+        try {
+            $file = new File($this->filePath);
+            $file->readLock();
+            $data = $file->readLeft($this->offset);
+            $file->unlock();
+            return $data ?: null;
+        } catch (FileException $e) {
+            throw new StorageException($e->getMessage());
         }
-
-        return file_get_contents($this->filePath, false, null, $this->offset) ?: null;
     }
 
     /**
@@ -97,11 +101,15 @@ class DiskFile implements StorageInterface
      */
     public function write(string $data): bool
     {
-        if (!is_writable($this->filePath)) {
-            throw new StorageException($this->filePath . ' - not writable!');
+        try {
+            $file = new File($this->filePath);
+            $file->writeLock();
+            $result = $file->writeRight($data);
+            $file->unlock();
+            return $result;
+        } catch (FileException $e) {
+            throw new StorageException($e->getMessage());
         }
-
-        return (bool)file_put_contents($this->filePath, $data, FILE_APPEND | LOCK_EX);
     }
 
     /**
@@ -110,38 +118,27 @@ class DiskFile implements StorageInterface
      */
     public function rewrite(string|callable $data): bool
     {
-        if (!is_writable($this->filePath)) {
-            throw new StorageException($this->filePath . ' - not writable!');
+        try {
+            $file = new File($this->filePath);
+            $file->writeLock();
+            if (is_callable($data)) {
+                $data = (string)$data($file->readLeft($this->offset));
+            }
+            $file->truncate($this->offset);
+            $result = $file->writeLeft($data, $this->offset);
+            $file->unlock();
+            return $result;
+        } catch (FileException $e) {
+            throw new StorageException($e->getMessage());
         }
-
-        $content = file_get_contents($this->filePath);
-        $data    = is_callable($data) ? (string)$data(substr($content, $this->offset)) : $data;
-        return (bool)file_put_contents($this->filePath, substr($content, 0, $this->offset) . $data, LOCK_EX);
     }
 
     /**
      * @inheritdoc
-     * @throws StorageException
      */
     public function free(): bool
     {
-        if (!self::isReadableDiskPath()) {
-            throw new StorageException(self::getDiskPath() . ' - not writable!');
-        }
-
         return unlink($this->filePath);
-    }
-
-    /**
-     * @throws StorageException
-     */
-    private function empty(): bool
-    {
-        if (!self::isReadableDiskPath()) {
-            throw new StorageException(self::getDiskPath() . ' - not writable!');
-        }
-
-        return (bool)file_put_contents($this->filePath, "\0\0", LOCK_EX);
     }
 
     /**
@@ -149,21 +146,28 @@ class DiskFile implements StorageInterface
      */
     public function hasEof(): bool
     {
-        $data = file_get_contents($this->filePath, false, null, 0, 1);
-        return strcmp($data, self::FLAG_EOF) === 0;
+        try {
+            $file = new File($this->filePath);
+            $file->readLeft(0, 1);
+            return strcmp($file->readLeft(0, 1), self::FLAG_EOF) === 0;
+        } catch (FileException) {
+            return false;
+        }
     }
 
     /**
      * @inheritdoc
-     * @throws StorageException
      */
     public function setEof(): bool
     {
-        if (!is_writable($this->filePath)) {
-            throw new StorageException($this->filePath . ' - not writable!');
+        try {
+            $file = new File($this->filePath);
+            $file->writeLock();
+            $result = $file->writeLeft(self::FLAG_EOF, 0, 1);
+            $file->unlock();
+            return $result;
+        } catch (FileException) {
+            return false;
         }
-
-        $data = substr_replace(file_get_contents($this->filePath), self::FLAG_EOF, 0, 1);
-        return (bool)file_put_contents($this->filePath, $data, LOCK_EX);
     }
 }
