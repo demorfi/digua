@@ -68,8 +68,11 @@ class DataFile implements JsonSerializable
      */
     public function rewrite(array|callable $data): bool
     {
-        $this->array = is_callable($data) ? (array)$data($this->array) : $data;
-        return $this->storage->rewrite(json_encode($this->array));
+        return $this->storage->rewrite(function ($fileData) use ($data) {
+            $fileData    = (array)json_decode((string)$fileData, true);
+            $this->array = is_callable($data) ? (array)$data($fileData, $this->array) : $data;
+            return json_encode($this->array);
+        });
     }
 
     /**
