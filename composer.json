@@ -28,8 +28,5 @@
       "Digua\\": "src/"
     }
   },
-  "config": {
-    "optimize-autoloader": true
-  },
-  "minimum-stability": "stable"
+  "minimum-stability": "dev"
 }
