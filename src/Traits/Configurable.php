@@ -16,7 +16,7 @@ trait Configurable
      */
     public static function setConfigValue(string $name, mixed $value): void
     {
-        self::$config[$name] = $value;
+        static::$config[$name] = $value;
     }
 
     /**
@@ -25,7 +25,7 @@ trait Configurable
      */
     public static function getConfigValue(string $name): mixed
     {
-        return self::$config[$name] ?? self::$defaults[$name] ?? null;
+        return static::$config[$name] ?? static::$defaults[$name] ?? null;
     }
 
     /**
@@ -34,6 +34,6 @@ trait Configurable
      */
     public static function hasConfigValue(string $name): bool
     {
-        return isset(self::$config[$name]) || isset(self::$defaults[$name]);
+        return isset(static::$config[$name]) || isset(static::$defaults[$name]);
     }
 }
