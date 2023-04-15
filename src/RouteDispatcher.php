@@ -34,14 +34,19 @@ class RouteDispatcher
     }
 
     /**
-     * @param RouteBuilderInterface|null $builder
+     * @param ?RouteBuilderInterface $builder
+     * @param ?string                $appEntryPath
      * @return Response
      * @throws RouteException
      */
-    public function default(?RouteBuilderInterface $builder = null): Response
+    public function default(?RouteBuilderInterface $builder = null, ?string $appEntryPath = null): Response
     {
+        $defEntryPath = defined('APP_ENTRY_PATH') ? constant('APP_ENTRY_PATH') : '\App\Controllers\\';
         return $this->try(
-            new RouteAsName($builder ?? new RouteAsNameBuilder($this->request)),
+            new RouteAsName(
+                $appEntryPath ?? $defEntryPath,
+                $builder ?? new RouteAsNameBuilder($this->request)
+            ),
             ErrorController::class,
             'default'
         );
