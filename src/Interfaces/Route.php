@@ -7,17 +7,18 @@ use Digua\Interfaces\Route\Builder as RouteBuilder;
 interface Route
 {
     /**
+     * @param string $appEntryPath
      * @param RouteBuilder $builder
      */
-    public function __construct(RouteBuilder $builder);
+    public function __construct(string $appEntryPath, RouteBuilder $builder);
 
     /**
-     * @return string|null
+     * @return ?string
      */
     public function getControllerName(): ?string;
 
     /**
-     * @return string|null
+     * @return ?string
      */
     public function getControllerAction(): ?string;
 
@@ -42,17 +43,22 @@ interface Route
     public function builder(): RouteBuilder;
 
     /**
-     * @return string|null
+     * @return ?string
      */
     public function getBaseName(): ?string;
 
     /**
-     * @return string|null
+     * @return ?string
      */
     public function getBaseAction(): ?string;
 
     /**
-     * @return string|null
+     * @return ?string
      */
     public function getBasePath(): ?string;
+
+    /**
+     * @return string
+     */
+    public function getEntryPath(): string;
 }

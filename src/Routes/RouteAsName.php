@@ -20,10 +20,13 @@ class RouteAsName implements RouteInterface
     private ?string $actionName;
 
     /**
+     * @param string                $appEntryPath
      * @param RouteBuilderInterface $builder
      */
-    public function __construct(private readonly RouteBuilderInterface $builder)
-    {
+    public function __construct(
+        private readonly string $appEntryPath,
+        private readonly RouteBuilderInterface $builder
+    ) {
         $this->controllerName = $this->builder->getControllerName();
         $this->actionName     = $this->builder->getActionName();
     }
@@ -55,9 +58,7 @@ class RouteAsName implements RouteInterface
                 return $this->controllerName;
             }
 
-            return (defined('APP_CONTROLLERS_PATH')
-                    ? constant('APP_CONTROLLERS_PATH')
-                    : '\App\Controllers\\') . ucfirst($this->controllerName);
+            return $this->getEntryPath() . ucfirst($this->controllerName);
         }
 
         return null;
@@ -104,5 +105,13 @@ class RouteAsName implements RouteInterface
     {
         $basePath = $this->getBasePath();
         return !empty($basePath) && preg_match('/^' . preg_quote($route, '/') . '/', $basePath) > 0;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getEntryPath(): string
+    {
+        return $this->appEntryPath;
     }
 }
