@@ -133,7 +133,7 @@ class Query implements RequestQueryInterface, NamedCollectionInterface
         $variables = $this->getFromPath(...$variables);
         if (!empty($variables)) {
             foreach ($variables as $name => $value) {
-                $this->set($name, $value);
+                $this->set((string)$name, $value);
 
                 // Removing a variable from path
                 $path = (!is_int($name) ? '/' . $name : '') . '/' . $value;
