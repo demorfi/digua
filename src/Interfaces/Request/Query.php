@@ -40,4 +40,10 @@ interface Query
      * @return array|null
      */
     public function getFromPath(int|string ...$variables): array|null;
+
+    /**
+     * @param string ...$path
+     * @return static
+     */
+    public function buildPath(string ...$path): static;
 }
