@@ -145,4 +145,13 @@ class Query implements RequestQueryInterface, NamedCollectionInterface
 
         return $this;
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function buildPath(string ...$path): static
+    {
+        $this->path = filter_var('/' . trim(implode('/', $path), '/'), FILTER_SANITIZE_URL);
+        return $this;
+    }
 }
