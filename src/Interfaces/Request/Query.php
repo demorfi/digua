@@ -17,7 +17,7 @@ interface Query
     /**
      * @return string
      */
-    public static function getHost(): string;
+    public function getHost(): string;
 
     /**
      * @return string
