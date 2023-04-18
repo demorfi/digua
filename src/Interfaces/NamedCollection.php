@@ -85,6 +85,11 @@ interface NamedCollection
     public function flush(): void;
 
     /**
+     * @return void
+     */
+    public function shake(): void;
+
+    /**
      * Overwrite data.
      *
      * @param array $array

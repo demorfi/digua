@@ -3,14 +3,36 @@
 namespace Digua\Request;
 
 use Digua\Traits\Data as DataTrait;
-use Digua\Interfaces\NamedCollection as NamedCollectionInterface;
+use Digua\Interfaces\Request\{
+    FilteredCollection as FilteredCollectionInterface,
+    FilteredInput as FilteredInputInterface
+};
 
-class Post implements NamedCollectionInterface
+class Post implements FilteredCollectionInterface
 {
     use DataTrait;
 
-    public function __construct()
+    /**
+     * @param FilteredInputInterface $filteredInput
+     */
+    public function __construct(private readonly FilteredInputInterface $filteredInput = new FilteredInput)
     {
-        $this->array = (array)filter_input_array(INPUT_POST, FILTER_SANITIZE_SPECIAL_CHARS);
+        $this->shake();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function shake(): void
+    {
+        $this->array = $this->filteredInput->filteredList(INPUT_POST);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function filtered(): FilteredInputInterface
+    {
+        return $this->filteredInput;
     }
 }

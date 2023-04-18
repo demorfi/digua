@@ -2,13 +2,14 @@
 
 namespace Digua\Request;
 
-use Digua\Interfaces\{
-    NamedCollection as NamedCollectionInterface,
-    Request\Query as RequestQueryInterface
-};
 use Digua\Traits\Data as DataTrait;
+use Digua\Interfaces\Request\{
+    FilteredCollection as FilteredCollectionInterface,
+    FilteredInput as FilteredInputInterface,
+    Query as RequestQueryInterface
+};
 
-class Query implements RequestQueryInterface, NamedCollectionInterface
+class Query implements FilteredCollectionInterface, RequestQueryInterface
 {
     use DataTrait;
 
@@ -20,35 +21,64 @@ class Query implements RequestQueryInterface, NamedCollectionInterface
     /**
      * @var string[]
      */
-    private array $extract = ['page'];
+    private array $defExport = ['page'];
 
-    public function __construct()
+    /**
+     * @param FilteredInputInterface $filteredInput
+     */
+    public function __construct(private readonly FilteredInputInterface $filteredInput = new FilteredInput)
     {
-        $this->array = (array)filter_input_array(INPUT_GET, FILTER_SANITIZE_SPECIAL_CHARS);
-        $parseUrl    = parse_url($this->getUri());
+        $this->shake();
+    }
 
-        if (!empty($parseUrl)) {
-            // Add query values
-            if (isset($parseUrl['query']) && !empty($parseUrl['query'])) {
-                parse_str($parseUrl['query'], $result);
-                $this->array += filter_var_array($result, FILTER_SANITIZE_SPECIAL_CHARS);
-            }
+    /**
+     * @inheritdoc
+     */
+    public function shake(): void
+    {
+        $this->array = $this->filteredInput->filteredList(INPUT_GET);
+        $this->collectQueryFromUri();
+        $this->buildPathFromUri();
+    }
 
-            // Check path transfer
-            if (isset($parseUrl['path']) && !empty($parseUrl['path'])) {
-                $this->path = $parseUrl['path'];
-                $this->exportFromPath(...$this->extract);
-            }
+    /**
+     * @inheritdoc
+     */
+    public function filtered(): FilteredInputInterface
+    {
+        return $this->filteredInput;
+    }
+
+    /**
+     * @return void
+     */
+    protected function buildPathFromUri(): void
+    {
+        $urlData = parse_url($this->getUri());
+        if (isset($urlData['path']) && !empty($urlData['path'])) {
+            $this->path = $urlData['path'];
+            $this->exportFromPath(...$this->defExport);
+        }
+    }
+
+    /**
+     * @return void
+     */
+    protected function collectQueryFromUri(): void
+    {
+        $urlData = parse_url($this->getUri());
+        if (isset($urlData['query']) && !empty($urlData['query'])) {
+            parse_str($urlData['query'], $result);
+            $this->array += filter_var_array($result, FILTER_SANITIZE_SPECIAL_CHARS);
         }
     }
 
     /**
      * @inheritdoc
-     * @internal Not use INPUT_SERVER as not always available with cli.
      */
     public function getUri(): string
     {
-        return filter_var($_SERVER['REQUEST_URI'] ?? '/', FILTER_SANITIZE_URL);
+        return filter_var($this->filteredInput->filteredVar(INPUT_SERVER, 'REQUEST_URI') ?? '/', FILTER_SANITIZE_URL);
     }
 
     /**
@@ -61,16 +91,16 @@ class Query implements RequestQueryInterface, NamedCollectionInterface
 
     /**
      * @inheritdoc
-     * @internal Not use INPUT_SERVER as not always available with cli.
      */
-    public static function getHost(): string
+    public function getHost(): string
     {
-        return strtolower(($_SERVER['REQUEST_SCHEME'] ?? 'http') . '://' . ($_SERVER['HTTP_HOST'] ?? ''));
+        $scheme = $this->filteredInput->filteredVar(INPUT_SERVER, 'REQUEST_SCHEME') ?? 'http';
+        $host   = $this->filteredInput->filteredVar(INPUT_SERVER, 'HTTP_HOST') ?? '';
+        return strtolower($scheme . '://' . $host);
     }
 
     /**
      * @inheritdoc
-     * @return string
      */
     public function getLocation(): string
     {
@@ -79,17 +109,16 @@ class Query implements RequestQueryInterface, NamedCollectionInterface
 
     /**
      * @inheritdoc
-     * @internal Not use INPUT_SERVER as not always available with cli.
      */
     public function isAsync(): bool
     {
-        return isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] === 'XMLHttpRequest';
+        return $this->filteredInput->filteredVar(INPUT_SERVER, 'HTTP_X_REQUESTED_WITH') === 'XMLHttpRequest';
     }
 
     /**
      * @inheritdoc
      */
-    public function getFromPath(int|string ...$variables): array|null
+    public function getFromPath(int|string ...$variables): ?array
     {
         if ($this->path !== '/') {
             $path = $this->path;
@@ -151,7 +180,8 @@ class Query implements RequestQueryInterface, NamedCollectionInterface
      */
     public function buildPath(string ...$path): static
     {
-        $this->path = filter_var('/' . trim(implode('/', $path), '/'), FILTER_SANITIZE_URL);
+        $path       = array_map(fn($value) => trim($value, '/'), array_filter($path));
+        $this->path = filter_var('/' . implode('/', $path), FILTER_SANITIZE_URL);
         return $this;
     }
 }
