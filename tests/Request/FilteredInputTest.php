@@ -1,9 +1,9 @@
 <?php declare(strict_types=1);
 
-namespace Request;
+namespace Tests\Request;
 
-use PHPUnit\Framework\TestCase;
 use Digua\Request\FilteredInput;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @backupStaticAttributes enabled
@@ -33,9 +33,9 @@ class FilteredInputTest extends TestCase
     {
         foreach ($this->sanitize as $type) {
             $options = mt_rand(PHP_INT_MIN, PHP_INT_MAX);
-            $this->assertNotEquals($options, FilteredInput::getSanitize($type));
+            $this->assertNotSame($options, FilteredInput::getSanitize($type));
             FilteredInput::setSanitize($type, $options);
-            $this->assertEquals($options, FilteredInput::getSanitize($type));
+            $this->assertSame($options, FilteredInput::getSanitize($type));
         }
     }
 
@@ -68,7 +68,7 @@ class FilteredInputTest extends TestCase
 
         $mock->method('filterInput')->willReturnCallback(fn(int $type) => ['type' => $type]);
         foreach ($this->sanitize as $type) {
-            $this->assertEquals(['type' => $type], $mock->filteredList($type));
+            $this->assertSame(['type' => $type], $mock->filteredList($type));
         }
     }
 

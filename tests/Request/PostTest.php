@@ -1,10 +1,10 @@
 <?php declare(strict_types=1);
 
-namespace Request;
+namespace Tests\Request;
 
-use PHPUnit\Framework\TestCase;
 use Digua\Request\{Post, FilteredInput};
 use Digua\Interfaces\Request\FilteredCollection as FilteredCollectionInterface;
+use PHPUnit\Framework\TestCase;
 
 class PostTest extends TestCase
 {
@@ -46,6 +46,6 @@ class PostTest extends TestCase
     {
         $this->data = ['var' => 'value', 'var2' => 'value2'];
         $this->post->shake();
-        $this->assertEquals($this->data, $this->post->getAll());
+        $this->assertSame($this->data, $this->post->getAll());
     }
 }

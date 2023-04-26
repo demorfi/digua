@@ -1,11 +1,11 @@
 <?php declare(strict_types=1);
 
-namespace Components\Storage;
+namespace Tests\Components\Storage;
 
 use Digua\Components\Storage\SharedMemory;
 use Digua\Exceptions\{Memory as MemoryException, MemoryShared as MemorySharedException};
-use Exception;
 use PHPUnit\Framework\TestCase;
+use Exception;
 
 class SharedMemoryTest extends TestCase
 {
@@ -95,7 +95,7 @@ class SharedMemoryTest extends TestCase
      * @throws MemorySharedException
      * @throws MemoryException
      */
-    public function testOutOfMemory(): void
+    public function testThrowOutOfMemory(): void
     {
         $storage = SharedMemory::create(1);
         $this->expectException(MemorySharedException::class);

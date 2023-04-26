@@ -1,28 +1,12 @@
 <?php declare(strict_types=1);
 
-namespace Components;
+namespace Tests\Components;
 
 use Digua\Components\Storage\DiskFile;
-use Digua\Components\Journal as JournalComponent;
+use Digua\Components\Journal;
 use Digua\Exceptions\Storage as StorageException;
 use Digua\Enums\SortType;
 use PHPUnit\Framework\TestCase;
-
-if (!defined('ROOT_PATH')) {
-    define('ROOT_PATH', null);
-}
-
-class Journal extends JournalComponent
-{
-    /**
-     * @return bool
-     */
-    public function free(): bool
-    {
-        $this->dataFile->flush();
-        return $this->dataFile->free();
-    }
-}
 
 class JournalTest extends TestCase
 {
@@ -31,7 +15,19 @@ class JournalTest extends TestCase
      */
     protected function setUp(): void
     {
+        if (!defined('ROOT_PATH')) {
+            define('ROOT_PATH', null);
+        }
+
         DiskFile::setDiskPath(__DIR__);
+    }
+
+    /**
+     * @return void
+     */
+    protected function tearDown(): void
+    {
+        @unlink(__DIR__ . '/journal.json');
     }
 
     /**
@@ -40,16 +36,14 @@ class JournalTest extends TestCase
      */
     public function testPushToJournal(): void
     {
-        $this->assertTrue(Journal::staticFlush());
-
         $this->assertTrue(Journal::staticPush('test message!'));
         $this->assertTrue(Journal::staticPush('test message 2!'));
         $this->assertTrue(Journal::getInstance()->push('test message 3!'));
-
         $this->assertSame(3, Journal::staticSize());
     }
 
     /**
+     * @depends testPushToJournal
      * @return void
      */
     public function testReadingJournal(): void
@@ -57,23 +51,25 @@ class JournalTest extends TestCase
         $messages = [];
         foreach (Journal::staticGetJournal(2) as $message) {
             $messages[] = $message['message'];
-            $this->assertEquals($message['date'], date('Y-m-d H:m:s', $message['time']));
+            $this->assertSame($message['date'], date('Y-m-d H:m:s', $message['time']));
         }
-        $this->assertEquals(['test message 3!', 'test message 2!'], $messages);
+        $this->assertSame(['test message 3!', 'test message 2!'], $messages);
 
         $messages = [];
         foreach (Journal::staticGetJournal(sort: SortType::ASC) as $message) {
             $messages[] = $message['message'];
-            $this->assertEquals($message['date'], date('Y-m-d H:m:s', $message['time']));
+            $this->assertSame($message['date'], date('Y-m-d H:m:s', $message['time']));
         }
-        $this->assertEquals(['test message!', 'test message 2!', 'test message 3!'], $messages);
+        $this->assertSame(['test message!', 'test message 2!', 'test message 3!'], $messages);
     }
 
     /**
+     * @runInSeparateProcess
      * @return void
+     * @throws StorageException
      */
     public function testFreeJournal(): void
     {
-        $this->assertTrue(Journal::getInstance()->free());
+        $this->assertTrue(Journal::getInstance()->flush());
     }
 }

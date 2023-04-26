@@ -1,7 +1,9 @@
 <?php declare(strict_types=1);
 
-use PHPUnit\Framework\TestCase;
+namespace Tests;
+
 use Digua\Loader;
+use PHPUnit\Framework\TestCase;
 
 class LoaderTest extends TestCase
 {

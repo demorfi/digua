@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Components;
+namespace Tests\Components;
 
 use Digua\Components\File;
 use Digua\Exceptions\File as FileException;
@@ -33,15 +33,15 @@ class FileTest extends TestCase
         $file = new File(__DIR__ . '/file-test.txt');
         $this->assertTrue($file->readLock());
 
-        $this->assertEquals('file test content', $file->readLeft());
-        $this->assertEquals('fi', $file->readLeft(0, 2));
-        $this->assertEquals('le te', $file->readLeft(2, 5));
-        $this->assertEquals('le test content', $file->readLeft(2));
+        $this->assertSame('file test content', $file->readLeft());
+        $this->assertSame('fi', $file->readLeft(0, 2));
+        $this->assertSame('le te', $file->readLeft(2, 5));
+        $this->assertSame('le test content', $file->readLeft(2));
 
-        $this->assertEquals('file test content', $file->readRight());
-        $this->assertEquals('content', $file->readRight(7));
-        $this->assertEquals('n', $file->readRight(2, 1));
-        $this->assertEquals('content', $file->readRight(0, 7));
+        $this->assertSame('file test content', $file->readRight());
+        $this->assertSame('content', $file->readRight(7));
+        $this->assertSame('n', $file->readRight(2, 1));
+        $this->assertSame('content', $file->readRight(0, 7));
         $this->assertTrue($file->unlock());
     }
 
@@ -55,20 +55,20 @@ class FileTest extends TestCase
         $this->assertTrue($file->writeLock());
 
         $this->assertTrue($file->writeLeft('1', 0, 1));
-        $this->assertEquals('1ile test content', $file->readLeft());
+        $this->assertSame('1ile test content', $file->readLeft());
         $this->assertTrue($file->writeLeft('2', 2, 1));
-        $this->assertEquals('1i2e test content', $file->readLeft());
+        $this->assertSame('1i2e test content', $file->readLeft());
 
         $this->assertTrue($file->writeRight('1'));
-        $this->assertEquals('1i2e test content1', $file->readRight());
+        $this->assertSame('1i2e test content1', $file->readRight());
         $this->assertTrue($file->writeRight('2', 2, 1));
-        $this->assertEquals('1i2e test conten21', $file->readRight());
+        $this->assertSame('1i2e test conten21', $file->readRight());
 
         $this->assertTrue($file->truncate(2));
-        $this->assertEquals('1i', $file->readLeft());
+        $this->assertSame('1i', $file->readLeft());
 
         $this->assertTrue($file->empty());
-        $this->assertEquals('', $file->readLeft());
+        $this->assertSame('', $file->readLeft());
 
         $this->assertTrue($file->unlock());
     }
