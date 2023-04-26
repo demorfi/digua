@@ -3,6 +3,8 @@
 namespace App\Controllers\Api;
 
 use Digua\Controllers\Base as BaseController;
+use Digua\Attributes\{Guardian\RequestPathRequired, Injector};
+use Digua\Request;
 
 class Settings extends BaseController
 {
@@ -21,8 +23,15 @@ class Settings extends BaseController
      *
      * @return true[]
      */
-    public function storeAction(): array
+    #[RequestPathRequired('user')]
+    #[Injector(['userId' => 'user'])]
+    public function storeAction(int $userId, Request $request): array
     {
-        return ['success' => true];
+        return [
+            'data' => [
+                'userId' => $userId,
+                'user'   => $request->getData()->query()->get('user')
+            ]
+        ];
     }
 }

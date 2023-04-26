@@ -7,6 +7,7 @@ use Digua\Exceptions\Path as PathException;
 use Digua\Controllers\Base as BaseController;
 use Digua\Components\Pagination\OfArray as PaginationOfArray;
 use Digua\Components\Searching\InArray as SearchInArray;
+use Digua\Attributes\Guardian\RequestPathAllowed;
 
 class Page1 extends BaseController
 {
@@ -43,7 +44,7 @@ class Page1 extends BaseController
     public function defaultAction(): Template
     {
         $title      = 'Page 1 [debug is ' . ($this->config->get('debug') ? 'active' : 'inactive') . ']';
-        $pagination = new PaginationOfArray($this->request);
+        $pagination = new PaginationOfArray((int)$this->dataRequest()->query()->get('page', 1));
         return $this->render('page1', compact('title', 'pagination'));
     }
 
@@ -53,6 +54,7 @@ class Page1 extends BaseController
      * @return Template|array
      * @throws PathException
      */
+    #[RequestPathAllowed('page')]
     public function list1Action(): Template|array
     {
         return $this->listAction('List 1');
@@ -64,6 +66,7 @@ class Page1 extends BaseController
      * @return Template|array
      * @throws PathException
      */
+    #[RequestPathAllowed('page')]
     public function list2Action(): Template|array
     {
         return $this->listAction('List 2');
@@ -91,7 +94,8 @@ class Page1 extends BaseController
         }
 
         // Pagination list
-        $pagination = (new PaginationOfArray($this->request))->setElements($list, self::PAGINATION_LIMITS);
+        $pagination = (new PaginationOfArray((int)$this->dataRequest()->query()->get('page', 1)))
+            ->setElements($list, self::PAGINATION_LIMITS);
         $list       = $pagination->getElementsOnPage();
 
         // Return json data
