@@ -9,7 +9,7 @@ use Digua\Interfaces\{
     Template as TemplateInterface
 };
 use Digua\Template;
-use Digua\Exceptions\Path;
+use Digua\Exceptions\{Path, NotFound};
 
 abstract class Base implements ControllerInterface, TemplateInterface
 {
@@ -51,5 +51,15 @@ abstract class Base implements ControllerInterface, TemplateInterface
     public function dataRequest(): RequestDataInterface
     {
         return $this->request->getData();
+    }
+
+    /**
+     * @param string $message
+     * @return void
+     * @throws NotFound
+     */
+    public function throwNotFound(string $message = ''): void
+    {
+        throw new NotFound($message);
     }
 }
