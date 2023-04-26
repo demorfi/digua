@@ -13,6 +13,7 @@ use Digua\Exceptions\{
     Route as RouteException
 };
 use Digua\Routes\{RouteAsName, RouteAsNameBuilder};
+use Exception;
 
 class RouteDispatcher
 {
@@ -27,28 +28,24 @@ class RouteDispatcher
     private ControllerInterface $controller;
 
     /**
-     * @param Request $request
-     */
-    public function __construct(private readonly Request $request = new Request)
-    {
-    }
-
-    /**
      * @param ?RouteBuilderInterface $builder
      * @param ?string                $appEntryPath
+     * @param ?string                $errorController
      * @return Response
-     * @throws RouteException
+     * @throws BaseException
      */
-    public function default(?RouteBuilderInterface $builder = null, ?string $appEntryPath = null): Response
-    {
+    public function default(
+        ?RouteBuilderInterface $builder = null,
+        ?string $appEntryPath = null,
+        ?string $errorController = null
+    ): Response {
         $defEntryPath = defined('APP_ENTRY_PATH') ? constant('APP_ENTRY_PATH') : '\App\Controllers\\';
         return $this->try(
             new RouteAsName(
                 $appEntryPath ?? $defEntryPath,
-                $builder ?? new RouteAsNameBuilder($this->request)
+                $builder ?? new RouteAsNameBuilder(new Request)
             ),
-            ErrorController::class,
-            'default'
+            $errorController ?? ErrorController::class
         );
     }
 
@@ -75,9 +72,7 @@ class RouteDispatcher
      */
     public function delegate(RouteInterface $route): Response
     {
-        $this->route = $route;
-        $this->request->setRoute($route);
-
+        $this->route    = $route;
         $controllerName = $this->route->getControllerName();
         $actionName     = $this->route->getControllerAction();
 
@@ -85,38 +80,39 @@ class RouteDispatcher
             throw new RouteException($controllerName . ' - controller not found!');
         }
 
-        $this->controller = new $controllerName($this->request);
+        $this->controller = new $controllerName($this->route->builder()->request());
         if (empty($actionName) || !method_exists($this->controller, $actionName)) {
             throw new RouteException($controllerName . '->' . $actionName . ' - action not found!');
         }
 
-        $this->request->setController($this->controller);
-        return Response::create(call_user_func([$this->controller, $actionName]));
+        if (!$this->route->isPermitted($this->controller)) {
+            throw new RouteException($controllerName . '->' . $actionName . ' - access not granted!');
+        }
+
+        $this->route->builder()->request()->setRoute($this->route);
+        $this->route->builder()->request()->setController($this->controller);
+        return Response::create($this->controller->$actionName(...$this->route->provide($this->controller)));
     }
 
     /**
      * @param RouteInterface $route
-     * @param string         $controller Alternative controller
-     * @param string         $action     Alternative controller action
+     * @param string         $errorController Alternative controller
+     * @param string         $errorAction     Alternative controller action
      * @return Response
-     * @throws RouteException
+     * @throws BaseException
      */
-    public function try(RouteInterface $route, string $controller, string $action): Response
+    public function try(RouteInterface $route, string $errorController, string $errorAction = 'default'): Response
     {
-        if (Env::isDev()) {
-            return $this->delegate($route);
-        }
-
         try {
-            return $this->delegate($route);
-        } catch (BaseException) {
             try {
-                $route->switch($controller, $action);
                 return $this->delegate($route);
-            } catch (BaseException $e) {
-                header('HTTP/1.1 500 Internal Server Error');
-                throw new RouteException($e->getMessage());
+            } catch (RouteException) {
+                $route->switch($errorController, $errorAction);
+                return $this->delegate($route);
             }
+        } catch (Exception $e) {
+            header('HTTP/1.1 500 Internal Server Error');
+            throw new BaseException($e->getMessage());
         }
     }
 }
