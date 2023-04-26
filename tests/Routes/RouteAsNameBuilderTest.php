@@ -1,10 +1,10 @@
 <?php declare(strict_types=1);
 
-namespace Routes;
+namespace Tests\Routes;
 
-use PHPUnit\Framework\TestCase;
 use Digua\Request;
 use Digua\Routes\RouteAsNameBuilder;
+use PHPUnit\Framework\TestCase;
 
 class RouteAsNameBuilderTest extends TestCase
 {
@@ -51,7 +51,7 @@ class RouteAsNameBuilderTest extends TestCase
     public function testBuilderDefinedPath(): void
     {
         $request = new Request;
-        $request->getData()->query()->buildPath('controller', 'action');
+        $request->getData()->query()->buildPath('controller', 'action')->shake();
         $builder = new RouteAsNameBuilder($request);
 
         $this->assertSame('controller', $builder->getControllerName());

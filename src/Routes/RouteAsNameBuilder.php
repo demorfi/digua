@@ -24,14 +24,10 @@ class RouteAsNameBuilder implements RouteBuilderInterface
      */
     public function __construct(private readonly RequestInterface $request)
     {
-        // Third argument to check long path
-        $variables = $this->request->getData()->query()->getFromPath(1, 2, 3);
+        $variables = $this->request->getData()->query()->getFromPath(1, 2);
 
-        // Disable non-existent paths
-        if (empty($variables) || sizeof($variables) < 3) {
-            $this->controllerName = $variables[0] ?? 'main';
-            $this->actionName     = $variables[1] ?? 'default';
-        }
+        $this->controllerName = $variables[0] ?? 'main';
+        $this->actionName     = $variables[1] ?? 'default';
     }
 
     /**
