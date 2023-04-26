@@ -2,10 +2,10 @@
 
 namespace Digua\Exceptions;
 
+use Digua\LateEvent;
+use Digua\Interfaces\Exception as ExceptionInterface;
 use Exception;
 use Throwable;
-use Digua\Interfaces\Exception as ExceptionInterface;
-use Digua\LateEvent;
 
 class Base extends Exception implements ExceptionInterface
 {
@@ -13,7 +13,7 @@ class Base extends Exception implements ExceptionInterface
      * @param string         $message
      * @param int            $code
      * @param Throwable|null $previous
-     * @uses LateEvent::register()
+     * @uses LateEvent::notify()
      */
     public function __construct(string $message = '', int $code = 0, ?Throwable $previous = null)
     {
