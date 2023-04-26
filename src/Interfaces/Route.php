@@ -32,6 +32,12 @@ interface Route
     public function switch(string $controller, string $action): void;
 
     /**
+     * @param Controller $controller
+     * @return bool
+     */
+    public function isPermitted(Controller $controller): bool;
+
+    /**
      * @param string $route
      * @return bool
      */
@@ -41,6 +47,12 @@ interface Route
      * @return RouteBuilder
      */
     public function builder(): RouteBuilder;
+
+    /**
+     * @param Controller $controller
+     * @return array
+     */
+    public function provide(Controller $controller): array;
 
     /**
      * @return ?string
