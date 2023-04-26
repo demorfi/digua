@@ -4,7 +4,7 @@ namespace Digua\Interfaces;
 
 use Digua\Interfaces\Request\Data as RequestData;
 
-interface Request
+interface Request extends Service
 {
     /**
      * @return RequestData
