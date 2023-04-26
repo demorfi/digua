@@ -19,15 +19,31 @@ class Query implements FilteredCollectionInterface, RequestQueryInterface
     private string $path = '/';
 
     /**
-     * @var string[]
+     * @var array
      */
-    private array $defExport = ['page'];
+    private array $paths = [];
+
+    /**
+     * @var array
+     */
+    private array $pathAsList = [];
+
+    /**
+     * @var array
+     */
+    private array $query = [];
+
+    /**
+     * @var array
+     */
+    private array $exported = [];
 
     /**
      * @param FilteredInputInterface $filteredInput
      */
     public function __construct(private readonly FilteredInputInterface $filteredInput = new FilteredInput)
     {
+        $this->buildPathFromUri();
         $this->shake();
     }
 
@@ -36,9 +52,13 @@ class Query implements FilteredCollectionInterface, RequestQueryInterface
      */
     public function shake(): void
     {
-        $this->array = $this->filteredInput->filteredList(INPUT_GET);
+        $this->collectPathFromUri();
         $this->collectQueryFromUri();
-        $this->buildPathFromUri();
+
+        $this->array = $this->filteredInput->filteredList(INPUT_GET)
+            + $this->pathAsList
+            + $this->query
+            + $this->exported;
     }
 
     /**
@@ -54,10 +74,40 @@ class Query implements FilteredCollectionInterface, RequestQueryInterface
      */
     protected function buildPathFromUri(): void
     {
-        $urlData = parse_url($this->getUri());
-        if (isset($urlData['path']) && !empty($urlData['path'])) {
-            $this->path = $urlData['path'];
-            $this->exportFromPath(...$this->defExport);
+        $this->path = parse_url($this->getUri(), PHP_URL_PATH) ?? '/';
+    }
+
+    /**
+     * Convert path to array.
+     *
+     * @return void
+     * @example
+     *         /key/value to [key => value]
+     *         /key/s-value to [key => sValue]
+     *         /s-key/s-value to [sKey => sValue]
+     */
+    protected function collectPathFromUri(): void
+    {
+        if (!empty($this->path) && $this->path !== '/') {
+            $paths = array_filter(
+                explode('/', trim($this->path, '/')),
+                fn($value) => !!preg_match('/\w/', trim($value))
+            );
+
+            // converting every odd key-value to keyValue
+            $this->paths = array_map(
+                fn($value, $key) => !!($key % 2)
+                    ? $value
+                    : str_replace('-', '', lcfirst(ucwords($value, '-'))),
+                $paths,
+                array_keys($paths)
+            );
+
+            if (!!(sizeof($this->paths) % 2)) {
+                $this->paths[] = null;
+            }
+
+            $this->pathAsList = array_column(array_chunk($this->paths, 2), 1, 0);
         }
     }
 
@@ -66,10 +116,10 @@ class Query implements FilteredCollectionInterface, RequestQueryInterface
      */
     protected function collectQueryFromUri(): void
     {
-        $urlData = parse_url($this->getUri());
-        if (isset($urlData['query']) && !empty($urlData['query'])) {
-            parse_str($urlData['query'], $result);
-            $this->array += filter_var_array($result, FILTER_SANITIZE_SPECIAL_CHARS);
+        $query = parse_url($this->getUri(), PHP_URL_QUERY);
+        if (!empty($query)) {
+            parse_str($query, $result);
+            $this->query = filter_var_array($result, FILTER_SANITIZE_SPECIAL_CHARS);
         }
     }
 
@@ -87,6 +137,14 @@ class Query implements FilteredCollectionInterface, RequestQueryInterface
     public function getPath(): string
     {
         return $this->path;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getPathAsList(): array
+    {
+        return $this->pathAsList;
     }
 
     /**
@@ -120,31 +178,18 @@ class Query implements FilteredCollectionInterface, RequestQueryInterface
      */
     public function getFromPath(int|string ...$variables): ?array
     {
-        if ($this->path !== '/') {
-            $path = $this->path;
-            if (!preg_match('/\/$/', $path)) {
-                $path .= '/';
-            }
-
-            $uriData = filter_var_array(
-                array_values(array_filter(explode('/', $path))),
-                FILTER_SANITIZE_SPECIAL_CHARS
-            );
-
+        if (!empty($this->paths)) {
             $found = [];
             foreach ($variables as $item) {
-                for ($i = 0; $i < sizeof($uriData); $i++) {
-                    // Search by index
-                    if (($i + 1) == $item) {
-                        $found[] = $uriData[$i];
-                        break;
-                    }
+                // Search by index
+                if (is_int($item) && isset($this->paths[$item - 1])) {
+                    $found[] = $this->paths[$item - 1];
+                    continue;
+                }
 
-                    // Search by name
-                    if ($item == $uriData[$i]) {
-                        $found[$item] = $uriData[$i + 1] ?? null;
-                        break;
-                    }
+                // Search by name
+                if (isset($this->pathAsList[$item])) {
+                    $found[$item] = $this->pathAsList[$item];
                 }
             }
 
@@ -162,7 +207,11 @@ class Query implements FilteredCollectionInterface, RequestQueryInterface
         $variables = $this->getFromPath(...$variables);
         if (!empty($variables)) {
             foreach ($variables as $name => $value) {
-                $this->set((string)$name, $value);
+                if (is_int($name)) {
+                    $this->exported['_' . $value . '_'] = $name;
+                } else {
+                    $this->exported['_' . $name . '_'] = $value;
+                }
 
                 // Removing a variable from path
                 $path = (!is_int($name) ? '/' . $name : '') . '/' . $value;
@@ -170,6 +219,8 @@ class Query implements FilteredCollectionInterface, RequestQueryInterface
                     $this->path = substr_replace($this->path, '', $pos, strlen($path));
                 }
             }
+
+            $this->shake();
         }
 
         return $this;
@@ -180,7 +231,7 @@ class Query implements FilteredCollectionInterface, RequestQueryInterface
      */
     public function buildPath(string ...$path): static
     {
-        $path       = array_map(fn($value) => trim($value, '/'), array_filter($path));
+        $path = array_map(fn($value) => trim($value, '/'), array_filter($path));
         $this->path = filter_var('/' . implode('/', $path), FILTER_SANITIZE_URL);
         return $this;
     }
