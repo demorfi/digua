@@ -1,9 +1,9 @@
 <?php declare(strict_types=1);
 
-namespace Request;
+namespace Tests\Request;
 
-use PHPUnit\Framework\TestCase;
 use Digua\Request\{Data, Cookies, Post, Query};
+use PHPUnit\Framework\TestCase;
 
 class DataTest extends TestCase
 {

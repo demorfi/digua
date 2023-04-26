@@ -1,9 +1,8 @@
 <?php declare(strict_types=1);
 
-namespace Components;
+namespace Tests\Components;
 
-use Digua\Components\Stack;
-use Digua\Components\Storage;
+use Digua\Components\{Stack, Storage};
 use Digua\Exceptions\Storage as StorageException;
 use Digua\Helper;
 use PHPUnit\Framework\TestCase;
@@ -44,7 +43,7 @@ class MemoryStackTest extends TestCase
         for ($i = 0; $i < $count; $i++) {
             $this->stack->push(range($i, $count));
         }
-        $this->assertEquals($count, $this->stack->size());
+        $this->assertSame($count, $this->stack->size());
     }
 
     /**
@@ -62,12 +61,12 @@ class MemoryStackTest extends TestCase
             $this->stack->push(range($i, $count));
         }
 
-        $this->assertEquals($count, $this->stack->size());
+        $this->assertSame($count, $this->stack->size());
         foreach ($this->stack->shadow() as $value) {
             $this->assertNotEmpty($value);
         }
 
-        $this->assertEquals($count, $this->stack->size());
+        $this->assertSame($count, $this->stack->size());
     }
 
     /**
@@ -90,15 +89,15 @@ class MemoryStackTest extends TestCase
             $this->stack->push($range);
         }
 
-        $this->assertEquals($count, $this->stack->size());
+        $this->assertSame($count, $this->stack->size());
 
         $actualData = [];
         foreach ($this->stack->read() as $item) {
             $actualData[] = $item;
         }
 
-        $this->assertEquals(0, $this->stack->size());
-        $this->assertEquals($data, array_reverse($actualData));
+        $this->assertSame(0, $this->stack->size());
+        $this->assertSame($data, array_reverse($actualData));
     }
 
     /**
@@ -121,14 +120,14 @@ class MemoryStackTest extends TestCase
             $this->stack->push($range);
         }
 
-        $this->assertEquals($count, $this->stack->size());
+        $this->assertSame($count, $this->stack->size());
 
         $actualData = [];
         foreach ($this->stack->readReverse() as $item) {
             $actualData[] = $item;
         }
 
-        $this->assertEquals(0, $this->stack->size());
-        $this->assertEquals($data, $actualData);
+        $this->assertSame(0, $this->stack->size());
+        $this->assertSame($data, $actualData);
     }
 }

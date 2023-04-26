@@ -1,10 +1,10 @@
 <?php declare(strict_types=1);
 
-namespace Request;
+namespace Tests\Request;
 
-use PHPUnit\Framework\TestCase;
 use Digua\Request\{Cookies, FilteredInput};
 use Digua\Interfaces\Request\FilteredCollection as FilteredCollectionInterface;
+use PHPUnit\Framework\TestCase;
 
 class CookiesTest extends TestCase
 {
@@ -46,6 +46,6 @@ class CookiesTest extends TestCase
     {
         $this->data = ['var' => 'value', 'var2' => 'value2'];
         $this->cookies->shake();
-        $this->assertEquals($this->data, $this->cookies->getAll());
+        $this->assertSame($this->data, $this->cookies->getAll());
     }
 }

@@ -1,5 +1,7 @@
 <?php declare(strict_types=1);
 
+namespace Tests;
+
 use Digua\LateEvent;
 use PHPUnit\Framework\TestCase;
 
@@ -53,7 +55,7 @@ class LateEventTest extends TestCase
             $uniqueEvents = array_count_values($eventName);
             foreach ($uniqueEvents as $event => $count) {
                 $this->assertTrue(LateEvent::hasSubscribers($event));
-                $this->assertEquals(array_fill(0, $count, $handler), LateEvent::getSubscribers($event));
+                $this->assertSame(array_fill(0, $count, $handler), LateEvent::getSubscribers($event));
 
                 $countNotifications = LateEvent::notify($event, ...$arguments);
                 $this->assertSame($count, $countNotifications);
@@ -61,7 +63,7 @@ class LateEventTest extends TestCase
             $this->assertSame(sizeof($eventName), $success);
         } else {
             $this->assertTrue(LateEvent::hasSubscribers($eventName));
-            $this->assertEquals([$handler], LateEvent::getSubscribers($eventName));
+            $this->assertSame([$handler], LateEvent::getSubscribers($eventName));
 
             $countNotifications = LateEvent::notify($eventName, ...$arguments);
             $this->assertSame(1, $success);

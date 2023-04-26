@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Components;
+namespace Tests\Components;
 
 use Digua\Components\DataFile;
 use Digua\Components\Storage\DiskFile;
@@ -8,10 +8,6 @@ use Digua\Helper;
 use Digua\Exceptions\Storage as StorageException;
 use PHPUnit\Framework\TestCase;
 use Exception;
-
-if (!defined('ROOT_PATH')) {
-    define('ROOT_PATH', null);
-}
 
 class DataFileTest extends TestCase
 {
@@ -26,6 +22,10 @@ class DataFileTest extends TestCase
      */
     protected function setUp(): void
     {
+        if (!defined('ROOT_PATH')) {
+            define('ROOT_PATH', null);
+        }
+
         DiskFile::setDiskPath(__DIR__);
         $this->dataFile = DataFile::create((string)Helper::makeIntHash());
     }
@@ -52,8 +52,8 @@ class DataFileTest extends TestCase
         $data = range(1, $count);
         $this->assertEmpty($this->dataFile->read());
         $this->assertTrue($this->dataFile->write($data));
-        $this->assertEquals($data, $this->dataFile->read());
-        $this->assertEquals(sizeof($data), $this->dataFile->size());
+        $this->assertSame($data, $this->dataFile->read());
+        $this->assertSame(sizeof($data), $this->dataFile->size());
     }
 
     /**
@@ -69,12 +69,12 @@ class DataFileTest extends TestCase
     {
         $data = range(1, $count);
         $this->assertTrue($this->dataFile->write($data));
-        $this->assertEquals($data, $this->dataFile->read());
+        $this->assertSame($data, $this->dataFile->read());
 
         $this->assertTrue($this->dataFile->write(['name1' => 'value1']));
         $this->dataFile->set('name2', 'value2');
         $this->dataFile->save();
-        $this->assertEquals(array_merge($data, ['name1' => 'value1', 'name2' => 'value2']), $this->dataFile->read());
+        $this->assertSame(array_merge($data, ['name1' => 'value1', 'name2' => 'value2']), $this->dataFile->read());
     }
 
     /**
@@ -90,9 +90,9 @@ class DataFileTest extends TestCase
     {
         $data = range(1, $count);
         $this->assertTrue($this->dataFile->write($data));
-        $this->assertEquals($data, $this->dataFile->read());
+        $this->assertSame($data, $this->dataFile->read());
 
         $this->assertTrue($this->dataFile->rewrite(['test' => 'value']));
-        $this->assertEquals(['test' => 'value'], $this->dataFile->read());
+        $this->assertSame(['test' => 'value'], $this->dataFile->read());
     }
 }

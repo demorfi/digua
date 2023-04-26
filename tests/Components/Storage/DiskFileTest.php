@@ -1,15 +1,11 @@
 <?php declare(strict_types=1);
 
-namespace Components\Storage;
+namespace Tests\Components\Storage;
 
 use Digua\Components\Storage\DiskFile;
 use Digua\Helper;
-use Exception;
 use PHPUnit\Framework\TestCase;
-
-if (!defined('ROOT_PATH')) {
-    define('ROOT_PATH', null);
-}
+use Exception;
 
 class DiskFileTest extends TestCase
 {
@@ -18,6 +14,10 @@ class DiskFileTest extends TestCase
      */
     protected function setUp(): void
     {
+        if (!defined('ROOT_PATH')) {
+            define('ROOT_PATH', null);
+        }
+
         DiskFile::setDiskPath(__DIR__);
     }
 

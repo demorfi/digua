@@ -1,7 +1,10 @@
 <?php declare(strict_types=1);
 
-use PHPUnit\Framework\TestCase;
+namespace Tests;
+
 use Digua\Helper;
+use PHPUnit\Framework\TestCase;
+use ValueError;
 
 class HelperTest extends TestCase
 {
@@ -14,7 +17,7 @@ class HelperTest extends TestCase
         Helper::register('testBoolean', $closure);
         $this->assertTrue(Helper::testBoolean(true));
         $this->assertFalse(Helper::testBoolean(false));
-        $this->assertEquals($closure, Helper::get('testBoolean'));
+        $this->assertSame($closure, Helper::get('testBoolean'));
 
         Helper::register('testSqrt', fn($value) => (int)sqrt($value));
         $this->assertSame(3, Helper::testSqrt(9));
@@ -37,9 +40,16 @@ class HelperTest extends TestCase
     /**
      * @return void
      */
-    public function testDefaultHelper(): void
+    public function testHelperFilterFileName(): void
     {
         $this->assertSame('test/1string-data.lg', Helper::filterFileName('+test/1; string-da&ta.lg?'));
+    }
+
+    /**
+     * @return void
+     */
+    public function testHelperMakeIntHash(): void
+    {
         $this->assertIsInt(Helper::makeIntHash());
     }
 }
