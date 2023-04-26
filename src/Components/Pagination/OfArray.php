@@ -9,21 +9,9 @@ use Generator;
 class OfArray implements JsonSerializable
 {
     /**
-     * Data.
-     *
-     * @var array
-     */
-    protected array $array = [];
-
-    /**
      * @var int
      */
     protected int $offset = 0;
-
-    /**
-     * @var int
-     */
-    protected int $limit = 0;
 
     /**
      * Total elements.
@@ -33,43 +21,39 @@ class OfArray implements JsonSerializable
     protected int $total = 1;
 
     /**
-     * Current element.
-     *
-     * @var int
+     * @param int   $currentPage
+     * @param array $elements
+     * @param int   $limit
      */
-    protected int $current = 1;
-
-    /**
-     * @var Request
-     */
-    private Request $request;
-
-    /**
-     * @param Request $request
-     */
-    public function __construct(Request $request)
-    {
-        $this->request = $request;
+    public function __construct(
+        protected int $currentPage = 1,
+        protected array $elements = [],
+        protected int $limit = 1
+    ) {
+        $this->setElements($this->elements, $this->limit);
     }
 
     /**
-     * Set elements for create pagination.
-     *
-     * @param array $array Elements
+     * @param array $elements
      * @param int   $limit
      * @return self
      */
-    public function setElements(array $array, int $limit): self
+    public function setElements(array $elements, int $limit): self
     {
-        $page = (int)$this->request->getData()->query()->get('page');
+        $this->elements = $elements;
+        $this->limit    = $limit;
 
-        $this->array   = $array;
-        $this->limit   = $limit;
-        $this->total   = (int)ceil(sizeof($array) / ($limit ?: 1));
-        $this->current = (!$page ? 1 : $page);
-        $this->offset  = ($this->current > 1 ? ($this->current - 1) * $this->limit : 0);
-
+        $this->calculate();
         return $this;
+    }
+
+    /**
+     * @return void
+     */
+    protected function calculate(): void
+    {
+        $this->total  = (int)ceil(sizeof($this->elements) / ($this->limit ?: 1));
+        $this->offset = ($this->currentPage > 1 ? ($this->currentPage - 1) * $this->limit : 0);
     }
 
     /**
@@ -79,7 +63,7 @@ class OfArray implements JsonSerializable
      */
     public function getElementsOnPage(): array
     {
-        return array_slice($this->array, $this->offset, $this->limit);
+        return array_slice($this->elements, $this->offset, $this->limit);
     }
 
     /**
@@ -89,7 +73,17 @@ class OfArray implements JsonSerializable
      */
     public function hasNext(): bool
     {
-        return $this->current < $this->total;
+        return $this->currentPage < $this->total;
+    }
+
+    /**
+     * @return self
+     */
+    public function nextPage(): self
+    {
+        $this->currentPage += $this->hasNext() ? 1 : 0;
+        $this->calculate();
+        return $this;
     }
 
     /**
@@ -99,7 +93,17 @@ class OfArray implements JsonSerializable
      */
     public function hasPrev(): bool
     {
-        return $this->current > 1 && $this->current <= $this->total;
+        return $this->currentPage > 1 && $this->currentPage <= $this->total;
+    }
+
+    /**
+     * @return self
+     */
+    public function prevPage(): self
+    {
+        $this->currentPage -= $this->hasPrev() ? 1 : 0;
+        $this->calculate();
+        return $this;
     }
 
     /**
@@ -117,7 +121,7 @@ class OfArray implements JsonSerializable
      */
     public function getCurrent(): int
     {
-        return $this->current;
+        return $this->currentPage;
     }
 
     /**
@@ -131,27 +135,29 @@ class OfArray implements JsonSerializable
     }
 
     /**
-     * @param string|null $url Prepend url path before /page/
+     * @param ?string $url Prepend url path before /page/
      * @return string
      */
     public function getNextPage(string $url = null): string
     {
-        return (!is_null($url) ? $url . '/page/' : '') . ($this->hasNext() ? $this->current + 1 : $this->current);
+        return (!is_null($url) ? $url . '/page/' : '')
+            . ($this->hasNext() ? $this->currentPage + 1 : $this->currentPage);
     }
 
     /**
-     * @param string|null $url Prepend url path before /page/
+     * @param ?string $url Prepend url path before /page/
      * @return string
      */
     public function getPrevPage(string $url = null): string
     {
-        return (!is_null($url) ? $url . '/page/' : '') . ($this->hasPrev() ? $this->current - 1 : $this->current);
+        return (!is_null($url) ? $url . '/page/' : '')
+            . ($this->hasPrev() ? $this->currentPage - 1 : $this->currentPage);
     }
 
     /**
      * Get generation navigation list.
      *
-     * @param string|null $url Prepend url path before /page/
+     * @param ?string $url Prepend url path before /page/
      * @return Generator
      */
     public function getNavigation(string $url = null): Generator
@@ -159,8 +165,8 @@ class OfArray implements JsonSerializable
         for ($i = 1; $i <= $this->total; $i++) {
             yield [
                 'page'   => $i,
-                'url'    => (!empty($url) ? $url . '/page/' : '') . $i,
-                'active' => $i === $this->current
+                'url'    => (!is_null($url) ? $url . '/page/' : '') . $i,
+                'active' => $i === $this->currentPage
             ];
         }
     }
