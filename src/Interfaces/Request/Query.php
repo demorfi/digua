@@ -15,6 +15,11 @@ interface Query
     public function getPath(): string;
 
     /**
+     * @return array
+     */
+    public function getPathAsList(): array;
+
+    /**
      * @return string
      */
     public function getHost(): string;

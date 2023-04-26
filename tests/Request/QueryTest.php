@@ -1,17 +1,17 @@
 <?php declare(strict_types=1);
 
-namespace Request;
+namespace Tests\Request;
 
-use PHPUnit\Framework\TestCase;
 use Digua\Request\{Query, FilteredInput};
 use Digua\Interfaces\Request\FilteredCollection as FilteredCollectionInterface;
+use PHPUnit\Framework\TestCase;
 
 class QueryTest extends TestCase
 {
     /**
-     * @var Query
+     * @var FilteredInput
      */
-    private Query $query;
+    private FilteredInput $input;
 
     /**
      * @var array
@@ -23,12 +23,11 @@ class QueryTest extends TestCase
      */
     protected function setUp(): void
     {
-        $input = $this->getMockBuilder(FilteredInput::class)
+        $this->input = $this->getMockBuilder(FilteredInput::class)
             ->onlyMethods(['filteredList'])
             ->getMock();
 
-        $input->method('filteredList')->willReturnCallback(fn() => $this->data);
-        $this->query = new Query($input);
+        $this->input->method('filteredList')->willReturnCallback(fn() => $this->data);
     }
 
     /**
@@ -36,7 +35,8 @@ class QueryTest extends TestCase
      */
     public function testInstanceOfFilteredCollection(): void
     {
-        $this->assertInstanceOf(FilteredCollectionInterface::class, $this->query);
+        $query = new Query($this->input);
+        $this->assertInstanceOf(FilteredCollectionInterface::class, $query);
     }
 
     /**
@@ -45,23 +45,23 @@ class QueryTest extends TestCase
     public function testIsItPossibleToGetDataContent(): void
     {
         $this->data = ['var' => 'value', 'var2' => 'value2'];
-        $this->query->shake();
 
-        $this->assertEquals($this->data, $this->query->getAll());
+        $query = new Query($this->input);
+        $this->assertSame($this->data, $query->getAll());
     }
 
     /**
      * @return void
      */
-    public function testWhetherTheBuildFromUriIsCalledOnShake(): void
+    public function testWhetherCollectFromUriIsCalledOnShake(): void
     {
         $query = $this->getMockBuilder(Query::class)
             ->setConstructorArgs([new FilteredInput])
-            ->onlyMethods(['collectQueryFromUri', 'buildPathFromUri'])
+            ->onlyMethods(['collectPathFromUri', 'collectQueryFromUri'])
             ->getMock();
 
+        $query->expects($this->once())->method('collectPathFromUri');
         $query->expects($this->once())->method('collectQueryFromUri');
-        $query->expects($this->once())->method('buildPathFromUri');
         $query->shake();
     }
 
@@ -70,14 +70,14 @@ class QueryTest extends TestCase
      */
     public function testIsItCorrectBuildFromUri(): void
     {
-        $this->data = ['REQUEST_URI' => '/controller/action/page/1?key=value&key2=value2'];
-        $this->query->shake();
+        $this->data = ['REQUEST_URI' => '/u-controller/u-action/u-page/1?key=value&key2=value2'];
 
-        $this->assertEquals(['page'], (fn() => $this->defExport)->bindTo($this->query, Query::class)());
-        $this->assertSame('value', $this->query->get('key'));
-        $this->assertSame('value2', $this->query->get('key2'));
-        $this->assertSame('1', $this->query->get('page'));
-        $this->assertSame('/controller/action', $this->query->getPath());
+        $query = new Query($this->input);
+        $this->assertSame('value', $query->get('key'));
+        $this->assertSame('value2', $query->get('key2'));
+        $this->assertSame('1', $query->get('uPage'));
+        $this->assertSame('u-action', $query->get('uController'));
+        $this->assertSame('/u-controller/u-action/u-page/1', $query->getPath());
     }
 
     /**
@@ -86,9 +86,9 @@ class QueryTest extends TestCase
     public function testIsItPossibleToGetUri(): void
     {
         $this->data = ['REQUEST_URI' => '/controller/action'];
-        $this->query->shake();
 
-        $this->assertSame('/controller/action', $this->query->getUri());
+        $query = new Query($this->input);
+        $this->assertSame('/controller/action', $query->getUri());
     }
 
     /**
@@ -97,9 +97,20 @@ class QueryTest extends TestCase
     public function testIsItPossibleToGetPath(): void
     {
         $this->data = ['REQUEST_URI' => '/controller/action'];
-        $this->query->shake();
 
-        $this->assertSame('/controller/action', $this->query->getPath());
+        $query = new Query($this->input);
+        $this->assertSame('/controller/action', $query->getPath());
+    }
+
+    /**
+     * @return void
+     */
+    public function testIsItPossibleToGetPathAsList(): void
+    {
+        $this->data = ['REQUEST_URI' => '/controller/action/page/1/sub/dir'];
+
+        $query = new Query($this->input);
+        $this->assertSame(['controller' => 'action', 'page' => '1', 'sub' => 'dir'], $query->getPathAsList());
     }
 
     /**
@@ -108,9 +119,9 @@ class QueryTest extends TestCase
     public function testIsItPossibleToGetHost(): void
     {
         $this->data = ['REQUEST_SCHEME' => 'https', 'HTTP_HOST' => 'test.dot'];
-        $this->query->shake();
 
-        $this->assertSame('https://test.dot', $this->query->getHost());
+        $query = new Query($this->input);
+        $this->assertSame('https://test.dot', $query->getHost());
     }
 
     /**
@@ -119,9 +130,9 @@ class QueryTest extends TestCase
     public function testIsItPossibleToGetLocation(): void
     {
         $this->data = ['REQUEST_URI' => '/controller/action', 'REQUEST_SCHEME' => 'https', 'HTTP_HOST' => 'test.dot'];
-        $this->query->shake();
 
-        $this->assertSame('https://test.dot/controller/action', $this->query->getLocation());
+        $query = new Query($this->input);
+        $this->assertSame('https://test.dot/controller/action', $query->getLocation());
     }
 
     /**
@@ -130,9 +141,9 @@ class QueryTest extends TestCase
     public function testIsItPossibleToGetAsync(): void
     {
         $this->data = ['HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest'];
-        $this->query->shake();
 
-        $this->assertTrue($this->query->isAsync());
+        $query = new Query($this->input);
+        $this->assertTrue($query->isAsync());
     }
 
     /**
@@ -141,14 +152,14 @@ class QueryTest extends TestCase
     public function testIsItPossibleToGetFromPathStringVariables(): void
     {
         $this->data = ['REQUEST_URI' => '/controller/action/sub/data'];
-        $this->query->shake();
 
-        $this->assertEmpty($this->query->getFromPath('test'));
-        $this->assertEquals(['controller' => 'action'], $this->query->getFromPath('controller'));
-        $this->assertEquals(['sub' => 'data'], $this->query->getFromPath('sub'));
-        $this->assertEquals(
+        $query = new Query($this->input);
+        $this->assertEmpty($query->getFromPath('test'));
+        $this->assertSame(['controller' => 'action'], $query->getFromPath('controller'));
+        $this->assertSame(['sub' => 'data'], $query->getFromPath('sub'));
+        $this->assertSame(
             ['controller' => 'action', 'sub' => 'data'],
-            $this->query->getFromPath('controller', 'sub')
+            $query->getFromPath('controller', 'sub')
         );
     }
 
@@ -157,13 +168,13 @@ class QueryTest extends TestCase
      */
     public function testIsItPossibleToGetFromPathIntVariables(): void
     {
-        $this->data = ['REQUEST_URI' => '/controller/action/sub/data'];
-        $this->query->shake();
+        $this->data = ['REQUEST_URI' => '/controller/action/sub/data/1/2'];
 
-        $this->assertEmpty($this->query->getFromPath(5, 0));
-        $this->assertEquals(['action'], $this->query->getFromPath(2));
-        $this->assertEquals(['controller', 'action'], $this->query->getFromPath(1, 2));
-        $this->assertEquals(['data', 'action', 'sub'], $this->query->getFromPath(4, 2, 3, 5));
+        $query = new Query($this->input);
+        $this->assertSame(['action'], $query->getFromPath(2));
+        $this->assertSame(['controller', 'action'], $query->getFromPath(1, 2));
+        $this->assertSame(['data', 'action', 'sub', '1', '2'], $query->getFromPath(4, 2, 3, 5, 6));
+        $this->assertSame(['1', '2'], $query->getFromPath(5, 6, 7));
     }
 
     /**
@@ -172,10 +183,10 @@ class QueryTest extends TestCase
     public function testIsItPossibleToGetFromPathStringAndIntVariables(): void
     {
         $this->data = ['REQUEST_URI' => '/controller/action/sub/data'];
-        $this->query->shake();
 
-        $this->assertEquals(['action', 'sub' => 'data'], $this->query->getFromPath(2, 'sub'));
-        $this->assertEquals(['controller' => 'action', 'action'], $this->query->getFromPath('controller', 2));
+        $query = new Query($this->input);
+        $this->assertSame(['action', 'sub' => 'data'], $query->getFromPath(2, 'sub'));
+        $this->assertSame(['controller' => 'action', 'action'], $query->getFromPath('controller', 2));
     }
 
     /**
@@ -184,24 +195,25 @@ class QueryTest extends TestCase
     public function testIsItPossibleToExportFromPath(): void
     {
         $this->data = ['REQUEST_URI' => '/controller/action/sub/dir/long/path'];
-        $this->query->shake();
 
-        $this->assertSame('/controller/action/sub/dir/long/path', $this->query->getPath());
-        $this->assertNull($this->query->get('sub'));
+        $query = new Query($this->input);
+        $this->assertSame('/controller/action/sub/dir/long/path', $query->getPath());
+        $this->assertSame('dir', $query->get('sub'));
 
-        $result = $this->query->exportFromPath('sub');
+        $result = $query->exportFromPath('sub');
         $this->assertInstanceOf(Query::class, $result);
 
-        $this->assertSame('/controller/action/long/path', $this->query->getPath());
-        $this->assertSame('dir', $this->query->get('sub'));
+        $this->assertSame('/controller/action/long/path', $query->getPath());
+        $this->assertSame('dir', $query->get('_sub_'));
 
         $this->data = ['REQUEST_URI' => '/controller/action/sub/dir/long/path'];
-        $this->query->shake();
 
-        $this->query->exportFromPath('sub', 'long');
-        $this->assertSame('/controller/action', $this->query->getPath());
-        $this->assertSame('dir', $this->query->get('sub'));
-        $this->assertSame('path', $this->query->get('long'));
+        $query = new Query($this->input);
+        $query->exportFromPath('sub', 'long');
+
+        $this->assertSame('/controller/action', $query->getPath());
+        $this->assertSame('dir', $query->get('_sub_'));
+        $this->assertSame('path', $query->get('_long_'));
     }
 
     /**
@@ -209,14 +221,15 @@ class QueryTest extends TestCase
      */
     public function testIsItPossibleToBuildPath(): void
     {
-        $this->query->buildPath('controller/', 'action', '/sub/');
-        $this->assertSame('/controller/action/sub', $this->query->getPath());
+        $query = new Query($this->input);
+        $query->buildPath('controller/', 'action', '/sub/');
+        $this->assertSame('/controller/action/sub', $query->getPath());
 
-        $this->query->buildPath('controller', 'action', 'sub');
-        $this->assertSame('/controller/action/sub', $this->query->getPath());
+        $query->buildPath('controller', 'action', 'sub');
+        $this->assertSame('/controller/action/sub', $query->getPath());
 
-        $query = $this->query->buildPath('/controller/action/sub/');
-        $this->assertSame('/controller/action/sub', $this->query->getPath());
-        $this->assertInstanceOf(Query::class, $query);
+        $result = $query->buildPath('/controller/action/sub/');
+        $this->assertSame('/controller/action/sub', $query->getPath());
+        $this->assertInstanceOf(Query::class, $result);
     }
 }
