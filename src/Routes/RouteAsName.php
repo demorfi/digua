@@ -2,10 +2,23 @@
 
 namespace Digua\Routes;
 
+use Digua\Injector;
+use Digua\Providers\Registry as RegistryProvider;
+use Digua\Attributes\Guardian as GuardianAttribute;
 use Digua\Interfaces\{
+    Controller as ControllerInterface,
+    Guardian as GuardianInterface,
     Route as RouteInterface,
+    Injector as InjectorInterface,
     Route\Builder as RouteBuilderInterface
 };
+use Digua\Exceptions\{
+    Base as BaseException,
+    Injector as InjectorException
+};
+use ReflectionAttribute;
+use ReflectionMethod;
+use ReflectionException;
 
 class RouteAsName implements RouteInterface
 {
@@ -18,6 +31,11 @@ class RouteAsName implements RouteInterface
      * @var string|null
      */
     private ?string $actionName;
+
+    /**
+     * @var ?InjectorInterface
+     */
+    private ?InjectorInterface $injector;
 
     /**
      * @param string                $appEntryPath
@@ -38,6 +56,43 @@ class RouteAsName implements RouteInterface
     {
         $this->controllerName = $controller;
         $this->actionName     = $action;
+    }
+
+    /**
+     * @inheritdoc
+     * @throws BaseException
+     */
+    public function isPermitted(ControllerInterface $controller): bool
+    {
+        if (is_subclass_of($controller, GuardianInterface::class)) {
+            return $controller->granted($this);
+        }
+
+        // Allowed access to entrypoint controller action
+        $paths = $this->builder->request()->getData()->query()->getPathAsList();
+        if (sizeof($paths) < 2) {
+            return true;
+        }
+
+        try {
+            $reflection = new ReflectionMethod($controller, $this->getControllerAction());
+            $attributes = $reflection->getAttributes(GuardianAttribute::class, ReflectionAttribute::IS_INSTANCEOF);
+            if (sizeof($attributes) > 0) {
+                foreach ($attributes as $attribute) {
+                    /* @var GuardianAttribute $guardian */
+                    $guardian = $attribute->newInstance();
+                    if (!$guardian->granted($this)) {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+        } catch (ReflectionException $e) {
+            throw new BaseException($e->getMessage());
+        }
+
+        return false;
     }
 
     /**
@@ -113,5 +168,28 @@ class RouteAsName implements RouteInterface
     public function getEntryPath(): string
     {
         return $this->appEntryPath;
+    }
+
+    /**
+     * @param InjectorInterface $injector
+     * @return void
+     */
+    public function addInjector(InjectorInterface $injector): void
+    {
+        $this->injector = $injector;
+    }
+
+    /**
+     * @param ControllerInterface $controller
+     * @return array
+     * @throws InjectorException
+     * @throws ReflectionException
+     */
+    public function provide(ControllerInterface $controller): array
+    {
+        $injector = $this->injector ?? new Injector($controller, $this->getControllerAction());
+        $injector->addProvider(new RouteAsNameProvider($this->builder->request()));
+        $injector->addProvider(new RegistryProvider($this->builder->request()));
+        return $injector->inject();
     }
 }

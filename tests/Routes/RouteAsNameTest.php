@@ -1,13 +1,30 @@
 <?php declare(strict_types=1);
 
-namespace Routes;
+namespace Tests\Routes;
 
-use PHPUnit\Framework\TestCase;
-use Digua\Request;
+use Digua\{Request, Registry, Injector};
+use Digua\Request\{FilteredInput, Query, Data};
 use Digua\Routes\{RouteAsName, RouteAsNameBuilder};
+use Digua\Interfaces\{
+    GuardianController as GuardianControllerInterface,
+    Controller as ControllerInterface,
+    Provider as ProviderInterface
+};
+use Digua\Exceptions\{
+    Base as BaseException,
+    Injector as InjectorException
+};
+use PHPUnit\Framework\TestCase;
+use Tests\Pacifiers\{ControllerSuccess, ControllerFailure, GuardianAttribute, StubService};
+use ReflectionException;
 
 class RouteAsNameTest extends TestCase
 {
+    /**
+     * @var array
+     */
+    private array $data = [];
+
     /**
      * @var RouteAsName
      */
@@ -18,8 +35,14 @@ class RouteAsNameTest extends TestCase
      */
     protected function setUp(): void
     {
-        $builder = new RouteAsNameBuilder(new Request);
+        $input = $this->getMockBuilder(FilteredInput::class)
+            ->onlyMethods(['filteredList'])
+            ->getMock();
+
+        $input->method('filteredList')->willReturnCallback(fn() => $this->data);
+        $builder     = new RouteAsNameBuilder(new Request(new Data(query: new Query($input))));
         $this->route = new RouteAsName('\App\Controllers\\', $builder);
+        Registry::set(StubService::class, new StubService);
     }
 
     /**
@@ -99,5 +122,102 @@ class RouteAsNameTest extends TestCase
     {
         $this->assertTrue($this->route->hasRoute('main.default'));
         $this->assertFalse($this->route->hasRoute('default.main'));
+    }
+
+    /**
+     * @return void
+     * @throws BaseException
+     */
+    public function testPermittedGuardianInterface(): void
+    {
+        $controller = $this->getMockBuilder(GuardianControllerInterface::class)
+            ->onlyMethods(['granted', 'getName'])
+            ->getMock();
+
+        $controller->expects($this->once())->method('granted')->willReturn(true);
+        $this->assertTrue($this->route->isPermitted($controller));
+    }
+
+    /**
+     * @return void
+     * @throws BaseException
+     */
+    public function testPermittedAccessToEntrypoint(): void
+    {
+        $controller = $this->getMockBuilder(ControllerInterface::class)
+            ->onlyMethods(['getName'])
+            ->addMethods(['actionAction'])
+            ->getMock();
+
+        $this->data = ['REQUEST_URI' => '/controller/action'];
+        $this->setUp();
+        $this->assertTrue($this->route->isPermitted($controller));
+
+        $this->data = ['REQUEST_URI' => '/controller/action/test/page'];
+        $this->setUp();
+        $this->assertFalse($this->route->isPermitted($controller));
+    }
+
+    /**
+     * @return void
+     * @throws BaseException
+     */
+    public function testPermittedViaAttributes(): void
+    {
+        $this->data = ['REQUEST_URI' => '/controller/success/test/page'];
+        $this->setUp();
+        $this->assertTrue($this->route->isPermitted(new ControllerSuccess(new Request)));
+
+        $this->data = ['REQUEST_URI' => '/controller/failure/test/page'];
+        $this->setUp();
+        $this->assertFalse($this->route->isPermitted(new ControllerFailure(new Request)));
+
+        $this->assertSame(2, GuardianAttribute::$called);
+    }
+
+    /**
+     * @return void
+     * @throws BaseException
+     */
+    public function testPermittedIfControllerOrActionIsNotFound(): void
+    {
+        $this->data = ['REQUEST_URI' => '/controller/success/test/page'];
+        $this->setUp();
+        $this->expectException(BaseException::class);
+
+        $controller = $this->getMockBuilder(ControllerInterface::class)
+            ->onlyMethods(['getName'])
+            ->addMethods(['actionAction'])
+            ->getMock();
+
+        $this->route->isPermitted($controller);
+    }
+
+    /**
+     * @return void
+     * @throws InjectorException
+     * @throws ReflectionException
+     */
+    public function testIsItPossibleToGetInjectInProvide(): void
+    {
+        $controller = $this->getMockBuilder(ControllerSuccess::class)
+            ->setConstructorArgs([new Request])
+            ->getMock();
+
+        $injector = $this->getMockBuilder(Injector::class)
+            ->setConstructorArgs([$controller, 'successAction'])
+            ->getMock();
+
+        $this->route->addInjector($injector);
+
+        $injector->expects($this->exactly(2))
+            ->method('addProvider')
+            ->with($this->containsOnlyInstancesOf(ProviderInterface::class));
+
+        $injector->expects($this->once())
+            ->method('inject')
+            ->willReturn([1, 2, 3]);
+
+        $this->assertSame([1, 2, 3], $this->route->provide($controller));
     }
 }
