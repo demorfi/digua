@@ -21,7 +21,9 @@ class Settings extends BaseController
     /**
      * Store action.
      *
-     * @return true[]
+     * @param int     $userId
+     * @param Request $request
+     * @return array[]
      */
     #[RequestPathRequired('user')]
     #[Injector(['userId' => 'user'])]
