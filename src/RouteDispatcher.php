@@ -72,15 +72,18 @@ class RouteDispatcher
      */
     public function delegate(RouteInterface $route): Response
     {
-        $this->route    = $route;
-        $controllerName = $this->route->getControllerName();
-        $actionName     = $this->route->getControllerAction();
+        $this->route = $route;
+        $this->route->builder()->request()->setRoute($this->route);
 
+        $controllerName = $this->route->getControllerName();
         if (empty($controllerName) || !is_subclass_of($controllerName, ControllerInterface::class)) {
             throw new RouteException($controllerName . ' - controller not found!');
         }
 
         $this->controller = new $controllerName($this->route->builder()->request());
+        $this->route->builder()->request()->setController($this->controller);
+
+        $actionName = $this->route->getControllerAction();
         if (empty($actionName) || !method_exists($this->controller, $actionName)) {
             throw new RouteException($controllerName . '->' . $actionName . ' - action not found!');
         }
@@ -89,8 +92,6 @@ class RouteDispatcher
             throw new RouteException($controllerName . '->' . $actionName . ' - access not granted!');
         }
 
-        $this->route->builder()->request()->setRoute($this->route);
-        $this->route->builder()->request()->setController($this->controller);
         return Response::create($this->controller->$actionName(...$this->route->provide($this->controller)));
     }
 
