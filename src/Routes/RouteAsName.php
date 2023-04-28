@@ -132,7 +132,9 @@ class RouteAsName implements RouteInterface
      */
     public function getBaseName(): ?string
     {
-        return !empty($this->controllerName) ? strtolower(basename($this->controllerName)) : null;
+        return !empty($this->controllerName)
+            ? strtolower(basename(str_replace('\\', '/', $this->controllerName)))
+            : null;
     }
 
     /**
@@ -140,7 +142,9 @@ class RouteAsName implements RouteInterface
      */
     public function getBaseAction(): ?string
     {
-        return !empty($this->actionName) ? strtolower(basename($this->actionName)) : null;
+        return !empty($this->actionName)
+            ? strtolower(basename(str_replace('::', '/', $this->actionName)))
+            : null;
     }
 
     /**
