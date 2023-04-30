@@ -170,7 +170,8 @@ class Query implements FilteredCollectionInterface, RequestQueryInterface
      */
     public function isAsync(): bool
     {
-        return $this->filteredInput->filteredVar(INPUT_SERVER, 'HTTP_X_REQUESTED_WITH') === 'XMLHttpRequest';
+        return $this->filteredInput->filteredVar(INPUT_SERVER, 'CONTENT_TYPE') == 'application/json' ||
+            $this->filteredInput->filteredVar(INPUT_SERVER, 'HTTP_X_REQUESTED_WITH') === 'XMLHttpRequest';
     }
 
     /**
