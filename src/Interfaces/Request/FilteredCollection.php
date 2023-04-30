@@ -10,4 +10,9 @@ interface FilteredCollection extends NamedCollectionInterface
      * @return FilteredInput
      */
     public function filtered(): FilteredInput;
+
+    /**
+     * @return void
+     */
+    public function shake(): void;
 }

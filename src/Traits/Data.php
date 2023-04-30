@@ -2,19 +2,17 @@
 
 namespace Digua\Traits;
 
+use Digua\Components\ArrayCollection;
+
 trait Data
 {
     /**
-     * Data.
-     *
      * @var array
      */
     protected array $array = [];
 
     /**
-     * Get value.
-     *
-     * @param string $name Name key
+     * @param string $name
      * @return mixed
      */
     public function __get(string $name): mixed
@@ -23,10 +21,8 @@ trait Data
     }
 
     /**
-     * Set value.
-     *
-     * @param string $name  Name key
-     * @param mixed  $value Value key
+     * @param string $name
+     * @param mixed  $value
      */
     public function __set(string $name, mixed $value): void
     {
@@ -34,9 +30,7 @@ trait Data
     }
 
     /**
-     * Isset key.
-     *
-     * @param string $name Name key
+     * @param string $name
      * @return bool
      */
     public function __isset(string $name): bool
@@ -45,9 +39,16 @@ trait Data
     }
 
     /**
-     * Get value.
-     *
-     * @param string $name    Name key
+     * @param string $name
+     * @return void
+     */
+    public function __unset(string $name): void
+    {
+        unset($this->array[$name]);
+    }
+
+    /**
+     * @param string $name
      * @param mixed  $default If request key not found it return default value
      * @return mixed
      */
@@ -57,24 +58,8 @@ trait Data
     }
 
     /**
-     * @param string ...$names
-     * @return array
-     */
-    public function only(string ...$names): array
-    {
-        $array = [];
-        foreach ($names as $name) {
-            $array[] = $this->array[$name] ?? null;
-        }
-
-        return $array;
-    }
-
-    /**
-     * Set value.
-     *
-     * @param string $name  Name key
-     * @param mixed  $value Value key
+     * @param string $name
+     * @param mixed  $value
      */
     public function set(string $name, mixed $value): void
     {
@@ -82,9 +67,7 @@ trait Data
     }
 
     /**
-     * Has key.
-     *
-     * @param string $name Name key
+     * @param string $name
      * @return bool
      */
     public function has(string $name): bool
@@ -93,22 +76,11 @@ trait Data
     }
 
     /**
-     * Slice array by key.
-     *
-     * @param string        $prefix
-     * @param callable|null $callable
-     * @return array
+     * @return ArrayCollection
      */
-    public function slice(string $prefix, callable $callable = null): array
+    public function collection(): ArrayCollection
     {
-        $array = [];
-        foreach ($this->array as $key => $value) {
-            if (($pos = stripos($key, $prefix)) !== false && (is_null($callable) || $callable($key, $value))) {
-                $array[substr($key, ($pos + strlen($prefix)))] = $value;
-            }
-        }
-
-        return $array;
+        return ArrayCollection::make($this->array);
     }
 
     /**
@@ -127,6 +99,14 @@ trait Data
     public function getKeys(): array
     {
         return array_keys($this->array);
+    }
+
+    /**
+     * @return array
+     */
+    public function getValues(): array
+    {
+        return array_values($this->array);
     }
 
     /**
