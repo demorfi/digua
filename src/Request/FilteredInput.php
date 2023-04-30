@@ -63,6 +63,12 @@ class FilteredInput implements FilteredInputInterface
             return (array)filter_var_array($_SERVER, self::$sanitize[$type]);
         }
 
+        // JSON POST requests
+        if ($type == INPUT_POST && isset($_SERVER['CONTENT_TYPE']) && $_SERVER['CONTENT_TYPE'] == 'application/json') {
+            $json = (array)json_decode(file_get_contents('php://input'), true);
+            return (array)filter_var_array($json, self::$sanitize[$type]);
+        }
+
         return (array)filter_input_array($type, self::$sanitize[$type]);
     }
 
