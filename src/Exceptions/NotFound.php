@@ -2,7 +2,10 @@
 
 namespace Digua\Exceptions;
 
-class NotFound extends Route
+class NotFound extends Abort
 {
-
+    /**
+     * @var int
+     */
+    protected $code = 404;
 }
