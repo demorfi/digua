@@ -8,8 +8,9 @@ use Digua\Interfaces\{
     Request\Data as RequestDataInterface,
     Template as TemplateInterface
 };
+use Digua\Enums\Headers;
 use Digua\Template;
-use Digua\Exceptions\{Path, NotFound};
+use Digua\Exceptions\{Path, NotFound, Abort};
 
 abstract class Base implements ControllerInterface, TemplateInterface
 {
@@ -61,5 +62,16 @@ abstract class Base implements ControllerInterface, TemplateInterface
     public function throwNotFound(string $message = ''): void
     {
         throw new NotFound($message);
+    }
+
+    /**
+     * @param int|Headers $code
+     * @param string      $message
+     * @return void
+     * @throws Abort
+     */
+    public function throwAbort(int|Headers $code = 0, string $message = ''): void
+    {
+        throw new Abort($message, ($code instanceof Headers) ? $code->value : $code);
     }
 }
