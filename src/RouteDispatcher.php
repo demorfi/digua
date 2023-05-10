@@ -107,8 +107,9 @@ class RouteDispatcher
         try {
             try {
                 return $this->delegate($route);
-            } catch (RouteException) {
+            } catch (RouteException $e) {
                 $route->switch($errorController, $errorAction);
+                $route->builder()->request()->abort($e);
                 return $this->delegate($route);
             }
         } catch (Exception $e) {
