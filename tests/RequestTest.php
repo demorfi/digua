@@ -8,6 +8,7 @@ use Digua\Interfaces\{
     Route as RouteInterface
 };
 use Digua\Request;
+use Digua\Exceptions\Route as RouteException;
 use PHPUnit\Framework\TestCase;
 
 class RequestTest extends TestCase
@@ -39,5 +40,15 @@ class RequestTest extends TestCase
         $request = new Request();
         $request->setController($this->createMock(ControllerInterface::class));
         $this->assertInstanceOf(ControllerInterface::class, $request->getController());
+    }
+
+    /**
+     * @return void
+     */
+    public function testAbortExceptionObjectIsReturned(): void
+    {
+        $request = new Request();
+        $request->abort(new RouteException);
+        $this->assertInstanceOf(RouteException::class, $request->getException());
     }
 }

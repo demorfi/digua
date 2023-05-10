@@ -3,6 +3,7 @@
 namespace Digua\Interfaces;
 
 use Digua\Interfaces\Request\Data as RequestData;
+use Digua\Exceptions\Route as RouteException;
 
 interface Request extends Service
 {
@@ -32,4 +33,15 @@ interface Request extends Service
      * @return Controller
      */
     public function getController(): Controller;
+
+    /**
+     * @param RouteException $exception
+     * @return void
+     */
+    public function abort(RouteException $exception): void;
+
+    /**
+     * @return ?RouteException
+     */
+    public function getException(): ?RouteException;
 }
