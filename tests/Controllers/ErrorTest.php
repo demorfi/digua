@@ -74,7 +74,7 @@ class ErrorTest extends TestCase
 
         $result = $this->controller->defaultAction();
         $this->assertInstanceOf(Response::class, $result);
-        $this->assertSame(['error' => 'not found'], $result->getData());
+        $this->assertSame(['error' => 'Not Found'], $result->getData());
         $this->assertSame([
             'content-type' => ['Content-Type', 'application/json; charset=UTF-8', 0],
             'http'         => ['http', 'HTTP/1.1 404 Not Found', 404]
