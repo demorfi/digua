@@ -3,6 +3,7 @@
 namespace Tests\Controllers;
 
 use Digua\{Request, Template};
+use Digua\Enums\Headers;
 use Digua\Controllers\Base;
 use Digua\Interfaces\{
     Controller as ControllerInterface,
@@ -10,7 +11,7 @@ use Digua\Interfaces\{
     Request as RequestInterface,
     Request\Data as RequestDataInterface,
 };
-use Digua\Exceptions\{Path, NotFound};
+use Digua\Exceptions\{Path, NotFound, Abort};
 use PHPUnit\Framework\TestCase;
 
 class BaseTest extends TestCase
@@ -91,7 +92,32 @@ class BaseTest extends TestCase
     public function testThrowNotFound(): void
     {
         $this->expectException(NotFound::class);
+        $this->expectExceptionCode(404);
         $this->expectExceptionMessage('Page Not Found');
         $this->controller->throwNotFound('Page Not Found');
+    }
+
+    /**
+     * @return void
+     * @throws Abort
+     */
+    public function testThrowAbortIntCode(): void
+    {
+        $this->expectException(Abort::class);
+        $this->expectExceptionCode(422);
+        $this->expectExceptionMessage('Unprocessable Entity');
+        $this->controller->throwAbort(422, 'Unprocessable Entity');
+    }
+
+    /**
+     * @return void
+     * @throws Abort
+     */
+    public function testThrowAbortEnumHeader(): void
+    {
+        $this->expectException(Abort::class);
+        $this->expectExceptionCode(202);
+        $this->expectExceptionMessage('Accepted');
+        $this->controller->throwAbort(Headers::ACCEPTED, 'Accepted');
     }
 }
