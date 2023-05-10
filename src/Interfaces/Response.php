@@ -3,7 +3,7 @@
 namespace Digua\Interfaces;
 
 use Stringable;
-use Digua\Enums\ContentType;
+use Digua\Enums\{ContentType, Headers};
 
 interface Response extends Stringable
 {
@@ -14,6 +14,12 @@ interface Response extends Stringable
      * @return self
      */
     public function addHeader(string $type, string $value, int $code): self;
+
+    /**
+     * @param Headers $code
+     * @return self
+     */
+    public function addHttpHeader(Headers $code): self;
 
     /**
      * @return array

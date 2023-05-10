@@ -2,7 +2,7 @@
 
 namespace Digua;
 
-use Digua\Enums\ContentType;
+use Digua\Enums\{ContentType, Headers};
 use Digua\Interfaces\Response as ResponseInterface;
 use Stringable;
 
@@ -36,6 +36,15 @@ class Response implements ResponseInterface
     public function addHeader(string $type, string $value, int $code = 0): self
     {
         $this->headers[strtolower($type)] = [$type, $value, $code];
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function addHttpHeader(Headers $code): ResponseInterface
+    {
+        $this->addHeader('http', 'HTTP/1.1 ' . $code->value . ' ' . $code->getText(), $code->value);
         return $this;
     }
 

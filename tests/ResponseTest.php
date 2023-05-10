@@ -3,7 +3,7 @@
 namespace Tests;
 
 use Digua\Response;
-use Digua\Enums\ContentType;
+use Digua\Enums\{ContentType, Headers};
 use PHPUnit\Framework\TestCase;
 
 class ResponseTest extends TestCase
@@ -48,6 +48,23 @@ class ResponseTest extends TestCase
         );
 
         $this->assertSame('https://url.test', $response->hasRedirect());
+    }
+
+    /**
+     * @return void
+     */
+    public function testIsItPossibleToAddHeaderByCode(): void
+    {
+        $response = new Response();
+        $this->assertEmpty($response->getHeaders());
+
+        $this->assertInstanceOf(
+            $response::class,
+            $response->addHttpHeader(Headers::UNPROCESSABLE_ENTITY)
+        );
+
+        $this->assertIsArray($response->getHeaders());
+        $this->assertSame(['http' => ['http', 'HTTP/1.1 422 Unprocessable Entity', 422]], $response->getHeaders());
     }
 
     /**
