@@ -9,6 +9,7 @@ use Digua\Interfaces\{
     Route as RouteInterface
 };
 use Digua\Request\Data as DataRequest;
+use Digua\Exceptions\Route as RouteException;
 
 class Request implements RequestInterface
 {
@@ -21,6 +22,11 @@ class Request implements RequestInterface
      * @var ControllerInterface
      */
     private ControllerInterface $controller;
+
+    /**
+     * @var ?RouteException
+     */
+    private ?RouteException $abort = null;
 
     /**
      * @param RequestDataInterface $dataRequest
@@ -67,5 +73,21 @@ class Request implements RequestInterface
     public function getController(): ControllerInterface
     {
         return $this->controller;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function abort(RouteException $exception): void
+    {
+        $this->abort = $exception;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getException(): ?RouteException
+    {
+        return $this->abort;
     }
 }
