@@ -6,6 +6,6 @@ $this->shortSection('header', 'parts/_menu');
 
 <?php $this->section('content'); ?>
 <div>
-    Not Found!
+    <?php echo $this->message; ?>!
 </div>
 <?php $this->endSection('content'); ?>
