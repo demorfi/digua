@@ -142,4 +142,26 @@ class ArrayCollection implements NamedCollection, Countable, ArrayAccess, Iterat
     {
         return static::make(array_filter($this->array, $callable, $mode));
     }
+
+    /**
+     * @param array $array
+     * @param bool  $recursive
+     * @return static
+     */
+    public function merge(array $array, bool $recursive = false): static
+    {
+        return static::make(call_user_func('array_merge' . ($recursive ? '_recursive' : ''), $this->array, $array));
+    }
+
+    /**
+     * @param callable $callable
+     * @param bool     $recursive
+     * @return static
+     */
+    public function each(callable $callable, bool $recursive = false): static
+    {
+        $array = $this->array;
+        call_user_func_array('array_walk' . ($recursive ? '_recursive' : ''), [&$array, $callable]);
+        return static::make($array);
+    }
 }

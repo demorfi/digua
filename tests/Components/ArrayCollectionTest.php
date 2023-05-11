@@ -131,4 +131,58 @@ class ArrayCollectionTest extends TestCase
             $collection->filter(fn($key) => $key === 'bar', ARRAY_FILTER_USE_KEY)->toArray()
         );
     }
+
+    /**
+     * @return void
+     */
+    public function testMethodMerge(): void
+    {
+        $collection = ArrayCollection::make(['foo' => 1, 'bar' => 2]);
+        $this->assertSame(
+            ['foo' => 1, 'bar' => 2, 'some' => 3],
+            $collection->merge(['some' => 3])->toArray()
+        );
+
+        $collection = ArrayCollection::make(['foo' => 1, 'bar' => 2]);
+        $this->assertSame(
+            ['foo' => 5, 'bar' => 2, 'some' => 3],
+            $collection->merge(['some' => 3, 'foo' => 5])->toArray()
+        );
+    }
+
+    /**
+     * @return void
+     */
+    public function testMergeRecursive(): void
+    {
+        $collection = ArrayCollection::make(['foo' => [1, 1, 'sub' => 1], 'bar' => [2, 2]]);
+        $this->assertSame(
+            ['foo' => [1, 1, 'sub' => [1, 2], 3], 'bar' => [2, 2], 'some' => 3],
+            $collection->merge(['some' => 3, 'foo' => [3, 'sub' => 2]], true)->toArray()
+        );
+    }
+
+    /**
+     * @return void
+     */
+    public function testMethodEach(): void
+    {
+        $collection = ArrayCollection::make(['foo' => 1, 'bar' => 2]);
+        $this->assertSame(
+            ['foo' => 2, 'bar' => 4],
+            $collection->each(fn(&$value) => $value = $value * 2)->toArray()
+        );
+    }
+
+    /**
+     * @return void
+     */
+    public function testEachRecursive(): void
+    {
+        $collection = ArrayCollection::make(['foo' => 1, 'bar' => 2, 'same' => [1, 2]]);
+        $this->assertSame(
+            ['foo' => 2, 'bar' => 4, 'same' => [2, 4]],
+            $collection->each(fn(&$value) => $value = $value * 2, true)->toArray()
+        );
+    }
 }
