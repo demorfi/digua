@@ -47,13 +47,13 @@ abstract class Base implements ControllerInterface, TemplateInterface
     }
 
     /**
-     * @param mixed $data
-     * @param int   $httpCode
+     * @param mixed       $data
+     * @param int|Headers $code
      * @return Response
      */
-    public function response(mixed $data, int $httpCode = 200): Response
+    public function response(mixed $data, int|Headers $code = 200): Response
     {
-        return Response::create($data)->addHttpHeader(Headers::from($httpCode));
+        return Response::create($data)->addHttpHeader(($code instanceof Headers) ? $code : Headers::from($code));
     }
 
     /**
