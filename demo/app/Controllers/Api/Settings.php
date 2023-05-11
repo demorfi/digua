@@ -3,6 +3,7 @@
 namespace App\Controllers\Api;
 
 use Digua\Controllers\Base as BaseController;
+use Digua\Response;
 use Digua\Attributes\{Guardian\RequestPathRequired, Injector};
 use Digua\Request;
 
@@ -11,11 +12,11 @@ class Settings extends BaseController
     /**
      * Default action.
      *
-     * @return array[]
+     * @return Response
      */
-    public function defaultAction(): array
+    public function defaultAction(): Response
     {
-        return ['data' => ['result' => true]];
+        return $this->response(['data' => ['result' => true]], 201);
     }
 
     /**
