@@ -53,7 +53,11 @@ class Types
     public function to(string $type): static
     {
         $value = $this->value;
-        settype($value, $type);
+        if (($type == 'bool' || $type == 'boolean') && ($value === 'true' || $value === 'false')) {
+            $value = $value === 'true';
+        } else {
+            settype($value, $type);
+        }
         return new static($value);
     }
 
