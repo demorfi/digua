@@ -2,7 +2,7 @@
 
 namespace Tests\Controllers;
 
-use Digua\{Request, Template};
+use Digua\{Request, Template, Response};
 use Digua\Enums\Headers;
 use Digua\Controllers\Base;
 use Digua\Interfaces\{
@@ -75,6 +75,23 @@ class BaseTest extends TestCase
     public function testRequestObjectIsReturned(): void
     {
         $this->assertInstanceOf(RequestInterface::class, $this->controller->request());
+    }
+
+    /**
+     * @return void
+     */
+    public function testCreateResponseObject(): void
+    {
+        $response = $this->controller->response(['result' => 'code'], 201);
+        $this->assertInstanceOf(Response::class, $response);
+        $this->assertSame(['result' => 'code'], $response->getData());
+        $this->assertSame(
+            [
+                'content-type' => ['Content-Type', 'application/json; charset=UTF-8', 0],
+                'http'         => ['http', 'HTTP/1.1 201 Created', 201]
+            ],
+            $response->getHeaders()
+        );
     }
 
     /**
