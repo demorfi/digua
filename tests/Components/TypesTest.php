@@ -124,4 +124,15 @@ class TypesTest extends TestCase
             }
         }
     }
+
+    /**
+     * @return void
+     */
+    public function testConvertTypeStringToBoolType(): void
+    {
+        $this->assertTrue(Types::value('true')->to('bool')->getValue());
+        $this->assertTrue(Types::value('1')->to('bool')->getValue());
+        $this->assertFalse(Types::value('false')->to('boolean')->getValue());
+        $this->assertFalse(Types::value('0')->to('bool')->getValue());
+    }
 }
