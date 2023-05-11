@@ -9,7 +9,7 @@ use Digua\Interfaces\{
     Template as TemplateInterface
 };
 use Digua\Enums\Headers;
-use Digua\Template;
+use Digua\{Template, Response};
 use Digua\Exceptions\{Path, NotFound, Abort};
 
 abstract class Base implements ControllerInterface, TemplateInterface
@@ -44,6 +44,16 @@ abstract class Base implements ControllerInterface, TemplateInterface
     public function request(): RequestInterface
     {
         return $this->request;
+    }
+
+    /**
+     * @param mixed $data
+     * @param int   $httpCode
+     * @return Response
+     */
+    public function response(mixed $data, int $httpCode = 200): Response
+    {
+        return Response::create($data)->addHttpHeader(Headers::from($httpCode));
     }
 
     /**
