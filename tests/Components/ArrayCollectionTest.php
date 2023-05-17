@@ -82,6 +82,21 @@ class ArrayCollectionTest extends TestCase
     /**
      * @return void
      */
+    public function testMethodExcept(): void
+    {
+        $collection = ArrayCollection::make(['foo' => 'value', 'bar' => 'value', 'some' => 'value']);
+        $this->assertSame(
+            ['foo' => 'value', 'bar' => 'value', 'some' => 'value'],
+            $collection->except('none')->toArray()
+        );
+        $this->assertSame(['foo' => 'value', 'some' => 'value'], $collection->except('bar')->toArray());
+        $this->assertSame(['bar' => 'value'], $collection->except('foo', 'some')->toArray());
+        $this->assertSame([], $collection->except('foo', 'some', 'bar')->toArray());
+    }
+
+    /**
+     * @return void
+     */
     public function testMethodSlice(): void
     {
         $collection = ArrayCollection::make([

@@ -115,6 +115,15 @@ class ArrayCollection implements NamedCollection, Countable, ArrayAccess, Iterat
     }
 
     /**
+     * @param string ...$names
+     * @return static
+     */
+    public function except(string ...$names): static
+    {
+        return $this->filter(fn($value, $key) => !in_array($key, $names));
+    }
+
+    /**
      * Slice array by key.
      *
      * @param string    $prefix
