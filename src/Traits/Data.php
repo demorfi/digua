@@ -3,6 +3,7 @@
 namespace Digua\Traits;
 
 use Digua\Components\ArrayCollection;
+use Digua\Components\Types;
 
 trait Data
 {
@@ -55,6 +56,28 @@ trait Data
     public function get(string $name, mixed $default = null): mixed
     {
         return $this->array[$name] ?? $default;
+    }
+
+    /**
+     * @param string $name
+     * @param ?mixed $default
+     * @return Types
+     */
+    public function getTypeValue(string $name, mixed $default = null): Types
+    {
+        return Types::value($this->array[$name] ?? $default);
+    }
+
+    /**
+     * @param string $name
+     * @param string $type
+     * @param ?mixed $default
+     * @return mixed
+     * @uses getTypeValue
+     */
+    public function getFixedTypeValue(string $name, string $type, mixed $default = null): mixed
+    {
+        return $this->getTypeValue($name, $default)->to($type)->getValue();
     }
 
     /**
