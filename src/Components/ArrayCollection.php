@@ -194,4 +194,15 @@ class ArrayCollection implements NamedCollection, Countable, ArrayAccess, Iterat
         call_user_func_array('array_walk' . ($recursive ? '_recursive' : ''), [&$array, $callable]);
         return static::make($array);
     }
+
+    /**
+     * @param int|string $key
+     * @param callable   $callable
+     * @param bool       $recursive
+     * @return static
+     */
+    public function replaceValue(int|string $key, callable $callable, bool $recursive = false): static
+    {
+        return $this->each(fn(&$v, $k) => $k === $key ? $v = $callable($v) : null, $recursive);
+    }
 }

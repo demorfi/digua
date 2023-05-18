@@ -231,4 +231,28 @@ class ArrayCollectionTest extends TestCase
             $collection->each(fn(&$value) => $value = $value * 2, true)->toArray()
         );
     }
+
+    /**
+     * @return void
+     */
+    public function testMethodReplaceValue(): void
+    {
+        $collection = ArrayCollection::make(['foo' => 1, 'bar' => 2]);
+        $this->assertSame(
+            ['foo' => 1, 'bar' => 'replaced by 2'],
+            $collection->replaceValue('bar', fn($v) => 'replaced by ' . $v)->toArray()
+        );
+    }
+
+    /**
+     * @return void
+     */
+    public function testMethodReplaceValueRecursive(): void
+    {
+        $collection = ArrayCollection::make(['foo' => 1, 'bar' => 2, 'same' => ['bar' => 3]]);
+        $this->assertSame(
+            ['foo' => 1, 'bar' => 'replaced by 2', 'same' => ['bar' => 'replaced by 3']],
+            $collection->replaceValue('bar', fn($v) => 'replaced by ' . $v, true)->toArray()
+        );
+    }
 }
