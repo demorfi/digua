@@ -71,6 +71,16 @@ class ArrayCollectionTest extends TestCase
     /**
      * @return void
      */
+    public function testMethodIsEmpty(): void
+    {
+        $collection = ArrayCollection::make(['foo' => 'value']);
+        $this->assertFalse($collection->isEmpty());
+        $this->assertTrue($collection->except('foo')->isEmpty());
+    }
+
+    /**
+     * @return void
+     */
     public function testMethodOnly(): void
     {
         $collection = ArrayCollection::make(['foo' => 'value', 'bar' => 'value', 'some' => 'value']);
@@ -92,6 +102,27 @@ class ArrayCollectionTest extends TestCase
         $this->assertSame(['foo' => 'value', 'some' => 'value'], $collection->except('bar')->toArray());
         $this->assertSame(['bar' => 'value'], $collection->except('foo', 'some')->toArray());
         $this->assertSame([], $collection->except('foo', 'some', 'bar')->toArray());
+    }
+
+    /**
+     * @return void
+     */
+    public function testMethodCollapse(): void
+    {
+        $collection = ArrayCollection::make([
+            'foo' => 'value',
+            'bar' => [
+                'foo'  => 'value',
+                'bar'  => 'value',
+                'some' => [1, 2, 3]
+            ]
+        ]);
+
+        $this->assertSame(
+            ['foo' => 'value', 'bar' => 'value', 'some' => [1, 2, 3]],
+            $collection->collapse('bar')->toArray()
+        );
+        $this->assertSame([1, 2, 3], $collection->collapse('bar', 'some')->toArray());
     }
 
     /**

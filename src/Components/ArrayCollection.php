@@ -101,6 +101,14 @@ class ArrayCollection implements NamedCollection, Countable, ArrayAccess, Iterat
     }
 
     /**
+     * @return bool
+     */
+    public function isEmpty(): bool
+    {
+        return empty($this->array);
+    }
+
+    /**
      * @param string ...$names
      * @return static
      */
@@ -121,6 +129,19 @@ class ArrayCollection implements NamedCollection, Countable, ArrayAccess, Iterat
     public function except(string ...$names): static
     {
         return $this->filter(fn($value, $key) => !in_array($key, $names));
+    }
+
+    /**
+     * @param string ...$names
+     * @return static
+     */
+    public function collapse(string ...$names): static
+    {
+        $collection = static::make($this->array);
+        foreach ($names as $name) {
+            $collection->overwrite($collection->get($name, []));
+        }
+        return $collection;
     }
 
     /**
