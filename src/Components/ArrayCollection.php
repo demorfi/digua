@@ -109,37 +109,37 @@ class ArrayCollection implements NamedCollection, Countable, ArrayAccess, Iterat
     }
 
     /**
-     * @param string ...$names
+     * @param int|string ...$keys
      * @return static
      */
-    public function only(string ...$names): static
+    public function only(int|string ...$keys): static
     {
         $array = [];
-        foreach ($names as $name) {
-            $array[$name] = $this->array[$name] ?? null;
+        foreach ($keys as $key) {
+            $array[$key] = $this->array[$key] ?? null;
         }
 
         return static::make($array);
     }
 
     /**
-     * @param string ...$names
+     * @param int|string ...$keys
      * @return static
      */
-    public function except(string ...$names): static
+    public function except(int|string ...$keys): static
     {
-        return $this->filter(fn($value, $key) => !in_array($key, $names));
+        return $this->filter(fn($value, $key) => !in_array($key, $keys));
     }
 
     /**
-     * @param string ...$names
+     * @param int|string ...$keys
      * @return static
      */
-    public function collapse(string ...$names): static
+    public function collapse(int|string ...$keys): static
     {
         $collection = static::make($this->array);
-        foreach ($names as $name) {
-            $collection->overwrite($collection->get($name, []));
+        foreach ($keys as $key) {
+            $collection->overwrite($collection->get($key, []));
         }
         return $collection;
     }

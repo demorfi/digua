@@ -13,89 +13,89 @@ trait Data
     protected array $array = [];
 
     /**
-     * @param string $name
+     * @param int|string $key
      * @return mixed
      */
-    public function __get(string $name): mixed
+    public function __get(int|string $key): mixed
     {
-        return $this->array[$name] ?? null;
+        return $this->array[$key] ?? null;
     }
 
     /**
-     * @param string $name
-     * @param mixed  $value
+     * @param int|string $key
+     * @param mixed      $value
      */
-    public function __set(string $name, mixed $value): void
+    public function __set(int|string $key, mixed $value): void
     {
-        $this->array[$name] = $value;
+        $this->array[$key] = $value;
     }
 
     /**
-     * @param string $name
+     * @param int|string $key
      * @return bool
      */
-    public function __isset(string $name): bool
+    public function __isset(int|string $key): bool
     {
-        return isset($this->array[$name]);
+        return isset($this->array[$key]);
     }
 
     /**
-     * @param string $name
+     * @param int|string $key
      * @return void
      */
-    public function __unset(string $name): void
+    public function __unset(int|string $key): void
     {
-        unset($this->array[$name]);
+        unset($this->array[$key]);
     }
 
     /**
-     * @param string $name
-     * @param mixed  $default If request key not found it return default value
+     * @param int|string $key
+     * @param mixed      $default If request key not found it return default value
      * @return mixed
      */
-    public function get(string $name, mixed $default = null): mixed
+    public function get(int|string $key, mixed $default = null): mixed
     {
-        return $this->array[$name] ?? $default;
+        return $this->array[$key] ?? $default;
     }
 
     /**
-     * @param string $name
-     * @param ?mixed $default
+     * @param int|string $key
+     * @param ?mixed     $default
      * @return Types
      */
-    public function getTypeValue(string $name, mixed $default = null): Types
+    public function getTypeValue(int|string $key, mixed $default = null): Types
     {
-        return Types::value($this->array[$name] ?? $default);
+        return Types::value($this->array[$key] ?? $default);
     }
 
     /**
-     * @param string $name
-     * @param string $type
-     * @param ?mixed $default
+     * @param int|string $key
+     * @param string     $type
+     * @param ?mixed     $default
      * @return mixed
      * @uses getTypeValue
      */
-    public function getFixedTypeValue(string $name, string $type, mixed $default = null): mixed
+    public function getFixedTypeValue(int|string $key, string $type, mixed $default = null): mixed
     {
-        return $this->getTypeValue($name, $default)->to($type)->getValue();
+        return $this->getTypeValue($key, $default)->to($type)->getValue();
     }
 
     /**
-     * @param string $name
-     * @param mixed  $value
+     * @param int|string $key
+     * @param mixed      $value
      */
-    public function set(string $name, mixed $value): void
+    public function set(int|string $key, mixed $value): void
     {
-        $this->array[$name] = $value;
+        $this->array[$key] = $value;
     }
 
     /**
-     * @param string $name
+     * @param int|string $key
      * @return bool
      */
-    public function has(string $name): bool
+    public function has(int|string $key): bool
     {
-        return $this->__isset($name);
+        return $this->__isset($key);
     }
 
     /**
