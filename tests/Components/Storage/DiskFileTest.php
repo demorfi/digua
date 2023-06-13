@@ -101,4 +101,19 @@ class DiskFileTest extends TestCase
         $this->assertTrue($storage->hasEof());
         $this->assertTrue($storage->free());
     }
+
+    /**
+     * @return void
+     * @throws Exception
+     */
+    public function testHas(): void
+    {
+        $name = (string)Helper::makeIntHash();
+        $this->assertFalse(DiskFile::has($name));
+
+        $storage = DiskFile::create($name);
+        $this->assertTrue(DiskFile::has($name));
+        $this->assertTrue($storage->free());
+        $this->assertFalse(DiskFile::has($name));
+    }
 }

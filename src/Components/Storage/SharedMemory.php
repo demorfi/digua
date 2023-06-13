@@ -65,6 +65,15 @@ class SharedMemory implements StorageInterface, JsonSerializable
     }
 
     /**
+     * @param string $name
+     * @return bool
+     */
+    public static function has(string $name): bool
+    {
+        return @shmop_open(crc32($name), 'a', 0, 0) instanceof Shmop;
+    }
+
+    /**
      * @return void
      * @throws MemorySharedException
      */

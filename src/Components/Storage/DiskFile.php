@@ -63,6 +63,15 @@ class DiskFile implements StorageInterface
     }
 
     /**
+     * @param string $name
+     * @return bool
+     */
+    public static function has(string $name): bool
+    {
+        return is_file(self::getDiskPath(Helper::filterFileName($name)));
+    }
+
+    /**
      * @inheritdoc
      */
     public function getName(): string

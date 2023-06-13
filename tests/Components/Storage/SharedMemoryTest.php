@@ -3,6 +3,7 @@
 namespace Tests\Components\Storage;
 
 use Digua\Components\Storage\SharedMemory;
+use Digua\Helper;
 use Digua\Exceptions\{Memory as MemoryException, MemoryShared as MemorySharedException};
 use PHPUnit\Framework\TestCase;
 use Exception;
@@ -88,6 +89,21 @@ class SharedMemoryTest extends TestCase
         $this->assertTrue($storage->setEof());
         $this->assertTrue($storage->hasEof());
         $this->assertTrue($storage->free());
+    }
+
+    /**
+     * @return void
+     * @throws MemoryException
+     */
+    public function testHas(): void
+    {
+        $name = (string)Helper::makeIntHash();
+        $this->assertFalse(SharedMemory::has($name));
+
+        $storage = new SharedMemory($name, 1);
+        $this->assertTrue(SharedMemory::has($name));
+        $this->assertTrue($storage->free());
+        $this->assertFalse(SharedMemory::has($name));
     }
 
     /**
