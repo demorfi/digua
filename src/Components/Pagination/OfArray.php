@@ -2,7 +2,6 @@
 
 namespace Digua\Components\Pagination;
 
-use Digua\Interfaces\Request;
 use JsonSerializable;
 use Generator;
 
