@@ -12,12 +12,12 @@ class RouteAsNameBuilder implements RouteBuilderInterface
     /**
      * @var string|null
      */
-    private ?string $controllerName = null;
+    private ?string $controllerName;
 
     /**
      * @var string|null
      */
-    private ?string $actionName = null;
+    private ?string $actionName;
 
     /**
      * @param RequestInterface $request
