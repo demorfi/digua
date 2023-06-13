@@ -37,6 +37,12 @@ interface Storage
     public function free(): bool;
 
     /**
+     * @param string $name
+     * @return bool
+     */
+    public static function has(string $name): bool;
+
+    /**
      * @return bool
      */
     public function hasEof(): bool;
