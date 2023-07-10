@@ -71,6 +71,26 @@ class ArrayCollectionTest extends TestCase
     /**
      * @return void
      */
+    public function testGetFirstElement(): void
+    {
+        $this->assertSame('value1', ArrayCollection::make(['foo' => 'value1', 'bar' => 'value2'])->first());
+        $this->assertSame(1, ArrayCollection::make([1,2,3])->first());
+        $this->assertSame(null, ArrayCollection::make()->first());
+    }
+
+    /**
+     * @return void
+     */
+    public function testGetLastElement(): void
+    {
+        $this->assertSame('value2', ArrayCollection::make(['foo' => 'value1', 'bar' => 'value2'])->last());
+        $this->assertSame(3, ArrayCollection::make([1,2,3])->last());
+        $this->assertSame(null, ArrayCollection::make()->last());
+    }
+
+    /**
+     * @return void
+     */
     public function testMethodIsEmpty(): void
     {
         $collection = ArrayCollection::make(['foo' => 'value']);

@@ -77,6 +77,22 @@ class ArrayCollection implements NamedCollection, Countable, ArrayAccess, Iterat
     }
 
     /**
+     * @return mixed
+     */
+    public function first(): mixed
+    {
+        return $this->array[array_key_first($this->array)] ?? null;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function last(): mixed
+    {
+        return $this->array[array_key_last($this->array)] ?? null;
+    }
+
+    /**
      * @inheritdoc
      */
     public function jsonSerialize(): array
