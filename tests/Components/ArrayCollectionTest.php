@@ -91,6 +91,24 @@ class ArrayCollectionTest extends TestCase
     /**
      * @return void
      */
+    public function testGetFirstKey(): void
+    {
+        $this->assertSame('foo', ArrayCollection::make(['foo' => 'value1', 'bar' => 'value2'])->firstKey());
+        $this->assertSame(0, ArrayCollection::make(['foo', 'bar'])->firstKey());
+    }
+
+    /**
+     * @return void
+     */
+    public function testGetLastKey(): void
+    {
+        $this->assertSame('bar', ArrayCollection::make(['foo' => 'value1', 'bar' => 'value2'])->lastKey());
+        $this->assertSame(1, ArrayCollection::make(['foo', 'bar'])->lastKey());
+    }
+
+    /**
+     * @return void
+     */
     public function testMethodIsEmpty(): void
     {
         $collection = ArrayCollection::make(['foo' => 'value']);
@@ -274,5 +292,37 @@ class ArrayCollectionTest extends TestCase
             ['foo' => 1, 'bar' => 'replaced by 2', 'same' => ['bar' => 'replaced by 3']],
             $collection->replaceValue('bar', fn($v) => 'replaced by ' . $v, true)->toArray()
         );
+    }
+
+    /**
+     * @return void
+     */
+    public function testSearch(): void
+    {
+        $collection = ArrayCollection::make(['foo' => 1, 'bar' => 2, 'same' => ['bar' => 3]]);
+        $this->assertTrue($collection->search(3)->isEmpty());
+        $this->assertSame(['bar' => 2], $collection->search('2')->toArray());
+        $this->assertSame('bar', $collection->search('2')->firstKey());
+    }
+
+    /**
+     * @return void
+     */
+    public function testSearchStrict(): void
+    {
+        $collection = ArrayCollection::make(['foo' => 1, 'bar' => 2, 'same' => ['bar' => 3]]);
+        $this->assertTrue($collection->search('1', true)->isEmpty());
+        $this->assertSame(['foo' => 1], $collection->search(1, true)->toArray());
+        $this->assertSame('foo', $collection->search(1, true)->firstKey());
+    }
+
+    /**
+     * @return void
+     */
+    public function testSearchRecursive(): void
+    {
+        $collection = ArrayCollection::make(['foo' => 1, 'bar' => 2, 'same' => ['bar' => 3]]);
+        $this->assertSame(['bar' => 2], $collection->search(2, true, true)->toArray());
+        $this->assertSame('same', $collection->search(3, false, true)->firstKey());
     }
 }
