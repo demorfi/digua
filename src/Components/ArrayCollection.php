@@ -93,6 +93,22 @@ class ArrayCollection implements NamedCollection, Countable, ArrayAccess, Iterat
     }
 
     /**
+     * @return int|string|null
+     */
+    public function firstKey(): int|string|null
+    {
+        return array_key_first($this->array);
+    }
+
+    /**
+     * @return int|string|null
+     */
+    public function lastKey(): int|string|null
+    {
+        return array_key_last($this->array);
+    }
+
+    /**
      * @inheritdoc
      */
     public function jsonSerialize(): array
@@ -220,5 +236,32 @@ class ArrayCollection implements NamedCollection, Countable, ArrayAccess, Iterat
     public function replaceValue(int|string $key, callable $callable, bool $recursive = false): static
     {
         return $this->each(fn(&$v, $k) => $k === $key ? $v = $callable($v) : null, $recursive);
+    }
+
+    /**
+     * @param mixed $needle
+     * @param bool  $strict
+     * @param bool  $recursive
+     * @return static
+     */
+    public function search(mixed $needle, bool $strict = false, bool $recursive = false): static
+    {
+        $array = [];
+        foreach($this->array as $key => $value) {
+            if (($strict && $value === $needle) || (!$strict && $value == $needle)) {
+                $array = [$key => $value];
+                break;
+            }
+
+            if ($recursive && is_array($value)) {
+                $result = static::make($value)->search($needle, $strict, $recursive);
+                if (!$result->isEmpty()) {
+                    $array = [$key => $result];
+                    break;
+                }
+            }
+        }
+
+        return static::make($array);
     }
 }
