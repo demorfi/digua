@@ -52,14 +52,14 @@ class JournalTest extends TestCase
         $messages = [];
         foreach (Journal::staticGetJournal(2) as $message) {
             $messages[] = $message['message'];
-            $this->assertSame($message['date'], date('Y-m-d H:i:s', $message['time']));
+            $this->assertSame($message['date'], date('m-d-Y H:i:s', (int)sprintf('%d', $message['time'])));
         }
         $this->assertSame(['test message 3!', 'test message 2!'], $messages);
 
         $messages = [];
         foreach (Journal::staticGetJournal(sort: SortType::ASC) as $message) {
             $messages[] = $message['message'];
-            $this->assertSame($message['date'], date('Y-m-d H:i:s', $message['time']));
+            $this->assertSame($message['date'], date('m-d-Y H:i:s', (int)sprintf('%d', $message['time'])));
         }
         $this->assertSame(['test message!', 'test message 2!', 'test message 3!'], $messages);
     }

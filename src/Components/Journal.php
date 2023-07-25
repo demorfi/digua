@@ -41,7 +41,7 @@ class Journal
      */
     public function push(string ...$message): bool
     {
-        $time    = time();
+        $time    = microtime(true);
         $message = sizeof($message) < 2 ? array_shift($message) : $message;
         $dataSet = compact('message', 'time');
         return $this->dataFile->rewrite(function ($fileData) use ($dataSet) {
@@ -79,14 +79,14 @@ class Journal
         $journal = $this->dataFile->getAll();
 
         // A file lock shifts ordinal numbering.
-        usort($journal, fn(array $a, array $b): int => ($a['time'] === $b['time'] ? 0 : ($a['time'] < $b['time'] ? -1 : 1)));
+        usort($journal, fn(array $a, array $b): int => ($a['time'] == $b['time'] ? 0 : ($a['time'] < $b['time'] ? -1 : 1)));
 
         if ($sort == SortType::DESC) {
-            $journal = array_reverse($journal, true);
+            $journal = array_reverse($journal);
         }
 
         return $limit
-            ? array_slice($journal, 0, $limit, true)
+            ? array_slice($journal, 0, $limit)
             : $journal;
     }
 
@@ -99,7 +99,7 @@ class Journal
     {
         $journal = $this->getAll($limit, $sort);
         foreach ($journal as $key => $item) {
-            $item['date'] = date('Y-m-d H:i:s', $item['time'] ?? 0);
+            $item['date'] = date('m-d-Y H:i:s', (int)sprintf('%d', $item['time']));
             yield $key => $item;
         }
     }
