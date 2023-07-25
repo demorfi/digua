@@ -78,6 +78,9 @@ class Journal
     {
         $journal = $this->dataFile->getAll();
 
+        // A file lock shifts ordinal numbering.
+        usort($journal, fn(array $a, array $b): int => ($a['time'] === $b['time'] ? 0 : ($a['time'] < $b['time'] ? -1 : 1)));
+
         if ($sort == SortType::DESC) {
             $journal = array_reverse($journal, true);
         }
