@@ -43,7 +43,7 @@ class Logger implements LoggerInterface
      */
     public function push(string $message): void
     {
-        $this->pushed[] = '[' . date('Y-m-d H:i:s', time()) . '] ' . $message;
+        $this->pushed[] = '[' . date('Y-m-d H:i:s') . '] ' . $message;
     }
 
     /**
