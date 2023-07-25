@@ -37,6 +37,7 @@ class JournalTest extends TestCase
     public function testPushToJournal(): void
     {
         $this->assertTrue(Journal::staticPush('test message!'));
+        sleep(1);
         $this->assertTrue(Journal::staticPush('test message 2!'));
         $this->assertTrue(Journal::getInstance()->push('test message 3!'));
         $this->assertSame(3, Journal::staticSize());
