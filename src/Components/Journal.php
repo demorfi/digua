@@ -99,7 +99,7 @@ class Journal
     {
         $journal = $this->getAll($limit, $sort);
         foreach ($journal as $key => $item) {
-            $item['date'] = date('m-d-Y H:i:s', (int)sprintf('%d', $item['time']));
+            $item['date'] = date('d-m-Y H:i:s', (int)sprintf('%d', $item['time']));
             yield $key => $item;
         }
     }
