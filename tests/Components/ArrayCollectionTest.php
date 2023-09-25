@@ -12,7 +12,6 @@ use ArrayAccess;
 use JsonSerializable;
 use Countable;
 
-
 class ArrayCollectionTest extends TestCase
 {
     /**
