@@ -4,8 +4,6 @@ define('ROOT_PATH', realpath(__DIR__ . '/..'));
 
 require_once realpath(ROOT_PATH . '/../bootstrap.php');
 
-Digua\Env::dev();
-
 $builder         = null;
 $appEntryPath    = null;
 $errorController = null;
