@@ -43,6 +43,9 @@ class RouteAsNameProviderTest extends TestCase
         ];
     }
 
+    /**
+     * @return array
+     */
     protected function dataTypePathProvider(): array
     {
         return [
