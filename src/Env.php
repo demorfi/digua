@@ -2,17 +2,58 @@
 
 namespace Digua;
 
-use Digua\Components\Logger as LoggerStorage;
+use Digua\Components\{DotEnv, Logger as LoggerStorage};
+use Digua\Traits\{Configurable, DiskPath};
 use Digua\Enums\Env as EnvEnum;
-use Digua\Exceptions\Base as BaseException;
+use Digua\Interfaces\Logger as LoggerInterface;
+use Digua\Exceptions\{
+    Base as BaseException,
+    File as FileException
+};
 use Throwable;
 
 class Env
 {
+    use Configurable, DiskPath;
+
     /**
      * @var EnvEnum
      */
-    private static EnvEnum $mode;
+    private static EnvEnum $mode = EnvEnum::Prod;
+
+    /**
+     * @var string[]
+     */
+    protected static array $defaults = [
+        'diskPath' => ROOT_PATH
+    ];
+
+    /**
+     * @param string $fileName
+     * @return void
+     * @throws FileException
+     */
+    public static function run(string $fileName = '.env'): void
+    {
+        if (($filePath = self::getDiskPath($fileName)) && file_exists($filePath)) {
+            (new DotEnv($filePath))->load();
+        }
+
+        self::setMode(
+            str_starts_with(strtoupper((string)self::get('APP_MODE')), 'DEV')
+                ? EnvEnum::Dev
+                : EnvEnum::Prod
+        );
+    }
+
+    /**
+     * @param string $name
+     * @return bool|array|string
+     */
+    public static function get(string $name): bool|array|string
+    {
+        return getenv(strtoupper($name), true);
+    }
 
     /**
      * @return void
@@ -52,12 +93,14 @@ class Env
     }
 
     /**
-     * @return void
+     * @param ?LoggerInterface $logger
+     * @return ?callable
      */
-    public static function addHandlerError(): void
+    public static function addHandlerError(?LoggerInterface $logger = null): ?callable
     {
-        set_error_handler(
-            function ($code, $message, $file, $line) {
+        $logger ??= LoggerStorage::getInstance();
+        return set_error_handler(
+            (function ($code, $message, $file, $line) use($logger) {
                 if (!(error_reporting() & $code)) {
                     return false;
                 }
@@ -70,20 +113,31 @@ class Env
                     default => 'Unknown'
                 };
 
-                LoggerStorage::staticPush($type . ': ' . $message . ' in ' . $file . ':' . $line);
+                $logger->push($type . ': ' . $message . ' in ' . $file . ':' . $line);
                 return false;
-            }
+            })(...)
         );
     }
 
     /**
-     * @return void
+     * @param ?LoggerInterface $logger
+     * @return ?callable
      */
-    public static function addHandlerException(): void
+    public static function addHandlerException(?LoggerInterface $logger = null): ?callable
     {
-        set_exception_handler(
-            (function (Throwable $exception) {
-                LoggerStorage::staticPush((string)$exception);
+        $logger ??= LoggerStorage::getInstance();
+
+        // Subscribe all exception message
+        LateEvent::subscribe(
+            BaseException::class,
+            (function (Throwable $exception) use($logger) {
+                    self::isDev() && $logger->push('Notice: ' . $exception);
+            })(...)
+        );
+
+        return set_exception_handler(
+            (function (Throwable $exception) use($logger) {
+                $logger->push((string)$exception);
                 if (self::isDev()) {
                     printf(
                         '<b>Fatal error</b>: Uncaught %s thrown in <b>%s</b> on line <b>%d</b>',
@@ -92,14 +146,6 @@ class Env
                         $exception->getLine()
                     );
                 }
-            })(...)
-        );
-
-        // Subscribe all exception message
-        LateEvent::subscribe(
-            BaseException::class,
-            (function (Throwable $exception) {
-                    self::isDev() ?? LoggerStorage::staticPush('Notice: ' . $exception);
             })(...)
         );
     }

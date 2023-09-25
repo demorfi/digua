@@ -7,7 +7,7 @@ if (!defined('ROOT_PATH')) {
 $loader = require_once __DIR__ . '/autoload.php';
 $loader->addIncludePath(ROOT_PATH . '/../$1', __DIR__ . '/../$1/src');
 
-Digua\Env::dev();
+Digua\Env::run();
 Digua\Env::addHandlerError();
 Digua\Env::addHandlerException();
 
