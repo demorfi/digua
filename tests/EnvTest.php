@@ -162,6 +162,20 @@ class EnvTest extends TestCase
         file_put_contents(__DIR__ . '/.env', 'APP_TEST_ENV=VALUE_TEST');
         Env::run();
         $this->assertSame('VALUE_TEST', Env::get('APP_TEST_ENV'));
+        $this->assertFalse(isset($_ENV['APP_TEST_ENV']));
+        $this->assertSame('VALUE_TEST', getenv('APP_TEST_ENV'));
+    }
+
+    /**
+     * @return void
+     * @throws FileException
+     */
+    public function testGetEnvDefaultValue(): void
+    {
+        file_put_contents(__DIR__ . '/.env', 'APP_TEST_ENV=VALUE_TEST');
+        Env::run();
+        $this->assertFalse( Env::get('APP_TEST_DEFAULT'));
+        $this->assertSame('DEFAULT_VALUE', Env::get('APP_TEST_DEFAULT', 'DEFAULT_VALUE'));
     }
 
     /**

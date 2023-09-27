@@ -48,11 +48,13 @@ class Env
 
     /**
      * @param string $name
-     * @return bool|array|string
+     * @param mixed $default
+     * @return mixed
      */
-    public static function get(string $name): bool|array|string
+    public static function get(string $name, mixed $default = false): mixed
     {
-        return getenv(strtoupper($name), true);
+        $name = strtoupper($name);
+        return $_ENV[$name] ?? getenv($name, true) ?: $default;
     }
 
     /**
