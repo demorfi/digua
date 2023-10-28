@@ -20,6 +20,14 @@ class InArray
     }
 
     /**
+     * @return array
+     */
+    public function getArray(): array
+    {
+        return $this->array;
+    }
+
+    /**
      * Find key in array.
      *
      * @param string $key
