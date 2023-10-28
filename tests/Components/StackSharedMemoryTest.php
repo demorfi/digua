@@ -8,7 +8,7 @@ use Digua\Helper;
 use PHPUnit\Framework\TestCase;
 use Exception;
 
-class MemoryStackTest extends TestCase
+class StackSharedMemoryTest extends TestCase
 {
     private Stack $stack;
 
