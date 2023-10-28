@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Tests\Pagination;
+namespace Tests\Components\Pagination;
 
 use Digua\Components\Pagination\OfArray;
 use PHPUnit\Framework\TestCase;
