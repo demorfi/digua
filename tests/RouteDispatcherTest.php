@@ -145,6 +145,7 @@ class RouteDispatcherTest extends TestCase
 
         $this->expectException(RouteException::class);
         $this->expectExceptionMessage('\App\Controllers\Main - controller not found!');
+        $this->expectExceptionCode(100);
         $dispatcher->delegate($route);
     }
 
@@ -160,6 +161,7 @@ class RouteDispatcherTest extends TestCase
 
         $this->expectException(RouteException::class);
         $this->expectExceptionMessage('ControllerSuccess->unknownAction - action not found!');
+        $this->expectExceptionCode(200);
         $dispatcher->delegate($route);
     }
 
@@ -274,6 +276,7 @@ class RouteDispatcherTest extends TestCase
         $route->expects($this->once())->method('isPermitted')->willReturn(false);
         $this->expectException(RouteException::class);
         $this->expectExceptionMessage('ControllerSuccess->successAction - access not granted!');
+        $this->expectExceptionCode(300);
         $dispatcher->delegate($route);
     }
 
