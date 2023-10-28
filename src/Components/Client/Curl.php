@@ -50,23 +50,20 @@ class Curl implements Client
      */
     private array $query = [];
 
-    /**
-     * @throws PathException
-     */
-    public function __construct()
-    {
-        self::throwIsBrokenDiskPath();
+    public function __construct(
+        private array $options = [
+            CURLOPT_HEADER         => false,
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_SSL_VERIFYHOST => false,
+            CURLOPT_CONNECTTIMEOUT => 20,
+            CURLOPT_TIMEOUT        => 20,
+            CURLOPT_USERAGENT      => self::DEFAULT_USER_AGENT,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_RETURNTRANSFER => true
+        ]
+    ) {
         $this->curl = curl_init();
-
-        // Set default curl options
-        curl_setopt($this->curl, CURLOPT_HEADER, false);
-        curl_setopt($this->curl, CURLOPT_SSL_VERIFYPEER, false);
-        curl_setopt($this->curl, CURLOPT_SSL_VERIFYHOST, false);
-        curl_setopt($this->curl, CURLOPT_CONNECTTIMEOUT, 20);
-        curl_setopt($this->curl, CURLOPT_TIMEOUT, 20);
-        curl_setopt($this->curl, CURLOPT_USERAGENT, self::DEFAULT_USER_AGENT);
-        curl_setopt($this->curl, CURLOPT_FOLLOWLOCATION, true);
-        curl_setopt($this->curl, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt_array($this->curl, $this->options); // Set default curl options
     }
 
     public function __destruct()
@@ -87,9 +84,38 @@ class Curl implements Client
     /**
      * @inheritdoc
      */
+    public function getUrl(): string
+    {
+        return $this->url;
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function addQuery(string $name, string $value): void
     {
         $this->query[$name] = $value;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getQuery(string $name): string|false
+    {
+        return $this->query[$name] ?? false;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getUri(): string
+    {
+        $url = $this->url;
+        if (!empty($this->query)) {
+            $url .= ((!str_contains($url, '?') ? '?' : '&') . http_build_query($this->query));
+        }
+
+        return $url;
     }
 
     /**
@@ -103,8 +129,17 @@ class Curl implements Client
     /**
      * @inheritdoc
      */
+    public function getField(string $name): string|false
+    {
+        return $this->fields[$name] ?? false;
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function setOption(int $name, mixed $value): void
     {
+        $this->options[$name] = $value;
         curl_setopt($this->curl, $name, $value);
     }
 
@@ -113,32 +148,51 @@ class Curl implements Client
      */
     public function getOption(int $name): mixed
     {
-        return curl_getinfo($this->curl, $name);
+        return $this->options[$name] ?? false;
     }
 
     /**
-     * Use cookie file.
-     *
      * @param string $fileName Cookie file name
+     * @return void
+     * @throws PathException
      */
     public function useCookie(string $fileName): void
     {
+        self::throwIsBrokenDiskPath();
         $filePath = self::getDiskPath(Helper::filterFileName($fileName) . FileExtension::COOKIE->value);
-        curl_setopt($this->curl, CURLOPT_COOKIEJAR, $filePath);
-        curl_setopt($this->curl, CURLOPT_COOKIEFILE, $filePath);
+        $this->setOption(CURLOPT_COOKIEJAR, $filePath);
+        $this->setOption(CURLOPT_COOKIEFILE, $filePath);
     }
 
     /**
      * @inheritdoc
      */
-    public function getUrl(): string
+    public function send(): void
     {
-        $url = $this->url;
-        if (!empty($this->query)) {
-            $url .= ((!str_contains($url, '?') ? '?' : '&') . http_build_query($this->query));
+        $this->setOption(CURLOPT_URL, str_replace(' ', '%20', $this->getUri()));
+
+        if (!empty($this->fields)) {
+            $this->setOption(CURLOPT_POST, true);
+            $this->setOption(CURLOPT_POSTFIELDS, http_build_query($this->fields));
         }
 
-        return $url;
+        $this->response = (string)curl_exec($this->curl);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function clean(): void
+    {
+        $this->__construct();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getInfo(?int $option): mixed
+    {
+        return curl_getinfo($this->curl, $option);
     }
 
     /**
@@ -155,29 +209,5 @@ class Curl implements Client
     public function getErrorCode(): int
     {
         return curl_errno($this->curl);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function send(): void
-    {
-        curl_setopt($this->curl, CURLOPT_URL, str_replace(' ', '%20', $this->getUrl()));
-
-        if (!empty($this->fields)) {
-            curl_setopt($this->curl, CURLOPT_POST, true);
-            curl_setopt($this->curl, CURLOPT_POSTFIELDS, http_build_query($this->fields));
-        }
-
-        $this->response = (string)curl_exec($this->curl);
-    }
-
-    /**
-     * @inheritdoc
-     * @throws PathException
-     */
-    public function clean(): void
-    {
-        $this->__construct();
     }
 }
