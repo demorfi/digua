@@ -56,8 +56,6 @@ trait Singleton
      */
     final public static function getInstance(): static
     {
-        return static::$instance === null
-            ? static::$instance = new static
-            : static::$instance;
+        return static::$instance ??= new static;
     }
 }
