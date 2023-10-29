@@ -8,7 +8,10 @@ use Digua\Interfaces\{
     Storage as StorageInterface
 };
 use Digua\Traits\Singleton;
-use Digua\Exceptions\Storage as StorageException;
+use Digua\Exceptions\{
+    Base as BaseException,
+    Storage as StorageException
+};
 
 /**
  * @method static void staticPush(string $message);
@@ -19,53 +22,100 @@ class Logger implements LoggerInterface
     use Singleton;
 
     /**
-     * @var Storage|StorageInterface
+     * @var array
      */
-    protected readonly Storage|StorageInterface $storage;
+    protected array $queue = [];
 
     /**
      * @var array
      */
-    private array $pushed = [];
+    protected array $pushed = [];
 
     /**
-     * @throws StorageException
+     * @var Storage[]|StorageInterface[]
      */
-    protected function __construct(Storage $storage = null)
+    protected array $storages = [];
+
+    /**
+     * @param Storage|StorageInterface $storage
+     * @return void
+     */
+    public function addStorage(Storage|StorageInterface $storage): void
     {
-        $this->storage = $storage ?: Storage::makeDiskFile('digua' . FileExtension::LOG->value);
+        $this->storages[] = $storage;
     }
 
     /**
-     * Add message to log.
-     *
+     * @return array
+     */
+    public function getPushed(): array
+    {
+        return $this->pushed;
+    }
+
+    /**
+     * @return array
+     */
+    public function getQueue(): array
+    {
+        return $this->queue;
+    }
+
+    /**
+     * @return void
+     */
+    public function clearQueue(): void
+    {
+        $this->queue = [];
+    }
+
+    /**
      * @inheritdoc
+     * @testWith ('message')
      */
     public function push(string $message): void
     {
-        $this->pushed[] = '[' . date('Y-m-d H:i:s') . '] ' . $message;
+        $date          = date('d-m-Y H:i:s');
+        $this->queue[] = compact('date', 'message');
     }
 
     /**
-     * Save log file.
-     *
      * @return void
      * @throws StorageException
      */
     public function save(): void
     {
-        $this->storage->write(implode("\n", $this->pushed) . "\n");
+        if (empty($this->queue)) {
+            return;
+        }
+
+        // default storage
+        if (empty($this->storages)) {
+            $this->storages[] = Storage::makeDiskFile('digua' . FileExtension::LOG->value);
+        }
+
+        try {
+            $messages = array_reduce($this->queue, function ($carry, $item) {
+                return $carry . '[' . $item['date'] . '] ' . $item['message'] . "\n";
+            }, '');
+
+            foreach ($this->storages as $storage) {
+                $storage->write($messages);
+            }
+        } catch (BaseException) {
+        }
+
+        $this->pushed = [...$this->pushed, ...$this->queue];
+        $this->clearQueue();
     }
 
     /**
-     * Auto save log file.
+     * Auto save.
      *
      * @throws StorageException
      */
     public function __destruct()
     {
-        if (!empty($this->pushed)) {
-            $this->save();
-        }
+        $this->save();
     }
 }
