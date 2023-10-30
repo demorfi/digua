@@ -1,6 +1,6 @@
 <nav aria-label="navigation">
     <ul class="pagination pull-left <?php echo !$this->pagination->hasPages() ? ' hidden ' : ''; ?>"
-        data-url="<?php echo $this->self['url']; ?>" data-root="#<?php echo $this->self['url']; ?>">
+        data-url="<?php echo $this->self['url']; ?>" data-root="#<?php echo $this->self['id']; ?>">
         <li class="pagination-prev <?php echo !$this->pagination->hasPrev() ? ' disabled ' : ''; ?>">
             <a href="<?php echo $this->pagination->getPrevPage($this->self['url']); ?>" aria-label="Previous">
                 <span aria-hidden="true">&laquo;</span>

@@ -29,11 +29,11 @@ $this->shortSection('header', 'parts/_menu');
                     <div class="col-md-6 col-xs-12">
 
                         <!-- Navigation pages -->
-                        <?php $this->view('parts/_navigation', ['url' => '/page1/list1']) ?>
+                        <?php $this->view('parts/_navigation', ['id' => 'page1-list1', 'url' => '/page1/list1']) ?>
                     </div>
 
                     <!-- Search -->
-                    <?php $this->view('parts/_search', ['url' => '/page1/list1']) ?>
+                    <?php $this->view('parts/_search', ['id' => 'page1-list1', 'url' => '/page1/list1']) ?>
                 </div>
 
                 <!-- Items -->
@@ -72,11 +72,11 @@ $this->shortSection('header', 'parts/_menu');
                     <div class="col-md-6 col-xs-12">
 
                         <!-- Navigation pages -->
-                        <?php $this->view('parts/_navigation', ['url' => '/page1/list2']) ?>
+                        <?php $this->view('parts/_navigation', ['id' => 'page1-list2', 'url' => '/page1/list2']) ?>
                     </div>
 
                     <!-- Search -->
-                    <?php $this->view('parts/_search', ['url' => '/page1/list2']) ?>
+                    <?php $this->view('parts/_search', ['id' => 'page1-list2', 'url' => '/page1/list2']) ?>
                 </div>
 
                 <!-- Items -->
