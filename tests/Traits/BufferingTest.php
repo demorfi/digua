@@ -5,7 +5,7 @@ namespace Tests\Traits;
 use Digua\Traits\Buffering;
 use PHPUnit\Framework\TestCase;
 
-class OutputTest extends TestCase
+class BufferingTest extends TestCase
 {
     /**
      * @var object
