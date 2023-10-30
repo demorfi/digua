@@ -2,8 +2,7 @@
 
 namespace Digua\Traits;
 
-use Digua\Components\ArrayCollection;
-use Digua\Components\Types;
+use Digua\Components\{ArrayCollection, Types};
 
 trait Data
 {
@@ -45,7 +44,9 @@ trait Data
      */
     public function __unset(int|string $key): void
     {
-        unset($this->array[$key]);
+        if ($this->__isset($key)) {
+            unset($this->array[$key]);
+        }
     }
 
     /**
@@ -55,7 +56,7 @@ trait Data
      */
     public function get(int|string $key, mixed $default = null): mixed
     {
-        return $this->array[$key] ?? $default;
+        return $this->__get($key) ?? $default;
     }
 
     /**
@@ -65,7 +66,7 @@ trait Data
      */
     public function getTypeValue(int|string $key, mixed $default = null): Types
     {
-        return Types::value($this->array[$key] ?? $default);
+        return Types::value($this->get($key, $default));
     }
 
     /**
@@ -86,7 +87,7 @@ trait Data
      */
     public function set(int|string $key, mixed $value): void
     {
-        $this->array[$key] = $value;
+        $this->__set($key, $value);
     }
 
     /**
@@ -96,6 +97,15 @@ trait Data
     public function has(int|string $key): bool
     {
         return $this->__isset($key);
+    }
+
+    /**
+     * @param int|string $key
+     * @return void
+     */
+    public function remove(int|string $key): void
+    {
+        $this->__unset($key);
     }
 
     /**
@@ -149,8 +159,6 @@ trait Data
     }
 
     /**
-     * Overwrite data.
-     *
      * @param array $array
      */
     public function overwrite(array $array): void
