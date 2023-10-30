@@ -2,8 +2,10 @@
 
 namespace Digua\Traits;
 
-use BadMethodCallException;
-use Digua\Exceptions\Singleton as SingletonException;
+use Digua\Exceptions\{
+    Singleton as SingletonException,
+    BadMethodCall as BadMethodCallException
+};
 
 trait Singleton
 {
@@ -40,6 +42,7 @@ trait Singleton
      * @param string $name
      * @param array  $arguments
      * @return mixed
+     * @throws BadMethodCallException
      */
     final public static function __callStatic(string $name, array $arguments): mixed
     {

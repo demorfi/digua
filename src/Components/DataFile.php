@@ -5,8 +5,10 @@ namespace Digua\Components;
 use Digua\Traits\Data;
 use Digua\Enums\FileExtension;
 use Digua\Interfaces\Storage as StorageInterface;
-use Digua\Exceptions\Storage as StorageException;
-use BadMethodCallException;
+use Digua\Exceptions\{
+    Storage as StorageException,
+    BadMethodCall as BadMethodCallException
+};
 use JsonSerializable;
 
 /**
@@ -96,6 +98,7 @@ class DataFile implements JsonSerializable
      * @param string $name
      * @param array  $arguments
      * @return mixed
+     * @throws BadMethodCallException
      */
     public function __call(string $name, array $arguments): mixed
     {
