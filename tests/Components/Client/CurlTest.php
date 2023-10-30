@@ -1,5 +1,42 @@
 <?php declare(strict_types=1);
 
+namespace Digua\Components\Client;
+
+use CurlHandle;
+
+/**
+ * Redefined function for testing get response.
+ *
+ * @return string
+ */
+function curl_exec(): string
+{
+    return '<!DOCTYPE html>
+                <html lang="en">
+                <head>
+                    <title>Fake Response</title>
+                </head>
+                <body>
+                </body>
+                </html>';
+}
+
+/**
+ * Redefined function for testing testIsItPossibleGetInfoForLastRequest method.
+ *
+ * @param CurlHandle $curl
+ * @param ?int       $option
+ * @return mixed
+ */
+function curl_getinfo(CurlHandle $curl, ?int $option): mixed
+{
+    if ($option === CURLINFO_HTTP_CODE) {
+        return 200;
+    }
+
+    return \curl_getinfo($curl, $option);
+}
+
 namespace Tests\Components\Client;
 
 use Digua\Components\Client\Curl;
@@ -135,13 +172,15 @@ class CurlTest extends TestCase
     public function testSendRequestAndGetResponse(): Curl
     {
         $curl = new Curl;
-        $curl->setUrl('https://www.google.com/search');
-        $curl->addQuery('q', 'search test');
+        $curl->setUrl('http://test-url.loc/');
+        $curl->addQuery('key', 'value string');
+
+        // function curl_exec redefined inside!
         $curl->send();
 
-        $this->assertSame($curl->getOption(CURLOPT_URL), 'https://www.google.com/search?q=search+test');
+        $this->assertSame($curl->getOption(CURLOPT_URL), 'http://test-url.loc/?key=value+string');
         $this->assertSame($curl->getErrorCode(), 0);
-        $this->assertTrue(str_contains($curl->getResponse(), 'value="search test"'));
+        $this->assertTrue(str_contains($curl->getResponse(), 'Fake Response'));
         return $curl;
     }
 
@@ -151,16 +190,18 @@ class CurlTest extends TestCase
     public function testSendPostRequestAndGetResponse(): void
     {
         $curl = new Curl;
-        $curl->setUrl('https://www.google.com/search');
-        $curl->addField('q', 'search test');
+        $curl->setUrl('http://test-url.loc/');
+        $curl->addField('key', 'value string');
+
+        // function curl_exec redefined inside!
         $curl->send();
 
-        $this->assertSame($curl->getOption(CURLOPT_URL), 'https://www.google.com/search');
+        $this->assertSame($curl->getOption(CURLOPT_URL), 'http://test-url.loc/');
         $this->assertTrue($curl->getOption(CURLOPT_POST));
-        $this->assertSame($curl->getOption(CURLOPT_POSTFIELDS), 'q=search+test');
+        $this->assertSame($curl->getOption(CURLOPT_POSTFIELDS), 'key=value+string');
 
         $this->assertSame($curl->getErrorCode(), 0);
-        $this->assertTrue(str_contains($curl->getResponse(), 'Method Not Allowed'));
+        $this->assertTrue(str_contains($curl->getResponse(), 'Fake Response'));
     }
 
     /**
@@ -182,7 +223,8 @@ class CurlTest extends TestCase
     public function testIsItPossibleGetInfoForLastRequest(): void
     {
         $curl = $this->testSendRequestAndGetResponse();
-        $this->assertSame($curl->getInfo(CURLINFO_EFFECTIVE_URL), 'https://www.google.com/search?q=search+test');
+        // function curl_getinfo redefined inside!
+        $this->assertSame($curl->getInfo(CURLINFO_EFFECTIVE_URL), 'http://test-url.loc/?key=value+string');
         $this->assertSame($curl->getInfo(CURLINFO_HTTP_CODE), 200);
     }
 }
