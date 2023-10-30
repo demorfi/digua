@@ -3,6 +3,7 @@
 namespace Tests;
 
 use Digua\Helper;
+use Digua\Exceptions\BadMethodCall as BadMethodCallException;
 use PHPUnit\Framework\TestCase;
 use ValueError;
 
@@ -51,5 +52,15 @@ class HelperTest extends TestCase
     public function testHelperMakeIntHash(): void
     {
         $this->assertIsInt(Helper::makeIntHash());
+    }
+
+    /**
+     * @return void
+     */
+    public function testThrowInvalidHelperMethod(): void
+    {
+        $this->expectException(BadMethodCallException::class);
+        $this->expectExceptionMessage('helper method never does not exist!');
+        Helper::never();
     }
 }
