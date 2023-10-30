@@ -85,7 +85,7 @@ class DiskFileTest extends TestCase
         $this->assertTrue($storage->rewrite($data));
         $this->assertSame($data, $storage->read());
 
-        $this->assertTrue($storage->rewrite(fn($data) => $data));
+        $this->assertTrue($storage->rewrite(static fn($data) => $data));
         $this->assertSame($data, $storage->read());
         $this->assertTrue($storage->free());
     }

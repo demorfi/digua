@@ -102,7 +102,7 @@ class Env
     {
         $logger ??= LoggerStorage::getInstance();
         return set_error_handler(
-            (function ($code, $message, $file, $line) use($logger) {
+            static function ($code, $message, $file, $line) use($logger) {
                 if (!(error_reporting() & $code)) {
                     return false;
                 }
@@ -117,7 +117,7 @@ class Env
 
                 $logger->push($type . ': ' . $message . ' in ' . $file . ':' . $line);
                 return false;
-            })(...)
+            }
         );
     }
 
@@ -132,13 +132,13 @@ class Env
         // Subscribe all exception message
         LateEvent::subscribe(
             BaseException::class,
-            (function (Throwable $exception) use($logger) {
+            function (Throwable $exception) use($logger) {
                     self::isDev() && $logger->push('Notice: ' . $exception);
-            })(...)
+            }
         );
 
         return set_exception_handler(
-            (function (Throwable $exception) use($logger) {
+            function (Throwable $exception) use($logger) {
                 $logger->push((string)$exception);
                 if (self::isDev()) {
                     printf(
@@ -148,7 +148,7 @@ class Env
                         $exception->getLine()
                     );
                 }
-            })(...)
+            }
         );
     }
 }

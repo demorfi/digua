@@ -14,13 +14,13 @@ class HelperTest extends TestCase
      */
     public function testAddHelper(): void
     {
-        $closure = fn($value) => $value;
+        $closure = static fn($value) => $value;
         Helper::register('testBoolean', $closure);
         $this->assertTrue(Helper::testBoolean(true));
         $this->assertFalse(Helper::testBoolean(false));
         $this->assertSame($closure, Helper::get('testBoolean'));
 
-        Helper::register('testSqrt', fn($value) => (int)sqrt($value));
+        Helper::register('testSqrt', static fn($value) => (int)sqrt($value));
         $this->assertSame(3, Helper::testSqrt(9));
         $this->assertSame(4, Helper::testSqrt(16));
     }
@@ -30,12 +30,12 @@ class HelperTest extends TestCase
      */
     public function testAddDuplicateHelper(): void
     {
-        Helper::register('testInteger', fn($value) => (int)$value);
-        Helper::register('testInteger', fn($value) => 5, true);
+        Helper::register('testInteger', static fn($value) => (int)$value);
+        Helper::register('testInteger', static fn($value) => 5, true);
         $this->assertSame(5, Helper::testInteger(3));
 
         $this->expectException(ValueError::class);
-        Helper::register('testInteger', fn($value) => (int)$value);
+        Helper::register('testInteger', static fn($value) => (int)$value);
     }
 
     /**

@@ -36,7 +36,7 @@ class LoaderTest extends TestCase
         $this->loader->method('requireFile')
             ->will(
                 $this->returnCallback(
-                    (function (string $filePath) {
+                    function (string $filePath) {
                         $this->filePath = '';
 
                         $result = in_array($filePath, [
@@ -51,7 +51,7 @@ class LoaderTest extends TestCase
                         }
 
                         return $result;
-                    })(...)
+                    }
                 )
             );
     }

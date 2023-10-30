@@ -50,7 +50,7 @@ class RouteDispatcherTest extends TestCase
         $dispatcher->method('try')
             ->will(
                 $this->returnCallback(
-                    function (mixed $route, string $controller, string $action) {
+                    static function (mixed $route, string $controller, string $action) {
                         return Response::create(compact('route', 'controller', 'action'));
                     }
                 )

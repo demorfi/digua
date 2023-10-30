@@ -181,17 +181,17 @@ class ArrayCollectionTest extends TestCase
 
         $this->assertSame(
             ['some' => 6],
-            $collection->slice('pref2-', fn($key, $value) => $value > 5)->toArray()
+            $collection->slice('pref2-', static fn($key, $value) => $value > 5)->toArray()
         );
 
         $this->assertSame(
             ['bar' => 5],
-            $collection->slice('pref2-', fn($key, $value) => $key === 'pref2-bar')->toArray()
+            $collection->slice('pref2-', static fn($key, $value) => $key === 'pref2-bar')->toArray()
         );
 
         $this->assertSame(
             ['pref1-some' => 3, 'pref2-foo' => 4],
-            $collection->slice('', fn($key, $value) => $value > 2 && $value < 5)->toArray()
+            $collection->slice('', static fn($key, $value) => $value > 2 && $value < 5)->toArray()
         );
     }
 
@@ -201,17 +201,17 @@ class ArrayCollectionTest extends TestCase
     public function testMethodFilter(): void
     {
         $collection = ArrayCollection::make(['foo' => 1, 'bar' => 2, 'some' => 3]);
-        $this->assertSame(['bar' => 2], $collection->filter(fn($value) => $value === 2)->toArray());
-        $this->assertSame(['bar' => 2, 'some' => 3], $collection->filter(fn($value) => $value > 1)->toArray());
+        $this->assertSame(['bar' => 2], $collection->filter(static fn($value) => $value === 2)->toArray());
+        $this->assertSame(['bar' => 2, 'some' => 3], $collection->filter(static fn($value) => $value > 1)->toArray());
 
         $this->assertSame(
             ['foo' => 1, 'some' => 3],
-            $collection->filter(fn($value, $key) => $key === 'foo' || $value === 3)->toArray()
+            $collection->filter(static fn($value, $key) => $key === 'foo' || $value === 3)->toArray()
         );
 
         $this->assertSame(
             ['bar' => 2],
-            $collection->filter(fn($key) => $key === 'bar', ARRAY_FILTER_USE_KEY)->toArray()
+            $collection->filter(static fn($key) => $key === 'bar', ARRAY_FILTER_USE_KEY)->toArray()
         );
     }
 
@@ -253,7 +253,7 @@ class ArrayCollectionTest extends TestCase
         $collection = ArrayCollection::make(['foo' => 1, 'bar' => 2]);
         $this->assertSame(
             ['foo' => 2, 'bar' => 4],
-            $collection->each(fn(&$value) => $value = $value * 2)->toArray()
+            $collection->each(static fn(&$value) => $value = $value * 2)->toArray()
         );
     }
 
@@ -265,7 +265,7 @@ class ArrayCollectionTest extends TestCase
         $collection = ArrayCollection::make(['foo' => 1, 'bar' => 2, 'same' => [1, 2]]);
         $this->assertSame(
             ['foo' => 2, 'bar' => 4, 'same' => [2, 4]],
-            $collection->each(fn(&$value) => $value = $value * 2, true)->toArray()
+            $collection->each(static fn(&$value) => $value = $value * 2, true)->toArray()
         );
     }
 
@@ -277,7 +277,7 @@ class ArrayCollectionTest extends TestCase
         $collection = ArrayCollection::make(['foo' => 1, 'bar' => 2]);
         $this->assertSame(
             ['foo' => 1, 'bar' => 'replaced by 2'],
-            $collection->replaceValue('bar', fn($v) => 'replaced by ' . $v)->toArray()
+            $collection->replaceValue('bar', static fn($v) => 'replaced by ' . $v)->toArray()
         );
     }
 
@@ -289,7 +289,7 @@ class ArrayCollectionTest extends TestCase
         $collection = ArrayCollection::make(['foo' => 1, 'bar' => 2, 'same' => ['bar' => 3]]);
         $this->assertSame(
             ['foo' => 1, 'bar' => 'replaced by 2', 'same' => ['bar' => 'replaced by 3']],
-            $collection->replaceValue('bar', fn($v) => 'replaced by ' . $v, true)->toArray()
+            $collection->replaceValue('bar', static fn($v) => 'replaced by ' . $v, true)->toArray()
         );
     }
 

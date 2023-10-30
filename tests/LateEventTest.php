@@ -14,7 +14,7 @@ class LateEventTest extends TestCase
     {
         LateEvent::clean();
         $this->assertFalse(LateEvent::hasSubscribers('eventName'));
-        LateEvent::subscribe('eventName', fn() => null);
+        LateEvent::subscribe('eventName', static fn() => null);
         $this->assertTrue(LateEvent::hasSubscribers('eventName'));
 
         $this->assertSame(1, sizeof(LateEvent::getSubscribers('eventName')));
@@ -23,7 +23,7 @@ class LateEventTest extends TestCase
         $this->assertFalse(LateEvent::hasSubscribers('eventName'));
         $this->assertSame(0, sizeof(LateEvent::getSubscribers('eventName')));
 
-        LateEvent::subscribe('eventName', fn() => null);
+        LateEvent::subscribe('eventName', static fn() => null);
         $this->assertTrue(LateEvent::hasSubscribers('eventName'));
         $this->assertSame(1, LateEvent::removeSubscribers('eventName'));
         $this->assertFalse(LateEvent::hasSubscribers('eventName'));
@@ -44,10 +44,10 @@ class LateEventTest extends TestCase
     {
         LateEvent::clean();
         $success = 0;
-        $handler = (function (...$receivedArguments) use (&$success, $arguments) {
+        $handler = function (...$receivedArguments) use (&$success, $arguments) {
             $this->assertEqualsCanonicalizing($arguments, $receivedArguments);
             $success++;
-        })(...);
+        };
 
         LateEvent::subscribe($eventName, $handler);
 

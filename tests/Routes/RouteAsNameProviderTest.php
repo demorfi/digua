@@ -24,7 +24,7 @@ class RouteAsNameProviderTest extends TestCase
             ->getMock();
 
         $input->method('filteredVar')
-            ->willReturnCallback(fn() => '/a-key/1/b-key/string');
+            ->willReturnCallback(static fn() => '/a-key/1/b-key/string');
 
         $request        = new Request(new Data(query: new Query($input)));
         $this->provider = new RouteAsNameProvider($request);

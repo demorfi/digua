@@ -66,7 +66,7 @@ class FilteredInputTest extends TestCase
             ->onlyMethods(['filterInput'])
             ->getMock();
 
-        $mock->method('filterInput')->willReturnCallback(fn(int $type) => ['type' => $type]);
+        $mock->method('filterInput')->willReturnCallback(static fn(int $type) => ['type' => $type]);
         foreach ($this->sanitize as $type) {
             $this->assertSame(['type' => $type], $mock->filteredList($type));
         }
@@ -81,7 +81,7 @@ class FilteredInputTest extends TestCase
             ->onlyMethods(['filterInput'])
             ->getMock();
 
-        $mock->method('filterInput')->willReturnCallback(fn(int $type) => ['type' => $type]);
+        $mock->method('filterInput')->willReturnCallback(static fn(int $type) => ['type' => $type]);
         foreach ($this->sanitize as $type) {
             $this->assertSame($type, $mock->filteredVar($type, 'type'));
         }

@@ -91,12 +91,12 @@ class Query implements FilteredCollectionInterface, RequestQueryInterface
         if (!empty($this->path) && $this->path !== '/') {
             $paths = array_filter(
                 explode('/', trim($this->path, '/')),
-                fn($value) => !!preg_match('/\w/', trim($value))
+                static fn($value) => !!preg_match('/\w/', trim($value))
             );
 
             // converting every odd key-value to keyValue
             $this->paths = array_map(
-                fn($value, $key) => !!($key % 2)
+                static fn($value, $key) => !!($key % 2)
                     ? $value
                     : str_replace('-', '', lcfirst(ucwords($value, '-'))),
                 $paths,
@@ -232,7 +232,7 @@ class Query implements FilteredCollectionInterface, RequestQueryInterface
      */
     public function buildPath(string ...$path): static
     {
-        $path = array_map(fn($value) => trim($value, '/'), array_filter($path));
+        $path = array_map(static fn($value) => trim($value, '/'), array_filter($path));
         $this->path = filter_var('/' . implode('/', $path), FILTER_SANITIZE_URL);
         return $this;
     }
