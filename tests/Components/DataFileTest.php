@@ -5,7 +5,10 @@ namespace Tests\Components;
 use Digua\Components\DataFile;
 use Digua\Components\Storage\DiskFile;
 use Digua\Helper;
-use Digua\Exceptions\Storage as StorageException;
+use Digua\Exceptions\{
+    Storage as StorageException,
+    BadMethodCall as BadMethodCallException
+};
 use PHPUnit\Framework\TestCase;
 use Exception;
 
@@ -94,5 +97,15 @@ class DataFileTest extends TestCase
 
         $this->assertTrue($this->dataFile->rewrite(['test' => 'value']));
         $this->assertSame(['test' => 'value'], $this->dataFile->read());
+    }
+
+    /**
+     * @return void
+     */
+    public function testThrowProxyingCallToInstance(): void
+    {
+        $this->expectException(BadMethodCallException::class);
+        $this->expectExceptionMessage('method never does not exist!');
+        $this->dataFile->never();
     }
 }

@@ -3,7 +3,10 @@
 namespace Tests\Components;
 
 use Digua\Components\{Stack, Storage, Storage\DiskFile};
-use Digua\Exceptions\Storage as StorageException;
+use Digua\Exceptions\{
+    Storage as StorageException,
+    BadMethodCall as BadMethodCallException
+};
 use Digua\Helper;
 use PHPUnit\Framework\TestCase;
 use Exception;
@@ -157,5 +160,17 @@ class StackTest extends TestCase
 
         $this->assertSame(0, $this->getStack($stack)->size());
         $this->assertSame($data, $actualData);
+    }
+
+    /**
+     * @dataProvider dataSetProvider
+     * @param string $stack
+     * @return void
+     */
+    public function testThrowProxyingCallToInstance(string $stack): void
+    {
+        $this->expectException(BadMethodCallException::class);
+        $this->expectExceptionMessage('method never does not exist!');
+        $this->getStack($stack)->never();
     }
 }
