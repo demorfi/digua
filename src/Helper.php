@@ -2,8 +2,10 @@
 
 namespace Digua;
 
-use Digua\Exceptions\Path as PathException;
-use BadMethodCallException;
+use Digua\Exceptions\{
+    Path as PathException,
+    BadMethodCall as BadMethodCallException
+};
 use ValueError;
 use Exception;
 
@@ -75,6 +77,7 @@ class Helper
      * @param string $name
      * @param array  $arguments
      * @return mixed
+     * @throws BadMethodCallException
      */
     public static function __callStatic(string $name, array $arguments)
     {

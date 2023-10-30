@@ -8,7 +8,7 @@ use Digua\Components\Storage\{
     DiskFile as DiskFileStorage,
     SharedMemory as SharedMemoryStorage
 };
-use BadMethodCallException;
+use Digua\Exceptions\BadMethodCall as BadMethodCallException;
 
 /**
  * @mixin StorageInterface
@@ -69,6 +69,7 @@ class Storage
      * @param string $name
      * @param array  $arguments
      * @return mixed
+     * @throws BadMethodCallException
      */
     public function __call(string $name, array $arguments): mixed
     {
