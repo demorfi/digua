@@ -35,6 +35,14 @@ class Storage
     }
 
     /**
+     * @return StorageInterface
+     */
+    public function getInstance(): StorageInterface
+    {
+        return $this->storage;
+    }
+
+    /**
      * @param string $storage
      * @param mixed  ...$arguments
      * @return static
