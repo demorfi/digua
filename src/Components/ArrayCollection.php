@@ -160,7 +160,7 @@ class ArrayCollection implements NamedCollection, Countable, ArrayAccess, Iterat
      */
     public function except(int|string ...$keys): static
     {
-        return $this->filter(fn($value, $key) => !in_array($key, $keys));
+        return $this->filter(static fn($value, $key) => !in_array($key, $keys));
     }
 
     /**
@@ -235,7 +235,7 @@ class ArrayCollection implements NamedCollection, Countable, ArrayAccess, Iterat
      */
     public function replaceValue(int|string $key, callable $callable, bool $recursive = false): static
     {
-        return $this->each(fn(&$v, $k) => $k === $key ? $v = $callable($v) : null, $recursive);
+        return $this->each(static fn(&$v, $k) => $k === $key ? $v = $callable($v) : null, $recursive);
     }
 
     /**

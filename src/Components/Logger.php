@@ -95,7 +95,7 @@ class Logger implements LoggerInterface
         }
 
         try {
-            $messages = array_reduce($this->queue, function ($carry, $item) {
+            $messages = array_reduce($this->queue, static function ($carry, $item) {
                 return $carry . '[' . $item['date'] . '] ' . $item['message'] . "\n";
             }, '');
 

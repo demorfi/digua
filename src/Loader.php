@@ -30,7 +30,7 @@ class Loader
      */
     public function register(): void
     {
-        spl_autoload_register((fn(string $className) => $this->load($className))(...));
+        spl_autoload_register(fn(string $className) => $this->load($className));
     }
 
     /**
@@ -50,7 +50,7 @@ class Loader
     {
         $filePath = str_replace('\\', '/', ltrim($filePath, '\\')) . '.php';
         $names    = explode('/', $filePath);
-        return array_map(function ($rootPath) use ($names, $filePath) {
+        return array_map(static function ($rootPath) use ($names, $filePath) {
 
             /**
              * Search and replace mask in include path

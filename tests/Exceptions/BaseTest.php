@@ -25,7 +25,7 @@ class BaseTest extends TestCase
     public function testIsItPossibleToNotifyLateEvent(): void
     {
         $result = null;
-        LateEvent::subscribe('LateEventBaseTest', function ($exception) use (&$result) {
+        LateEvent::subscribe('LateEventBaseTest', static function ($exception) use (&$result) {
             $result = $exception;
         });
 

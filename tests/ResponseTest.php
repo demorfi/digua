@@ -162,7 +162,7 @@ class ResponseTest extends TestCase
         $response->method('sendHeader')
             ->will(
                 $this->returnCallback(
-                    function (string $header, bool $replace = true, int $code = 0) use (&$headersSent) {
+                    static function (string $header, bool $replace = true, int $code = 0) use (&$headersSent) {
                         $headersSent[] = [$header, $replace, $code];
                     }
                 )
