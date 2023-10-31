@@ -126,7 +126,7 @@ class LoggerTest extends TestCase
         $this->logger->push($message . '-1');
         $this->logger->push($message . '-2');
         $this->logger->save();
-        $this->assertFalse(is_file(__DIR__ . '/digua.log'));
+        $this->assertFileDoesNotExist(__DIR__ . '/digua.log');
     }
 
     /**
