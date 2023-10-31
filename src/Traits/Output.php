@@ -13,11 +13,9 @@ trait Output
     }
 
     /**
-     * Get buffer content.
-     *
-     * @return string
+     * @return string|false
      */
-    public function flushBuffer(): string
+    public function flushBuffer(): string|false
     {
         return ob_get_clean();
     }
