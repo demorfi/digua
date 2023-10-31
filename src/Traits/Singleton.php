@@ -31,14 +31,6 @@ trait Singleton
     }
 
     /**
-     * @throws SingletonException
-     */
-    final public function __sleep()
-    {
-        throw new SingletonException('Object serialize forbidden!');
-    }
-
-    /**
      * @param string $name
      * @param array  $arguments
      * @return mixed
@@ -46,7 +38,7 @@ trait Singleton
      */
     final public static function __callStatic(string $name, array $arguments): mixed
     {
-        $name = preg_replace('/^static/', '', $name);
+        $name = lcfirst(preg_replace('/^static/', '', $name));
         if (!method_exists(self::getInstance(), $name)) {
             throw new BadMethodCallException('method ' . $name . ' does not exist!');
         }
