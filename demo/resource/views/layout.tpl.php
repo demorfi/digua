@@ -9,16 +9,10 @@
     <link rel="stylesheet" href="/stylesheet/bootstrap.min.css"/>
     <link rel="stylesheet" href="/stylesheet/font-awesome.min.css"/>
     <link rel="stylesheet" href="/stylesheet/main.css"/>
-    <?php foreach ($this->styles() as $style) { ?>
-        <link rel="stylesheet" href="/stylesheet/<?php echo $style; ?>.css"/>
-    <?php } ?>
     <script defer src="/javascript/jquery.min.js"></script>
     <script defer src="/javascript/jquery.storageapi.min.js"></script>
     <script defer src="/javascript/bootstrap.min.js"></script>
     <script defer src="/javascript/main.js"></script>
-    <?php foreach ($this->javascripts() as $javascript) { ?>
-        <script src="/javascript/<?php echo $javascript; ?>.js" type="module"></script>
-    <?php } ?>
 </head>
 <body class="bg-success">
 <?php echo $this->block('header'); ?>
