@@ -64,7 +64,6 @@ class BaseTest extends TestCase
         $this->assertInstanceOf(TemplateInterface::class, $result);
 
         $data = (string)$result;
-        $result->flushBuffer();
         $this->assertSame('test string', $data);
         unlink($testFile);
     }

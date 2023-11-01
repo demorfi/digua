@@ -2,7 +2,7 @@
 
 namespace Tests\Traits;
 
-use Digua\Traits\Output;
+use Digua\Traits\Buffering;
 use PHPUnit\Framework\TestCase;
 
 class OutputTest extends TestCase
@@ -19,7 +19,7 @@ class OutputTest extends TestCase
     {
         ob_end_clean();
         $this->traitOutput = new class {
-            use Output;
+            use Buffering;
         };
     }
 
@@ -34,27 +34,37 @@ class OutputTest extends TestCase
     /**
      * @return void
      */
-    public function testFlushBuffer(): void
+    public function testFlushBuffering(): void
     {
-        $this->assertFalse($this->traitOutput->flushBuffer());
+        $this->assertEmpty($this->traitOutput->flushBuffering());
 
-        $this->traitOutput->startBuffer();
+        $this->traitOutput->startBuffering();
         print 'test string';
 
-        $this->assertSame($this->traitOutput->flushBuffer(), 'test string');
+        $this->assertSame($this->traitOutput->getBufferingContents(), 'test string');
+        $this->assertSame($this->traitOutput->flushBuffering(), 'test string');
     }
 
     /**
      * @return void
      */
-    public function testCleanBuffer(): void
+    public function testStopBuffering(): void
     {
-        $this->assertFalse($this->traitOutput->flushBuffer());
+        $this->assertTrue($this->traitOutput->startBuffering());
+        $this->assertTrue($this->traitOutput->stopBuffering());
+    }
 
-        $this->traitOutput->startBuffer();
+    /**
+     * @return void
+     */
+    public function testCleanBuffering(): void
+    {
+        $this->assertEmpty($this->traitOutput->flushBuffering());
+
+        $this->traitOutput->startBuffering();
         print 'test string';
 
-        $this->traitOutput->cleanBuffer();
-        $this->assertSame($this->traitOutput->flushBuffer(), '');
+        $this->traitOutput->cleanBuffering();
+        $this->assertSame($this->traitOutput->flushBuffering(), '');
     }
 }
