@@ -3,7 +3,7 @@
 namespace Digua\Components\Client;
 
 use CurlHandle;
-use Digua\Traits\{Configurable, DiskPath};
+use Digua\Traits\DiskPath;
 use Digua\Helper;
 use Digua\Interfaces\Client;
 use Digua\Exceptions\Path as PathException;
@@ -11,7 +11,7 @@ use Digua\Enums\FileExtension;
 
 class Curl implements Client
 {
-    use Configurable, DiskPath;
+    use DiskPath;
 
     /**
      * @var string
