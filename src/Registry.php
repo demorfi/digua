@@ -38,6 +38,6 @@ abstract class Registry
      */
     final public static function get(string $key): ServiceInterface
     {
-        return self::$services[$key] ?? throw new RegistryException('Invalid key given');
+        return self::$services[$key] ?? throw new RegistryException('Invalid key given!');
     }
 }

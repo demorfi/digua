@@ -130,7 +130,7 @@ class TemplateAsPHPEngine implements TemplateEngineInterface
     {
         $filePath = $this->path . '/' . Helper::filterFileName($template) . FileExtension::TPL->value;
         if (!is_readable($filePath)) {
-            throw new TemplateException($filePath . ' - template not found!');
+            throw new TemplateException(sprintf('Template (%s) not found!', $filePath));
         }
 
         $this->set('self', $variables);

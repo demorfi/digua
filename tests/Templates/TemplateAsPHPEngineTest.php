@@ -148,7 +148,7 @@ class TemplateAsPHPEngineTest extends TestCase
     public function testThrowViewTemplateInNotFound(): void
     {
         $this->expectException(TemplateException::class);
-        $this->expectExceptionMessage(__DIR__ . '/template.tpl.php - template not found!');
+        $this->expectExceptionMessage('Template (' . __DIR__ . '/template.tpl.php) not found!');
 
         $engine = new TemplateAsPHPEngine(__DIR__, $this->request);
         $this->callToEngine($engine, 'view', 'template');

@@ -24,7 +24,7 @@ class ConfigTest extends TestCase
     public function testThrowConfigPathIsNotReadable(): void
     {
         $this->expectException(PathException::class);
-        $this->expectExceptionMessage('The path (' . __DIR__ . '/pathToFile) for ' . Config::class . ' is not readable!');
+        $this->expectExceptionMessage('The disk path (' . __DIR__ . '/pathToFile) is not readable!');
         $this->expectExceptionCode(200);
 
         Config::setDiskPath(__DIR__ . '/pathToFile');

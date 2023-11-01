@@ -60,7 +60,7 @@ class HelperTest extends TestCase
     public function testThrowInvalidHelperMethod(): void
     {
         $this->expectException(BadMethodCallException::class);
-        $this->expectExceptionMessage('helper method never does not exist!');
+        $this->expectExceptionMessage('Helper (never) does not exist!');
         Helper::never();
     }
 }

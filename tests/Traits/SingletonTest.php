@@ -47,7 +47,7 @@ class SingletonTest extends TestCase
     public function testThrowCallMethodAsStatic(): void
     {
         $this->expectException(BadMethodCallException::class);
-        $this->expectExceptionMessage('method methodNever does not exist!');
+        $this->expectExceptionMessage('Method (methodNever) does not exist!');
 
         StubSingleton::staticMethodNever();
     }

@@ -62,12 +62,12 @@ trait DiskPath
     public static function throwIsBrokenDiskPath(): bool
     {
         if (!self::hasConfigValue('diskPath')) {
-            throw new PathException('The path for ' . self::class . ' is not configured!', 100);
+            throw new PathException(sprintf('The disk path for (%s) is not configured!', self::class), 100);
         }
 
         $path = self::getConfigValue('diskPath');
         if (!is_dir($path) || !is_readable($path)) {
-            throw new PathException('The path (' . $path . ') for ' . self::class . ' is not readable!', 200);
+            throw new PathException(sprintf('The disk path (%s) is not readable!', $path), 200);
         }
 
         return false;

@@ -30,7 +30,7 @@ class Helper
     public static function register(string $name, callable $callable, bool $force = false): void
     {
         if (!$force && isset(self::$helpers[$name])) {
-            throw new ValueError('Helper (' . $name . ') already exists!');
+            throw new ValueError(sprintf('Helper (%s) already exists!', $name));
         }
 
         self::$helpers[$name] = $callable;
@@ -90,6 +90,6 @@ class Helper
             return self::$defName(...$arguments);
         }
 
-        throw new BadMethodCallException('helper method ' . $name . ' does not exist!');
+        throw new BadMethodCallException(sprintf('Helper (%s) does not exist!', $name));
     }
 }

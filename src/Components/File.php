@@ -18,7 +18,7 @@ class File
     public function __construct(private readonly string $filePath)
     {
         if (is_dir($this->filePath) || !is_writable($this->filePath)) {
-            throw new FileException($this->filePath . ' - file is not writable!');
+            throw new FileException(sprintf('File (%s) is not writable!', $this->filePath));
         }
 
         $this->handle = fopen($this->filePath, 'r+');
@@ -36,7 +36,7 @@ class File
     public function readLock(): bool
     {
         if (!flock($this->handle, LOCK_SH)) {
-            throw new FileException($this->filePath . ' - failed to lock file!');
+            throw new FileException(sprintf('File (%s) cannot be locked!', $this->filePath));
         }
         return true;
     }
@@ -48,7 +48,7 @@ class File
     public function writeLock(): bool
     {
         if (!flock($this->handle, LOCK_EX)) {
-            throw new FileException($this->filePath . ' - failed to lock file!');
+            throw new FileException(sprintf('File (%s) cannot be locked!', $this->filePath));
         }
         return true;
     }
@@ -60,7 +60,7 @@ class File
     public function unlock(): bool
     {
         if (!flock($this->handle, LOCK_UN)) {
-            throw new FileException($this->filePath . ' - failed to unlock file!');
+            throw new FileException(sprintf('File (%s) cannot be unlocked!', $this->filePath));
         }
         return true;
     }

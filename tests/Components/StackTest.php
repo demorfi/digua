@@ -170,7 +170,7 @@ class StackTest extends TestCase
     public function testThrowProxyingCallToInstance(string $stack): void
     {
         $this->expectException(BadMethodCallException::class);
-        $this->expectExceptionMessage('method never does not exist!');
+        $this->expectExceptionMessage('Method (never) does not exist!');
         $this->getStack($stack)->never();
     }
 }
