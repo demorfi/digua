@@ -4,7 +4,7 @@ namespace Digua\Components\Storage;
 
 use Digua\Helper;
 use Digua\Components\File;
-use Digua\Traits\{Configurable, DiskPath};
+use Digua\Traits\DiskPath;
 use Digua\Interfaces\Storage as StorageInterface;
 use Digua\Exceptions\{
     Path as PathException,
@@ -14,7 +14,7 @@ use Digua\Exceptions\{
 
 class DiskFile implements StorageInterface
 {
-    use Configurable, DiskPath;
+    use DiskPath;
 
     /**
      * @var string

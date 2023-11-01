@@ -2,13 +2,13 @@
 
 namespace Digua;
 
-use Digua\Traits\{Data, Configurable, DiskPath};
+use Digua\Traits\{Data, DiskPath};
 use Digua\Exceptions\Path as PathException;
 use Digua\Enums\FileExtension;
 
 class Config
 {
-    use Data, Configurable, DiskPath;
+    use Data, DiskPath;
 
     /**
      * @var string[]

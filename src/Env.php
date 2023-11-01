@@ -3,7 +3,7 @@
 namespace Digua;
 
 use Digua\Components\{DotEnv, Logger as LoggerStorage};
-use Digua\Traits\{Configurable, DiskPath};
+use Digua\Traits\DiskPath;
 use Digua\Enums\Env as EnvEnum;
 use Digua\Interfaces\Logger as LoggerInterface;
 use Digua\Exceptions\{
@@ -14,7 +14,7 @@ use Throwable;
 
 class Env
 {
-    use Configurable, DiskPath;
+    use DiskPath;
 
     /**
      * @var EnvEnum
