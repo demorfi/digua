@@ -4,6 +4,7 @@ namespace Tests\Traits;
 
 use Digua\Traits\Configurable;
 use PHPUnit\Framework\TestCase;
+use stdClass;
 
 class ConfigurableTest extends TestCase
 {
@@ -32,7 +33,7 @@ class ConfigurableTest extends TestCase
      */
     public function testSetAndGetConfigValue(): void
     {
-        $obj = new \stdClass();
+        $obj = new stdClass;
         $this->traitConfigurable::setConfigValue('index', 0);
         $this->traitConfigurable::setConfigValue('name obj', $obj);
         $this->traitConfigurable::setConfigValue('enabled', false);
