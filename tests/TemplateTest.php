@@ -50,7 +50,7 @@ class TemplateTest extends TestCase
     public function testThrowIsTemplateDirectoryIsNotReadable(): void
     {
         $this->expectException(PathException::class);
-        $this->expectExceptionMessage('The path (' . __DIR__ . '/templatePath) for ' . Template::class . ' is not readable!');
+        $this->expectExceptionMessage('The disk path (' . __DIR__ . '/templatePath) is not readable!');
         $this->expectExceptionCode(200);
 
         Template::setDiskPath(__DIR__ . '/templatePath');

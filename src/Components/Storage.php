@@ -28,7 +28,7 @@ class Storage
     public function __construct(string $storageName, mixed ...$arguments)
     {
         if (!is_subclass_of($storageName, StorageInterface::class)) {
-            throw new StorageException($storageName . ' - storage not found!');
+            throw new StorageException(sprintf('Storage (%s) not found!', $storageName));
         }
 
         $this->storage = new $storageName(...$arguments);
@@ -82,7 +82,7 @@ class Storage
     public function __call(string $name, array $arguments): mixed
     {
         if (!is_callable([$this->storage, $name])) {
-            throw new BadMethodCallException('method ' . $name . ' does not exist!');
+            throw new BadMethodCallException(sprintf('Method (%s) does not exist!', $name));
         }
 
         return $this->storage->$name(...$arguments);

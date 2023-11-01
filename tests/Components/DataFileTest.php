@@ -105,7 +105,7 @@ class DataFileTest extends TestCase
     public function testThrowProxyingCallToInstance(): void
     {
         $this->expectException(BadMethodCallException::class);
-        $this->expectExceptionMessage('method never does not exist!');
+        $this->expectExceptionMessage('Method (never) does not exist!');
         $this->dataFile->never();
     }
 }

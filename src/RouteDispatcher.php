@@ -77,7 +77,7 @@ class RouteDispatcher
 
         $controllerName = $this->route->getControllerName();
         if (empty($controllerName) || !is_subclass_of($controllerName, ControllerInterface::class)) {
-            throw new RouteException($controllerName . ' - controller not found!', 100);
+            throw new RouteException(sprintf('Controller (%s) not found!', $controllerName), 100);
         }
 
         $this->controller = new $controllerName($this->route->builder()->request());
@@ -85,11 +85,11 @@ class RouteDispatcher
 
         $actionName = $this->route->getControllerAction();
         if (empty($actionName) || !method_exists($this->controller, $actionName)) {
-            throw new RouteException($controllerName . '->' . $actionName . ' - action not found!', 200);
+            throw new RouteException(sprintf('Action (%s->%s) not found!', $controllerName, $actionName), 200);
         }
 
         if (!$this->route->isPermitted($this->controller)) {
-            throw new RouteException($controllerName . '->' . $actionName . ' - access not granted!', 300);
+            throw new RouteException(sprintf('Action (%s->%s) access not granted!', $controllerName, $actionName), 300);
         }
 
         return Response::create($this->controller->$actionName(...$this->route->provide($this->controller)));

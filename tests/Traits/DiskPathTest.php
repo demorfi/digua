@@ -104,7 +104,7 @@ class DiskPathTest extends TestCase
     public function testThrowIsNotConfiguredDiskPath(): void
     {
         $this->expectException(PathException::class);
-        $this->expectExceptionMessage('The path for ' . $this->traitDiskPath::class . ' is not configured!');
+        $this->expectExceptionMessage('The disk path for (' . $this->traitDiskPath::class . ') is not configured!');
         $this->expectExceptionCode(100);
 
         $this->traitDiskPath::setConfigValue('diskPath', null);
@@ -117,7 +117,7 @@ class DiskPathTest extends TestCase
     public function testThrowIsNotReadableDiskPath(): void
     {
         $this->expectException(PathException::class);
-        $this->expectExceptionMessage('The path (/testPath) for ' . $this->traitDiskPath::class . ' is not readable!');
+        $this->expectExceptionMessage('The disk path (/testPath) is not readable!');
         $this->expectExceptionCode(200);
 
         $this->traitDiskPath::setDiskPath('/testPath/');

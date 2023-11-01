@@ -47,7 +47,7 @@ class DotEnvTest extends TestCase
     {
         $filePath = __DIR__ . '/.env-not-found';
         $this->expectException(FileException::class);
-        $this->expectExceptionMessage('file ' . $filePath . ' does not exist!');
+        $this->expectExceptionMessage('File (' . $filePath . ') does not exist!');
         new DotEnv($filePath);
     }
 
@@ -59,7 +59,7 @@ class DotEnvTest extends TestCase
     {
         $filePath = __DIR__ . '/.env-unreadable';
         $this->expectException(FileException::class);
-        $this->expectExceptionMessage('file ' . $filePath . ' is unreadable!');
+        $this->expectExceptionMessage('File (' . $filePath . ') is unreadable!');
 
         // function is_readable redefined!
         (new DotEnv($filePath))->load();

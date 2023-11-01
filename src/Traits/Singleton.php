@@ -40,7 +40,7 @@ trait Singleton
     {
         $name = lcfirst(preg_replace('/^static/', '', $name));
         if (!method_exists(self::getInstance(), $name)) {
-            throw new BadMethodCallException('method ' . $name . ' does not exist!');
+            throw new BadMethodCallException(sprintf('Method (%s) does not exist!', $name));
         }
 
         return self::getInstance()->$name(...$arguments);

@@ -128,7 +128,7 @@ class Stack implements StackInterface
     public function __call(string $name, array $arguments): mixed
     {
         if (!is_callable([$this->storage, $name])) {
-            throw new BadMethodCallException('method ' . $name . ' does not exist!');
+            throw new BadMethodCallException(sprintf('Method (%s) does not exist!', $name));
         }
 
         return $this->storage->$name(...$arguments);

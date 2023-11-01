@@ -13,7 +13,7 @@ class DotEnv
     public function __construct(protected string $filePath)
     {
         if (!is_file($this->filePath)) {
-            throw new FileException(sprintf('file %s does not exist!', $this->filePath));
+            throw new FileException(sprintf('File (%s) does not exist!', $this->filePath));
         }
     }
 
@@ -24,7 +24,7 @@ class DotEnv
     public function load(): void
     {
         if (!is_readable($this->filePath)) {
-            throw new FileException(sprintf('file %s is unreadable!', $this->filePath));
+            throw new FileException(sprintf('File (%s) is unreadable!', $this->filePath));
         }
 
         if (!empty($envData = parse_ini_file($this->filePath))) {

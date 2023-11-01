@@ -42,7 +42,7 @@ class StorageTest extends TestCase
     public function testThrowInvalidStorageInstance(): void
     {
         $this->expectException(StorageException::class);
-        $this->expectExceptionMessage(self::class . ' - storage not found!');
+        $this->expectExceptionMessage('Storage (' . self::class . ') not found!');
         new Storage(self::class);
     }
 
@@ -87,7 +87,7 @@ class StorageTest extends TestCase
     public function testThrowProxyingCallToStorageInstance(): void
     {
         $this->expectException(BadMethodCallException::class);
-        $this->expectExceptionMessage('method never does not exist!');
+        $this->expectExceptionMessage('Method (never) does not exist!');
 
         $storage = new Storage(StubStorage::class);
         $storage->never();

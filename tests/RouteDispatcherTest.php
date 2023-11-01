@@ -144,7 +144,7 @@ class RouteDispatcherTest extends TestCase
         $route      = new RouteAsName('\App\Controllers\\', $this->builder);
 
         $this->expectException(RouteException::class);
-        $this->expectExceptionMessage('\App\Controllers\Main - controller not found!');
+        $this->expectExceptionMessage('Controller (\App\Controllers\Main) not found!');
         $this->expectExceptionCode(100);
         $dispatcher->delegate($route);
     }
@@ -160,7 +160,7 @@ class RouteDispatcherTest extends TestCase
         $route = new RouteAsName('', $this->builder);
 
         $this->expectException(RouteException::class);
-        $this->expectExceptionMessage('ControllerSuccess->unknownAction - action not found!');
+        $this->expectExceptionMessage('Action (Tests\Pacifiers\ControllerSuccess->unknownAction) not found!');
         $this->expectExceptionCode(200);
         $dispatcher->delegate($route);
     }
@@ -192,7 +192,7 @@ class RouteDispatcherTest extends TestCase
         $route = new RouteAsName('', $this->builder);
 
         $this->expectException(BaseException::class);
-        $this->expectExceptionMessage('Test - controller not found!');
+        $this->expectExceptionMessage('Controller (Test) not found!');
         $dispatcher->try($route, 'Test', '');
     }
 
@@ -275,7 +275,7 @@ class RouteDispatcherTest extends TestCase
 
         $route->expects($this->once())->method('isPermitted')->willReturn(false);
         $this->expectException(RouteException::class);
-        $this->expectExceptionMessage('ControllerSuccess->successAction - access not granted!');
+        $this->expectExceptionMessage('Action (Tests\Pacifiers\ControllerSuccess->successAction) access not granted!');
         $this->expectExceptionCode(300);
         $dispatcher->delegate($route);
     }

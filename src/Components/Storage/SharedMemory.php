@@ -81,7 +81,7 @@ class SharedMemory implements StorageInterface, JsonSerializable
     {
         $this->shmId = shmop_open(crc32($this->name), 'c', 0644, $this->size + $this->offset);
         if ($this->shmId === false) {
-            throw new MemorySharedException('Error when connecting to shared memory through the key ' . $this->name);
+            throw new MemorySharedException(sprintf('Error when connecting to shared memory through the key: %s', $this->name));
         }
     }
 
@@ -106,7 +106,7 @@ class SharedMemory implements StorageInterface, JsonSerializable
         if ($size > $this->size) {
             throw new MemorySharedException(
                 sprintf(
-                    'The allowed memory limit has been exceeded. Requested %d out of %d possible',
+                    'The allowed memory limit has been exceeded. Requested %d out of %d possible!',
                     $size,
                     $this->size
                 )
@@ -188,7 +188,7 @@ class SharedMemory implements StorageInterface, JsonSerializable
                 shmop_write($this->shmId, self::FLAG_LOCK, 0);
                 shmop_write($this->shmId, $data, $this->offset);
             } catch (ValueError $e) {
-                throw new MemorySharedException('Error when trying to write to shared memory - ' . $e->getMessage());
+                throw new MemorySharedException(sprintf('Error when trying to write to shared memory: %s', $e->getMessage()));
             } finally {
                 shmop_write($this->shmId, self::FLAG_UNLOCK, 0);
             }
@@ -219,7 +219,7 @@ class SharedMemory implements StorageInterface, JsonSerializable
 
                 shmop_write($this->shmId, $data, $this->offset);
             } catch (MemoryException|ValueError $e) {
-                throw new MemorySharedException('Error when trying to write to shared memory - ' . $e->getMessage());
+                throw new MemorySharedException(sprintf('Error when trying to write to shared memory: %s', $e->getMessage()));
             } finally {
                 shmop_write($this->shmId, self::FLAG_UNLOCK, 0);
             }
