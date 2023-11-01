@@ -13,6 +13,14 @@ trait Output
     }
 
     /**
+     * @return bool
+     */
+    public function stopBuffer(): bool
+    {
+        return ob_end_flush();
+    }
+
+    /**
      * @return string|false
      */
     public function flushBuffer(): string|false
