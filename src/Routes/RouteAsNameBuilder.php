@@ -10,12 +10,12 @@ use Digua\Interfaces\{
 class RouteAsNameBuilder implements RouteBuilderInterface
 {
     /**
-     * @var string|null
+     * @var ?string
      */
     private ?string $controllerName;
 
     /**
-     * @var string|null
+     * @var ?string
      */
     private ?string $actionName;
 

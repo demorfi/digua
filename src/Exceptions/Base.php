@@ -10,9 +10,9 @@ use Throwable;
 class Base extends Exception implements ExceptionInterface
 {
     /**
-     * @param string         $message
-     * @param int            $code
-     * @param Throwable|null $previous
+     * @param string     $message
+     * @param int        $code
+     * @param ?Throwable $previous
      * @uses LateEvent::notify()
      */
     public function __construct(string $message = '', int $code = 0, ?Throwable $previous = null)
