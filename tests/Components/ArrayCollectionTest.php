@@ -70,6 +70,17 @@ class ArrayCollectionTest extends TestCase
     /**
      * @return void
      */
+    public function testAppendElement(): void
+    {
+        $collection = ArrayCollection::make();
+        $collection->append('value1');
+        $collection->append('value2');
+        $this->assertSame($collection->getAll(), ['value1', 'value2']);
+    }
+
+    /**
+     * @return void
+     */
     public function testGetFirstElement(): void
     {
         $this->assertSame('value1', ArrayCollection::make(['foo' => 'value1', 'bar' => 'value2'])->first());
