@@ -92,8 +92,8 @@ class File
     }
 
     /**
-     * @param int      $offset
-     * @param int|null $length
+     * @param int  $offset
+     * @param ?int $length
      * @return string
      */
     public function readLeft(int $offset = 0, ?int $length = null): string
@@ -104,8 +104,8 @@ class File
     }
 
     /**
-     * @param int      $offset
-     * @param int|null $length
+     * @param int  $offset
+     * @param ?int $length
      * @return string
      */
     public function readRight(int $offset = 0, ?int $length = null): string
@@ -116,9 +116,9 @@ class File
     }
 
     /**
-     * @param string   $data
-     * @param int      $offset
-     * @param int|null $length
+     * @param string $data
+     * @param int    $offset
+     * @param ?int   $length
      * @return bool
      */
     public function writeLeft(string $data, int $offset = 0, ?int $length = null): bool
@@ -128,9 +128,9 @@ class File
     }
 
     /**
-     * @param string   $data
-     * @param int      $offset
-     * @param int|null $length
+     * @param string $data
+     * @param int    $offset
+     * @param ?int   $length
      * @return bool
      */
     public function writeRight(string $data, int $offset = 0, ?int $length = null): bool

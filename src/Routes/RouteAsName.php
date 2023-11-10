@@ -23,12 +23,12 @@ use ReflectionException;
 class RouteAsName implements RouteInterface
 {
     /**
-     * @var string|null
+     * @var ?string
      */
     private ?string $controllerName;
 
     /**
-     * @var string|null
+     * @var ?string
      */
     private ?string $actionName;
 

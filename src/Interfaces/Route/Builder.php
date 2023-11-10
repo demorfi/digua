@@ -17,12 +17,12 @@ interface Builder
     public function request(): RequestInterface;
 
     /**
-     * @return string|null
+     * @return ?string
      */
     public function getControllerName(): ?string;
 
     /**
-     * @return string|null
+     * @return ?string
      */
     public function getActionName(): ?string;
 

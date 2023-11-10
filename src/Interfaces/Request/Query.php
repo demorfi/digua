@@ -42,9 +42,9 @@ interface Query
 
     /**
      * @param int|string ...$variables
-     * @return array|null
+     * @return ?array
      */
-    public function getFromPath(int|string ...$variables): array|null;
+    public function getFromPath(int|string ...$variables): ?array;
 
     /**
      * @param string ...$path
