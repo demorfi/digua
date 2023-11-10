@@ -77,6 +77,15 @@ class ArrayCollection implements NamedCollection, Countable, ArrayAccess, Iterat
     }
 
     /**
+     * @param mixed $value
+     * @return void
+     */
+    public function append(mixed $value): void
+    {
+        $this->offsetSet(null, $value);
+    }
+
+    /**
      * @return mixed
      */
     public function first(): mixed
