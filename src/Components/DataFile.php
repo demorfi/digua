@@ -34,12 +34,12 @@ class DataFile implements JsonSerializable
 
     /**
      * @param string $fileName Storage file name
-     * @return self
+     * @return static
      * @throws StorageException
      */
-    public static function create(string $fileName): self
+    public static function create(string $fileName): static
     {
-        return new self($fileName);
+        return new static($fileName);
     }
 
     /**
