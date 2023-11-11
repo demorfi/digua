@@ -15,9 +15,9 @@ interface Storage
     public function getName(): string;
 
     /**
-     * @return ?string
+     * @return string|array|null
      */
-    public function read(): ?string;
+    public function read(): string|array|null;
 
     /**
      * @param string $data
