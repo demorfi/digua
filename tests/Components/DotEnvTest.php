@@ -66,6 +66,7 @@ class DotEnvTest extends TestCase
     }
 
     /**
+     * @runInSeparateProcess
      * @return void
      * @throws FileException
      */
@@ -76,5 +77,33 @@ class DotEnvTest extends TestCase
         // function is_readable redefined!
         (new DotEnv(__DIR__ . '/.env-readable'))->load();
         $this->assertSame('ENV_VALUE', getenv('ENV_KEY'));
+    }
+
+    /**
+     * @runInSeparateProcess
+     * @return void
+     * @throws FileException
+     */
+    public function testIsItImpossibleRedefineGlobalEnv(): void
+    {
+        $_ENV['ENV_KEY'] = 'SYS_ENV';
+
+        // function is_readable redefined!
+        (new DotEnv(__DIR__ . '/.env-readable'))->load();
+        $this->assertFalse(getenv('ENV_KEY'));
+    }
+
+    /**
+     * @runInSeparateProcess
+     * @return void
+     * @throws FileException
+     */
+    public function testIsItImpossibleRedefineGlobalServer(): void
+    {
+        $_SERVER['ENV_KEY'] = 'SYS_ENV';
+
+        // function is_readable redefined!
+        (new DotEnv(__DIR__ . '/.env-readable'))->load();
+        $this->assertFalse(getenv('ENV_KEY'));
     }
 }
