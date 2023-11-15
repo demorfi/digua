@@ -65,4 +65,19 @@ class EventTest extends TestCase
         $event = new Event(['called' => 'string']);
         $event->called();
     }
+
+    /**
+     * @return void
+     */
+    public function testIsItPossibleSetAndGetEventId(): void
+    {
+        $event = new Event();
+        $this->assertNull($event->getId());
+
+        $event = new Event(id: 12345);
+        $this->assertSame(12345, $event->getId());
+
+        $event = new Event(id: 'eventId');
+        $this->assertSame('eventId', $event->getId());
+    }
 }
