@@ -22,9 +22,10 @@ class Event
     protected mixed $previous = null;
 
     /**
-     * @param array $params
+     * @param array           $params
+     * @param int|string|null $id
      */
-    public function __construct(array $params = [])
+    public function __construct(array $params = [], protected int|string|null $id = null)
     {
         foreach ($params as $key => $value) {
             $this->__set($key, $value);
@@ -32,12 +33,13 @@ class Event
     }
 
     /**
-     * @param array $params
+     * @param array           $params
+     * @param int|string|null $id
      * @return static
      */
-    public static function make(array $params = []): static
+    public static function make(array $params = [], int|string|null $id = null): static
     {
-        return new static($params);
+        return new static($params, $id);
     }
 
     /**
@@ -70,6 +72,14 @@ class Event
         }
 
         return $this->previous;
+    }
+
+    /**
+     * @return int|string|null
+     */
+    public function getId(): int|string|null
+    {
+        return $this->id;
     }
 
     /**
