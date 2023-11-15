@@ -29,7 +29,9 @@ class DotEnv
 
         if (!empty($envData = parse_ini_file($this->filePath))) {
             foreach ($envData as $envKey => $envValue) {
-                putenv(sprintf('%s=%s', $envKey, $envValue));
+                if (!isset($_ENV[$envKey]) && !isset($_SERVER[$envKey])) {
+                    putenv(sprintf('%s=%s', $envKey, $envValue));
+                }
             }
         }
     }

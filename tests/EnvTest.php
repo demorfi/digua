@@ -126,6 +126,7 @@ class EnvTest extends TestCase
     }
 
     /**
+     * @runInSeparateProcess
      * @return void
      * @throws FileException
      */
@@ -140,6 +141,7 @@ class EnvTest extends TestCase
     }
 
     /**
+     * @runInSeparateProcess
      * @return void
      * @throws FileException
      */
@@ -154,6 +156,7 @@ class EnvTest extends TestCase
     }
 
     /**
+     * @runInSeparateProcess
      * @return void
      * @throws FileException
      */
@@ -167,6 +170,34 @@ class EnvTest extends TestCase
     }
 
     /**
+     * @runInSeparateProcess
+     * @return void
+     * @throws FileException
+     */
+    public function testGetGlobalEnvValue(): void
+    {
+        file_put_contents(__DIR__ . '/.env', 'APP_TEST_ENV=VALUE_TEST');
+        $_ENV['APP_TEST_ENV'] = 'VALUE_GLOBAL_TEST';
+        Env::run();
+        $this->assertSame('VALUE_GLOBAL_TEST', Env::get('APP_TEST_ENV'));
+    }
+
+    /**
+     * @runInSeparateProcess
+     * @return void
+     * @throws FileException
+     */
+    public function testGetGlobalServerValue(): void
+    {
+        file_put_contents(__DIR__ . '/.env', 'APP_TEST_ENV=VALUE_TEST');
+        $_SERVER['APP_TEST_ENV'] = 'VALUE_GLOBAL_TEST';
+
+        Env::run();
+        $this->assertSame('VALUE_GLOBAL_TEST', Env::get('APP_TEST_ENV'));
+    }
+
+    /**
+     * @runInSeparateProcess
      * @return void
      * @throws FileException
      */
@@ -174,7 +205,7 @@ class EnvTest extends TestCase
     {
         file_put_contents(__DIR__ . '/.env', 'APP_TEST_ENV=VALUE_TEST');
         Env::run();
-        $this->assertFalse( Env::get('APP_TEST_DEFAULT'));
+        $this->assertFalse(Env::get('APP_TEST_DEFAULT'));
         $this->assertSame('DEFAULT_VALUE', Env::get('APP_TEST_DEFAULT', 'DEFAULT_VALUE'));
     }
 
