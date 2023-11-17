@@ -67,6 +67,7 @@ class Event
      */
     public function __invoke(mixed ...$arguments): mixed
     {
+        $this->previous = null;
         foreach ($this->handlers as $handler) {
             $this->previous = $handler($this, $this->previous, ...$arguments);
         }
