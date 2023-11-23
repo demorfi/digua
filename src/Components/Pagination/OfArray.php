@@ -3,7 +3,6 @@
 namespace Digua\Components\Pagination;
 
 use JsonSerializable;
-use Generator;
 
 class OfArray implements JsonSerializable
 {
@@ -157,9 +156,9 @@ class OfArray implements JsonSerializable
      * Get generation navigation list.
      *
      * @param ?string $url Prepend url path before /page/
-     * @return Generator
+     * @return iterable
      */
-    public function getNavigation(string $url = null): Generator
+    public function getNavigation(string $url = null): iterable
     {
         for ($i = 1; $i <= $this->total; $i++) {
             yield [

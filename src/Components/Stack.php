@@ -7,7 +7,6 @@ use Digua\Interfaces\{
     Stack as StackInterface
 };
 use Digua\Exceptions\BadMethodCall as BadMethodCallException;
-use Generator;
 
 /**
  * @mixin Storage|StorageInterface
@@ -73,7 +72,7 @@ class Stack implements StackInterface
     /**
      * @inheritdoc
      */
-    public function read(): Generator|false
+    public function read(): iterable|false
     {
         while (true) {
             $data = $this->pull();
@@ -88,7 +87,7 @@ class Stack implements StackInterface
     /**
      * @inheritdoc
      */
-    public function readReverse(): Generator|false
+    public function readReverse(): iterable|false
     {
         while (true) {
             $data = $this->shift();
@@ -103,7 +102,7 @@ class Stack implements StackInterface
     /**
      * @inheritdoc
      */
-    public function shadow(): Generator
+    public function shadow(): iterable
     {
         $stack = $this->unpack($this->storage->read());
         foreach ($stack as $value) {

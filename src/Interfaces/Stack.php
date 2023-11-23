@@ -2,8 +2,6 @@
 
 namespace Digua\Interfaces;
 
-use Generator;
-
 interface Stack
 {
     /**
@@ -23,19 +21,19 @@ interface Stack
     public function shift(): mixed;
 
     /**
-     * @return Generator|false
+     * @return iterable|false
      */
-    public function read(): Generator|false;
+    public function read(): iterable|false;
 
     /**
-     * @return Generator|false
+     * @return iterable|false
      */
-    public function readReverse(): Generator|false;
+    public function readReverse(): iterable|false;
 
     /**
-     * @return Generator
+     * @return iterable
      */
-    public function shadow(): Generator;
+    public function shadow(): iterable;
 
     /**
      * @return int
