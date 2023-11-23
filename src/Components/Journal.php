@@ -6,12 +6,11 @@ use Digua\Components\DataFile as DiskFileJsonStorage;
 use Digua\Enums\SortType;
 use Digua\Exceptions\Storage as StorageException;
 use Digua\Traits\Singleton;
-use Generator;
 
 /**
  * @method static bool staticPush(string ...$message);
  * @method static bool staticFlush(int $offset = 0);
- * @method static Generator staticGetJournal(int $limit = 0, SortType $sort = SortType::DESC);
+ * @method static iterable staticGetJournal(int $limit = 0, SortType $sort = SortType::DESC);
  * @method static int staticSize();
  */
 class Journal
@@ -93,9 +92,9 @@ class Journal
     /**
      * @param int      $limit
      * @param SortType $sort
-     * @return Generator
+     * @return iterable
      */
-    public function getJournal(int $limit = 0, SortType $sort = SortType::DESC): Generator
+    public function getJournal(int $limit = 0, SortType $sort = SortType::DESC): iterable
     {
         $journal = $this->getAll($limit, $sort);
         foreach ($journal as $key => $item) {
