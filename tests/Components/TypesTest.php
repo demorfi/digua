@@ -2,12 +2,12 @@
 
 namespace Tests\Components;
 
-use Digua\Components\Types;
+use Digua\Components\{Types, ArrayCollection};
 use PHPUnit\Framework\TestCase;
 
 class TypesTest extends TestCase
 {
-    const TYPES = ['bool', 'boolean', 'int', 'integer', 'double', 'float', 'string', 'array', 'object', 'null'];
+    const TYPES = ['bool', 'boolean', 'int', 'integer', 'double', 'float', 'string', 'array', 'object', 'null', 'collection'];
 
     /**
      * @return array[]
@@ -15,13 +15,14 @@ class TypesTest extends TestCase
     protected function dataTypesProvider(): array
     {
         return [
-            'null'   => ['null', 'null', null],
-            'bool'   => ['bool', 'boolean', true, false],
-            'int'    => ['int', 'integer', PHP_INT_MIN, PHP_INT_MAX],
-            'float'  => ['float', 'float', PHP_FLOAT_MIN, PHP_FLOAT_MAX],
-            'string' => ['string', 'string', 'test string'],
-            'array'  => ['array', 'array', []],
-            'object' => ['object', 'object', $this]
+            'null'       => ['null', 'null', null],
+            'bool'       => ['bool', 'boolean', true, false],
+            'int'        => ['int', 'integer', PHP_INT_MIN, PHP_INT_MAX],
+            'float'      => ['float', 'float', PHP_FLOAT_MIN, PHP_FLOAT_MAX],
+            'string'     => ['string', 'string', 'test string'],
+            'array'      => ['array', 'array', []],
+            'object'     => ['object', 'object', $this],
+            'collection' => ['object', 'collection', new ArrayCollection]
         ];
     }
 
@@ -64,8 +65,6 @@ class TypesTest extends TestCase
     {
         $this->assertSame($shortName, Types::type($shortName)->getNameShort());
         $this->assertSame($shortName, Types::type($longName)->getNameShort());
-
-        $this->assertSame($longName, Types::type($shortName)->getNameLong());
         $this->assertSame($longName, Types::type($longName)->getNameLong());
     }
 
@@ -120,7 +119,7 @@ class TypesTest extends TestCase
                     continue;
                 }
 
-                $this->assertSame($tType->getNameLong(), $tValue->to($type)->getNameLong());
+                $this->assertSame($tType->getNameShort(), $tValue->to($type)->getNameShort());
             }
         }
     }

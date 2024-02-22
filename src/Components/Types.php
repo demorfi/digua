@@ -4,7 +4,7 @@ namespace Digua\Components;
 
 class Types
 {
-    const ALIAS_TYPES = ['boolean' => 'bool', 'integer' => 'int'];
+    const ALIAS_TYPES = ['boolean' => 'bool', 'integer' => 'int', 'collection' => 'object'];
 
     /**
      * @var string
@@ -23,7 +23,14 @@ class Types
     {
         $type = strtolower(gettype($this->value));
 
-        $this->long  = $type === 'double' ? 'float' : $type;
+        $this->long  = match ($type) {
+            'double' => 'float',
+            'object' => match (true) {
+                $this->value instanceof ArrayCollection => 'collection',
+                default => $type
+            },
+            default => $type
+        };
         $this->short = self::ALIAS_TYPES[$this->long] ?? $this->long;
     }
 
@@ -42,7 +49,11 @@ class Types
      */
     public static function type(string $type): static
     {
-        settype($type, $type);
+        $realType = self::ALIAS_TYPES[$type] ?? $type;
+        match ($type) {
+            'collection' => $type = new ArrayCollection,
+            default => settype($type, $realType)
+        };
         return new static($type);
     }
 
@@ -52,11 +63,16 @@ class Types
      */
     public function to(string $type): static
     {
-        $value = $this->value;
-        if (($type == 'bool' || $type == 'boolean') && ($value === 'true' || $value === 'false')) {
+        $realType = self::ALIAS_TYPES[$type] ?? $type;
+        $value    = $this->value;
+        if ($realType == 'bool' && ($value === 'true' || $value === 'false')) {
             $value = $value === 'true';
         } else {
-            settype($value, $type);
+            settype($value, $realType);
+            $value = match ($type) {
+                'collection' => new ArrayCollection((array)$value),
+                default => $value
+            };
         }
         return new static($value);
     }
@@ -91,7 +107,8 @@ class Types
      */
     public function is(string $type): bool
     {
-        return $this->short === $type || $this->long === $type || $this->value instanceof $type;
+        $realType = self::ALIAS_TYPES[$type] ?? $type;
+        return $this->short === $realType || $this->value instanceof $type;
     }
 
     /**
