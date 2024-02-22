@@ -175,4 +175,40 @@ class DataTest extends TestCase
         $this->assertSame($this->traitData->getAll(), ['key3' => 'value3', 'key4' => 'value4', 'key5' => 'value5']);
         $this->assertSame($this->traitData->size(), 3);
     }
+
+    /**
+     * @return void
+     */
+    public function testIsItPossibleCallMethod(): void
+    {
+        $this->traitData->set('key', __METHOD__);
+        $result = $this->traitData->callWrap(fn(&$traitData) => $traitData->get('key'));
+        $this->assertSame($result, __METHOD__);
+    }
+
+    /**
+     * @return void
+     */
+    public function testIsItPossibleCallIfConditionBool(): void
+    {
+        $this->traitData->set('key', __METHOD__);
+        $result = $this->traitData->callWrapIfTrue(fn(&$traitData) => $traitData->get('key'), true);
+        $this->assertSame($result, __METHOD__);
+
+        $result = $this->traitData->callWrapIfTrue(fn(&$traitData) => $traitData->get('key'), false);
+        $this->assertNull($result);
+    }
+
+    /**
+     * @return void
+     */
+    public function testIsItPossibleCallIfConditionCallable(): void
+    {
+        $this->traitData->set('key', __METHOD__);
+        $result = $this->traitData->callWrapIfTrue(fn(&$traitData) => $traitData->get('key'), fn() => true);
+        $this->assertSame($result, __METHOD__);
+
+        $result = $this->traitData->callWrapIfTrue(fn(&$traitData) => $traitData->get('key'), fn() => false);
+        $this->assertNull($result);
+    }
 }

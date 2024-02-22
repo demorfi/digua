@@ -165,4 +165,23 @@ trait Data
     {
         $this->array = $array;
     }
+
+    /**
+     * @param callable $callable
+     * @return mixed
+     */
+    public function callWrap(callable $callable): mixed
+    {
+        return $callable($this);
+    }
+
+    /**
+     * @param callable      $callable
+     * @param bool|callable $condition
+     * @return mixed
+     */
+    public function callWrapIfTrue(callable $callable, bool|callable $condition): mixed
+    {
+        return (is_callable($condition) && $condition($this) === true) || $condition === true ? $this->callWrap($callable) : null;
+    }
 }
