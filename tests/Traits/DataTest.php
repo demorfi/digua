@@ -196,7 +196,7 @@ class DataTest extends TestCase
         $this->assertSame($result, __METHOD__);
 
         $result = $this->traitData->callWrapIfTrue(fn(&$traitData) => $traitData->get('key'), false);
-        $this->assertNull($result);
+        $this->assertSame($result, $this->traitData);
     }
 
     /**
@@ -205,10 +205,12 @@ class DataTest extends TestCase
     public function testIsItPossibleCallIfConditionCallable(): void
     {
         $this->traitData->set('key', __METHOD__);
-        $result = $this->traitData->callWrapIfTrue(fn(&$traitData) => $traitData->get('key'), fn() => true);
+        $result = $this->traitData->callWrapIfTrue(fn(&$traitData) => $traitData->get('key'),
+            fn(&$traitData) => $traitData->size() > 0);
         $this->assertSame($result, __METHOD__);
 
-        $result = $this->traitData->callWrapIfTrue(fn(&$traitData) => $traitData->get('key'), fn() => false);
-        $this->assertNull($result);
+        $result = $this->traitData->callWrapIfTrue(fn(&$traitData) => $traitData->get('key'),
+            fn(&$traitData) => $traitData->size() < 0);
+        $this->assertSame($result, $this->traitData);
     }
 }
