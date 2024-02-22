@@ -182,6 +182,6 @@ trait Data
      */
     public function callWrapIfTrue(callable $callable, bool|callable $condition): mixed
     {
-        return (is_callable($condition) && $condition($this) === true) || $condition === true ? $this->callWrap($callable) : null;
+        return (is_callable($condition) && $condition($this) === true) || $condition === true ? $this->callWrap($callable) : $this;
     }
 }
