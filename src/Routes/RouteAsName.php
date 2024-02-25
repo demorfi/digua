@@ -14,7 +14,8 @@ use Digua\Interfaces\{
 };
 use Digua\Exceptions\{
     Base as BaseException,
-    Injector as InjectorException
+    Injector as InjectorException,
+    Route as RouteException
 };
 use ReflectionAttribute;
 use ReflectionMethod;
@@ -186,14 +187,20 @@ class RouteAsName implements RouteInterface
     /**
      * @param ControllerInterface $controller
      * @return array
-     * @throws InjectorException
-     * @throws ReflectionException
+     * @throws BaseException
+     * @throws RouteException
      */
     public function provide(ControllerInterface $controller): array
     {
-        $injector = $this->injector ?? new Injector($controller, $this->getControllerAction());
-        $injector->addProvider(new RouteAsNameProvider($this->builder->request()));
-        $injector->addProvider(new RegistryProvider($this->builder->request()));
-        return $injector->inject();
+        try {
+            $injector = $this->injector ?? new Injector($controller, $this->getControllerAction());
+            $injector->addProvider(new RouteAsNameProvider($this->builder->request()));
+            $injector->addProvider(new RegistryProvider($this->builder->request()));
+            return $injector->inject();
+        } catch (InjectorException $e) {
+            throw new RouteException($e->getMessage(), 400, $e);
+        } catch (ReflectionException $e) {
+            throw new BaseException($e->getMessage(), 401, $e);
+        }
     }
 }
