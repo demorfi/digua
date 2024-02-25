@@ -53,6 +53,7 @@ class Injector implements InjectorInterface
     private function throw(ReflectionParameter $parameter, string $message): void
     {
         throw new InjectorException(
+            $parameter,
             sprintf(
                 $message . ' for {%s->%s(%s $%s)}',
                 $parameter->getDeclaringClass()->getName(),
