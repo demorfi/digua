@@ -12,7 +12,7 @@ use Digua\Interfaces\{
 };
 use Digua\Exceptions\{
     Base as BaseException,
-    Injector as InjectorException
+    Route as RouteException
 };
 use PHPUnit\Framework\TestCase;
 use Tests\Pacifiers\{ControllerSuccess, ControllerFailure, GuardianAttribute, StubService};
@@ -195,8 +195,8 @@ class RouteAsNameTest extends TestCase
 
     /**
      * @return void
-     * @throws InjectorException
-     * @throws ReflectionException
+     * @throws BaseException
+     * @throws RouteException
      */
     public function testIsItPossibleToGetInjectInProvide(): void
     {
@@ -210,7 +210,7 @@ class RouteAsNameTest extends TestCase
 
         $this->route->addInjector($injector);
 
-        $injector->expects($this->exactly(2))
+        $injector->expects($this->exactly(3))
             ->method('addProvider')
             ->with($this->containsOnlyInstancesOf(ProviderInterface::class));
 

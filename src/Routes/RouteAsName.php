@@ -198,6 +198,7 @@ class RouteAsName implements RouteInterface
         try {
             $injector = $this->injector ?? new Injector($controller, $this->getControllerAction());
             $injector->addProvider(new NamedCollectionProvider($this->builder->request()->getData()->query()));
+            $injector->addProvider(new NamedCollectionProvider($this->builder->request()->getData()->post()));
             $injector->addProvider(new RegistryProvider($this->builder->request()));
             return $injector->inject();
         } catch (InjectorException $e) {
