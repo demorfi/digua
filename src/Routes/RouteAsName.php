@@ -3,7 +3,10 @@
 namespace Digua\Routes;
 
 use Digua\Injector;
-use Digua\Providers\Registry as RegistryProvider;
+use Digua\Providers\{
+    Registry as RegistryProvider,
+    NamedCollection as NamedCollectionProvider
+};
 use Digua\Attributes\Guardian as GuardianAttribute;
 use Digua\Interfaces\{
     Controller as ControllerInterface,
@@ -194,7 +197,7 @@ class RouteAsName implements RouteInterface
     {
         try {
             $injector = $this->injector ?? new Injector($controller, $this->getControllerAction());
-            $injector->addProvider(new RouteAsNameProvider($this->builder->request()));
+            $injector->addProvider(new NamedCollectionProvider($this->builder->request()->getData()->query()));
             $injector->addProvider(new RegistryProvider($this->builder->request()));
             return $injector->inject();
         } catch (InjectorException $e) {
