@@ -21,13 +21,21 @@ class DataFile implements JsonSerializable
     /**
      * @var Storage|StorageInterface
      */
-    protected readonly Storage|StorageInterface $storage;
+    protected Storage|StorageInterface $storage;
 
     /**
      * @param string $fileName Storage file name
      * @throws StorageException
      */
-    public function __construct(protected string $fileName)
+    public function __construct(protected readonly string $fileName)
+    {
+        $this->init();
+    }
+
+    /**
+     * @throws StorageException
+     */
+    protected function init(): void
     {
         $this->storage = Storage::makeDiskFile($this->fileName . FileExtension::JSON->value);
     }
@@ -44,7 +52,6 @@ class DataFile implements JsonSerializable
 
     /**
      * @return array
-     * @throws StorageException
      */
     public function read(): array
     {
@@ -55,7 +62,6 @@ class DataFile implements JsonSerializable
     /**
      * @param array $data
      * @return bool
-     * @throws StorageException
      */
     public function write(array $data): bool
     {
@@ -79,7 +85,6 @@ class DataFile implements JsonSerializable
 
     /**
      * @return bool
-     * @throws StorageException
      */
     public function save(): bool
     {
