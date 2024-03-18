@@ -2,7 +2,6 @@
 
 namespace Digua\Components;
 
-use Digua\Components\DataFile as DiskFileJsonStorage;
 use Digua\Enums\SortType;
 use Digua\Exceptions\Storage as StorageException;
 use Digua\Traits\Singleton;
@@ -18,14 +17,19 @@ class Journal
     use Singleton;
 
     /**
-     * @var Storage|DiskFileJsonStorage
+     * @var DataFile
      */
-    protected readonly Storage|DiskFileJsonStorage $dataFile;
+    protected DataFile $dataFile;
+
+    protected function __construct()
+    {
+        $this->init();
+    }
 
     /**
-     * @throws StorageException
+     * @return void
      */
-    protected function __construct()
+    protected function init(): void
     {
         $this->dataFile = new DataFile('journal');
         $this->dataFile->read();
@@ -56,7 +60,6 @@ class Journal
      *
      * @param int $offset
      * @return bool
-     * @throws StorageException
      */
     public function flush(int $offset = 0): bool
     {
