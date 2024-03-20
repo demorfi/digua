@@ -6,6 +6,8 @@ enum FileExtension: string
 {
     case COOKIE = '.cookie';
 
+    case JDB = '.jdb';
+
     case JSON = '.json';
 
     case LOG = '.log';

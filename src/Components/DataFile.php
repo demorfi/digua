@@ -37,7 +37,7 @@ class DataFile implements JsonSerializable
      */
     protected function init(): void
     {
-        $this->storage = Storage::makeDiskFile($this->fileName . FileExtension::JSON->value);
+        $this->storage = Storage::makeDiskFile($this->fileName . FileExtension::JDB->value);
     }
 
     /**

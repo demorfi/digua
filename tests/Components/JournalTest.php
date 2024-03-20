@@ -5,7 +5,7 @@ namespace Tests\Components;
 use Digua\Components\Storage\DiskFile;
 use Digua\Components\Journal;
 use Digua\Exceptions\Storage as StorageException;
-use Digua\Enums\SortType;
+use Digua\Enums\{SortType, FileExtension};
 use PHPUnit\Framework\TestCase;
 
 class JournalTest extends TestCase
@@ -27,7 +27,7 @@ class JournalTest extends TestCase
      */
     protected function tearDown(): void
     {
-        @unlink(__DIR__ . '/journal.json');
+        @unlink(__DIR__ . '/journal' . FileExtension::JDB->value);
     }
 
     /**
