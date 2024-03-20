@@ -11,6 +11,7 @@ use Exception;
 
 /**
  * @method static string filterFileName(string $fileName);
+ * @method static string filterFilePath(string $filePath);
  * @method static int makeIntHash();
  */
 class Helper
@@ -46,12 +47,22 @@ class Helper
     }
 
     /**
-     * @param string $fileName Allows only symbols A-Za-z/0-9-_.
+     * @param string $fileName Allows only symbols A-Za-z0-9-_@#$%.
      * @return string
+     * @uses filterFilePath
      */
     protected static function defaultFilterFileName(string $fileName): string
     {
-        return preg_replace(['/[^A-Za-z0-9\-_.\/]/', '/\.{2,}/', '/\/{2,}|\/$/', '/\.+\//'], '', $fileName);
+        return str_replace('/', '', self::filterFilePath($fileName));
+    }
+
+    /**
+     * @param string $filePath Allows only symbols A-Za-z/0-9-_@#$%.
+     * @return string
+     */
+    protected static function defaultFilterFilePath(string $filePath): string
+    {
+        return preg_replace(['/[^A-Za-z0-9\-_@#$%.\/]/', '/\.{2,}/', '/\/{2,}|\/$/', '/\.+\//'], '', $filePath);
     }
 
     /**

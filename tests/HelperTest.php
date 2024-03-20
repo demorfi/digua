@@ -43,7 +43,15 @@ class HelperTest extends TestCase
      */
     public function testHelperFilterFileName(): void
     {
-        $this->assertSame('test/1string-data.lg', Helper::filterFileName('+test/1; string-da&ta.lg?'));
+        $this->assertSame('$test1@str%ing-#data.lg', Helper::filterFileName('$+test/1;@str%ing-#da&ta.lg?'));
+    }
+
+    /**
+     * @return void
+     */
+    public function testHelperFilterFilePath(): void
+    {
+        $this->assertSame('$test/1@str%ing-#data.lg', Helper::filterFilePath('$+test/1;@str%ing-#da&ta.lg?'));
     }
 
     /**

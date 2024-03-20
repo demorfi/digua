@@ -128,7 +128,7 @@ class TemplateAsPHPEngine implements TemplateEngineInterface
      */
     protected function view(string $template, array $variables = []): void
     {
-        $filePath = $this->path . '/' . Helper::filterFileName($template) . FileExtension::TPL->value;
+        $filePath = $this->path . '/' . Helper::filterFilePath($template) . FileExtension::TPL->value;
         if (!is_readable($filePath)) {
             throw new TemplateException(sprintf('Template (%s) not found!', $filePath));
         }
