@@ -2,7 +2,7 @@
 
 namespace Tests\Request;
 
-use Digua\Request\{Data, Cookies, Post, Query};
+use Digua\Request\{Data, Cookies, Post, Query, Files};
 use PHPUnit\Framework\TestCase;
 
 class DataTest extends TestCase
@@ -42,5 +42,13 @@ class DataTest extends TestCase
     public function testCookiesObjectIsReturned(): void
     {
         $this->assertInstanceOf(Cookies::class, $this->data->cookies());
+    }
+
+    /**
+     * @return void
+     */
+    public function testFilesObjectIsReturned(): void
+    {
+        $this->assertInstanceOf(Files::class, $this->data->files());
     }
 }

@@ -10,11 +10,13 @@ class Data implements RequestDataInterface
      * @param Post    $post
      * @param Query   $query
      * @param Cookies $cookies
+     * @param Files   $files
      */
     public function __construct(
         private readonly Post $post = new Post,
         private readonly Query $query = new Query,
-        private readonly Cookies $cookies = new Cookies
+        private readonly Cookies $cookies = new Cookies,
+        private readonly Files $files = new Files
     ) {
     }
 
@@ -40,5 +42,13 @@ class Data implements RequestDataInterface
     public function cookies(): Cookies
     {
         return $this->cookies;
+    }
+
+    /**
+     * @return Files
+     */
+    public function files(): Files
+    {
+        return $this->files;
     }
 }

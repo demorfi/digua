@@ -2,7 +2,7 @@
 
 namespace Digua\Interfaces\Request;
 
-use Digua\Request\{Cookies, Post, Query};
+use Digua\Request\{Cookies, Post, Query, Files};
 
 interface Data
 {
@@ -20,4 +20,9 @@ interface Data
      * @return Cookies
      */
     public function cookies(): Cookies;
+
+    /**
+     * @return Files
+     */
+    public function files(): Files;
 }
