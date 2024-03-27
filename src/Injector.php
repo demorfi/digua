@@ -127,7 +127,7 @@ class Injector implements InjectorInterface
         while ($parameters->valid()) {
             $parameter = $parameters->current();
 
-            $type = (string)$parameter->getType();
+            $type = ltrim((string)$parameter->getType(), '?'); // ?string type possible
             if (str_contains($type, '|')) {
                 $this->throw($parameter, 'Injector does not support multiple types');
             }
